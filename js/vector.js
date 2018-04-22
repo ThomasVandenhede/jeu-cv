@@ -28,11 +28,6 @@ Object.defineProperties(Vector.prototype, {
   }
 });
 
-<<<<<<< HEAD
-Vector.prototype.
-
-=======
->>>>>>> vector-class
 var v = new Vector(3, 4);
 console.log(v.x, v.y, v.norm);
 v.x = 15;
