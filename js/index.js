@@ -1,48 +1,8 @@
 var player = new PlayerFactory(100, 100);
-  
-// Singleton pattern
-var keyboardManager = (function () {
-  var instance;
-  function init() {
-    var keyMappings = {
-      'ArrowUp': 'UP',
-      'ArrowDown': 'DOWN',
-      'ArrowLeft': 'LEFT',
-      'ArrowRight': 'RIGHT',
-      'Enter': 'ENTER',
-    }
-
-    window.onkeydown = function(event) {
-      console.log(event.code, event.key);
-      if (keyMappings[event.code]) {
-
-      }
-    }
-    
-    return {
-      listen: function() {
-        window.onkeydown = function() {
-          
-        };
-        window.onkeyup = function() {
-          
-        };
-      },
-    };
-  };
-
-  return {
-    getInstance: function () {
-      if ( !instance ) {
-        instance = init();
-      }
-      return instance;
-    }
-  };
-}());
 
 var game = (function() {
   var keyboard = keyboardManager.getInstance();
+  var keyboard1 = keyboardManager.getInstance();
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
   
@@ -53,6 +13,30 @@ var game = (function() {
     ctx.fillStyle = "#0095DD";
     ctx.fill();
     ctx.closePath();
+
+    if (keyboard.LEFT) {
+      console.log('move left');
+    }
+
+    if (keyboard.RIGHT) {
+      console.log('move right');
+    }
+
+    if (keyboard.UP) {
+      console.log('move up');
+    }
+
+    if (keyboard.DOWN) {
+      console.log('move down');
+    }
+
+    if (keyboard.ENTER) {
+      console.log('enter');
+    }
+
+    if (keyboard.SPACE) {
+      console.log('space');
+    }
 
     player.draw(ctx);
 
