@@ -1,45 +1,42 @@
-var player = new PlayerFactory(100, 100);
+var player = PlayerFactory(100, 0);
 
-var game = (function() {
+(function game() {
   var keyboard = keyboardManager.getInstance();
   var keyboard1 = keyboardManager.getInstance();
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
   
-  (function mainLoop() {
-  
-    ctx.beginPath();
-    ctx.rect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
-
-    if (keyboard.LEFT) {
-      console.log('move left');
+  function render() {
+    if (keyboard.RIGHT || keyboard.LEFT) {
+      if (keyboard.LEFT) {
+        player.speed.x = -20;
+      }
+      
+      if (keyboard.RIGHT) {
+        player.speed.x = 20;
+      }
+    } else {
+      player.speed.x = 0;
     }
-
-    if (keyboard.RIGHT) {
-      console.log('move right');
-    }
-
+    
     if (keyboard.UP) {
-      console.log('move up');
+      player.jump();
     }
-
-    if (keyboard.DOWN) {
-      console.log('move down');
-    }
-
+    
     if (keyboard.ENTER) {
       console.log('enter');
     }
-
-    if (keyboard.SPACE) {
-      console.log('space');
-    }
-
+    
+    player.update();
+    clearCanvas();
     player.draw(ctx);
 
-    requestAnimationFrame(mainLoop);
-  }());
+    requestAnimationFrame(render);
+  };
+
+  requestAnimationFrame(render)
 }());
