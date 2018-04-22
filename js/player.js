@@ -3,8 +3,12 @@ var PlayerFactory = (function() {
   function Player(x, y) {
     this.x = x;
     this.y = y;
-    this.dx = 2;
-    this.dy = -2;
+    this.speed = new Vector();
+  }
+
+  Player.prototype.update = function() {
+    this.x += this.speed.x;
+    this.x += this.speed.x;
   }
 
   Player.prototype.draw = function(ctx) {
