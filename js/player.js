@@ -1,9 +1,5 @@
 // Factory pattern
-<<<<<<< HEAD
-var PlayerFactory = (function() {
-=======
 var playerFactory = (function() {
->>>>>>> platform
   var MAX_SPEED = 100;
 
   function Player(x, y) {
@@ -25,11 +21,7 @@ var playerFactory = (function() {
   Player.prototype.jump = function() {
     if (this.isColliding.down) {
       this.isColliding.down = false;
-<<<<<<< HEAD
-      this.speed.y = -65;
-=======
       this.speed.y = -60;
->>>>>>> platform
     }
   }
 
@@ -40,11 +32,7 @@ var playerFactory = (function() {
       , x1, y1, dx, dy, dvx, dvy;
 
     // apply gravity based on whether player is free falling
-<<<<<<< HEAD
     this.acceleration.y = (this.isColliding.down) ? 0 : 12;
-=======
-    this.acceleration.y = (this.isColliding.down) ? 0 : 10;
->>>>>>> platform
 
     // compute new speed based on acceleration and time ellapsed since last rendering
     dvx = this.acceleration.x * (t1 - t0) / 100;
@@ -62,7 +50,6 @@ var playerFactory = (function() {
     this.x += dx;
     if (this.y + this.height + dy >= canvas.height) {
       this.y = canvas.height - this.height;
->>>>>>> platform
       this.isColliding.down = true;
     } else {
       this.y += dy;

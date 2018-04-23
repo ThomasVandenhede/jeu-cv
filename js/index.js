@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-var player = PlayerFactory(100, 0);
-
-=======
->>>>>>> platform
 (function game() {
   var keyboard = keyboardManager.getInstance();
   var keyboard1 = keyboardManager.getInstance();
@@ -47,21 +42,12 @@ var player = PlayerFactory(100, 0);
     
     player.update();
     clearCanvas();
-<<<<<<< HEAD
-    player.draw(ctx);
-
-    requestAnimationFrame(render);
-  };
-
-=======
     for (var i = 0; i < drawables.length; i++) {
       drawables[i].draw(ctx);
     }
-    console.log(player.y + player.height);
 
     requestAnimationFrame(render);
   };
 
->>>>>>> platform
   requestAnimationFrame(render)
 }());
