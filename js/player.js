@@ -48,7 +48,7 @@ var playerFactory = (function() {
     dx = (t1 - t0) / 100 * this.speed.x;
     dy = (t1 - t0) / 100 * this.speed.y;
     this.x += dx;
-    if (this.y + dy >= canvas.height) {
+    if (this.y + this.height + dy >= canvas.height) {
       this.y = canvas.height - this.height;
       this.isColliding.down = true;
     } else {

@@ -45,6 +45,7 @@
     for (var i = 0; i < drawables.length; i++) {
       drawables[i].draw(ctx);
     }
+    console.log(player.y + player.height);
 
     requestAnimationFrame(render);
   };
