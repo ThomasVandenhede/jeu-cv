@@ -1,5 +1,5 @@
 // Factory pattern
-var PlayerFactory = (function() {
+var playerFactory = (function() {
   var MAX_SPEED = 100;
 
   function Player(x, y) {
@@ -49,7 +49,7 @@ var PlayerFactory = (function() {
     dy = (t1 - t0) / 100 * this.speed.y;
     this.x += dx;
     if (this.y + dy >= canvas.height) {
-      this.y = canvas.height - player.height;
+      this.y = canvas.height - this.height;
       this.isColliding.down = true;
     } else {
       this.y += dy;
