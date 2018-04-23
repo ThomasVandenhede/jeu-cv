@@ -5,11 +5,13 @@
   var ctx = canvas.getContext('2d');
   var drawables = [];
   var player = playerFactory(100, 0);
+  var ground = platformFactory(0, canvas.height - 10, canvas.width, 10);
   var platform1 = platformFactory(0, 350, 200, 20);
   var platform2 = platformFactory(350, 250, 250, 20);
   var platform3 = platformFactory(0, 150, 200, 20);
   drawables.push(
     player,
+    ground,
     platform1,
     platform2,
     platform3
