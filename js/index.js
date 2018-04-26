@@ -3,6 +3,8 @@
   var keyboard1 = keyboardManager.getInstance();
   var canvas = document.getElementById("canvas");
   var ctx = canvas.getContext("2d");
+
+  // drawables
   var drawables = [];
   var player = playerFactory(100, 0);
   var ground = platformFactory(0, canvas.height - 10, canvas.width, 10);
@@ -53,7 +55,13 @@
     return el !== player;
   });
 
-  console.log(player.collidableWith);
+  var sound1 = new Sound("./assets/sounds/0274.mp3");
+  player.jumpSound = sound1;
+  // var mainMusic = new Sound("./assets/sounds/Benny-hill-theme.mp3")
+  // mainMusic.sound.loop = true;
+  // mainMusic.sound.playbackRate = .6;
+
+  // mainMusic.play();
 
   function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);

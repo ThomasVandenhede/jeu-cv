@@ -89,6 +89,7 @@ var playerFactory = (function() {
 
   Player.prototype.jump = function() {
     if (this.isColliding.down) {
+      this.jumpSound.replay();
       this.isColliding.down = false;
       this.speed.y = -60;
     }
