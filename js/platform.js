@@ -9,12 +9,12 @@ var platformFactory = (function() {
     this.height = height;
   }
 
-  Platform.prototype.draw = function(ctx) {
+  Platform.prototype.draw = function(ctx, camera) {
     ctx.fillStyle = "black";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
   };
 
   return function(x, y, width, height) {
     return new Platform(x, y, width, height);
-  }
-}());
+  };
+})();

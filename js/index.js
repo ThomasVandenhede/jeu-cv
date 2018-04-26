@@ -55,6 +55,8 @@
 
   console.log(player.collidableWith);
 
+  var camera = { x: 0, y: 0 };
+
   function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
@@ -88,9 +90,18 @@
     }
 
     player.update();
+    if (player.x > canvas.width * 2 / 3) {
+      camera.x = player.x - canvas.width * 2 / 3;
+    }
+    if (player.x < canvas.width * 1 / 3) {
+      camera.x = player.x - canvas.width * 1 / 3;
+    }
+    camera.y = player.y - canvas.height / 2;
+
     clearCanvas();
+
     for (var i = 0; i < drawables.length; i++) {
-      drawables[i].draw(ctx);
+      drawables[i].draw(ctx, camera);
     }
 
     requestAnimationFrame(render);
