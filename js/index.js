@@ -1,13 +1,15 @@
 window.addEventListener("DOMContentLoaded", function() {
-  function fitCanvasToClient() {
-    var canvas = document.getElementById("canvas");
-    console.log("hello");
-    canvas.setAttribute("width", document.documentElement.clientWidth);
-    canvas.setAttribute("height", document.documentElement.clientHeight);
+  function fitCanvasesToClient() {
+    var canvases = document.querySelectorAll("canvas");
+
+    canvases.forEach(function(canvas) {
+      canvas.setAttribute("width", document.documentElement.clientWidth);
+      canvas.setAttribute("height", document.documentElement.clientHeight);
+    });
   }
 
-  fitCanvasToClient();
-  window.addEventListener("resize", fitCanvasToClient);
+  fitCanvasesToClient();
+  window.addEventListener("resize", fitCanvasesToClient);
 
   (function game() {
     var keyboard = keyboardManager.getInstance();

@@ -8,7 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="main.css">
   <style>
-    #canvas {
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
     }
@@ -19,10 +22,9 @@
   <noscript>
     Veuillez activer JavaScript.
   </noscript>
-  <canvas id='canvas' height=480 width=640>
-    Votre navigateur ne supporte pas la balise canvas. Changez de navigateur ou jetez
-    votre ordinateur.
-  </canvas>
+  <canvas id="background"></canvas>
+  <canvas id="canvas"></canvas>
+  
   <script src="./js/keyboardManager.js"></script>
   <script src="./js/rectangle.js"></script>
   <script src="./js/vector.js"></script>
