@@ -1,6 +1,7 @@
 // Factory pattern
 var playerFactory = (function() {
   var MAX_SPEED = 100;
+  var animationID;
 
   function Player(x, y) {
     this.x = x;
@@ -24,16 +25,28 @@ var playerFactory = (function() {
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
       this.isCrouching = true;
-      this.height = 10;
-      // this.y += 30;
+      animationID && clearInterval(animationID);
+      animationID = setInterval(function() {
+        this.height -= 2;
+        this.y += 2;
+        if (this.height <= 10) {
+          clearInterval(animationID);
+        }
+      }.bind(this), 10);
     }
   };
 
   Player.prototype.stand = function() {
     if (this.isCrouching) {
       this.isCrouching = false;
-      this.height = 40;
-      this.y -= 30;
+      animationID && clearInterval(animationID);
+      animationID = setInterval(() => {
+        this.height += 2;
+        this.y -= 2;
+        if (this.height >= 40) {
+          clearInterval(animationID);
+        }
+      }, 10);
     }
   };
 
