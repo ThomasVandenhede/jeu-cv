@@ -6,42 +6,36 @@ var Camera = (function() {
     BOTH: "both"
   };
 
-  function Camera(
-    xView,
-    yView,
-    canvasWidth,
-    canvasHeight,
-    worldWidth,
-    worldHeight
-  ) {
-    this.xView = xView || 0;
-    this.yView = yView || 0;
+  function Camera(x, y, worldWidth, worldHeight) {
+    this.x = x || 0;
+    this.y = y || 0;
 
-    this.xDeadZone = 0; // min distance to horizontal borders
-    this.yDeadZone = 0; // min distance to vertical borders
+    this.xDeadZone = canvas.width / 3; // min distance to horizontal borders
+    this.yDeadZone = canvas.height / 3; // min distance to vertical borders
 
-    this.wView = canvasWidth;
-    this.hView = canvasHeight;
+    this.wView = canvas.width;
+    this.hView = canvas.height;
 
     this.axis = AXIS.BOTH;
 
     this.followed = null;
 
-    this.viewportRect = new Rectangle(
-      this.xView,
-      this.yView,
-      this.wView,
-      this.hView
-    );
+    this.viewportRect = new Rectangle(this.x, this.y, this.wView, this.hView);
+    console.log(this.viewportRect);
 
     // rectangle that represents the world's boundary (room's boundary)
-    this.worldRect = new Rectangle(0, 0, worldWidth, worldHeight);
+    this.worldRect = new Rectangle(
+      0,
+      -500,
+      3000,
+      3000
+    );
   }
 
   Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
-    this.xDeadZone = xDeadZone;
-    this.yDeadZone = yDeadZone;
+    // this.xDeadZone = xDeadZone;
+    // this.yDeadZone = yDeadZone;
   };
 
   Camera.prototype.update = function() {
@@ -49,38 +43,38 @@ var Camera = (function() {
     if (this.followed != null) {
       if (this.axis == AXIS.HORIZONTAL || this.axis == AXIS.BOTH) {
         // moves camera on horizontal axis based on followed object position
-        if (this.followed.x - this.xView + this.xDeadZone > this.wView) {
-          this.xView = this.followed.x - (this.wView - this.xDeadZone);
-        } else if (this.followed.x - this.xDeadZone < this.xView) {
-          this.xView = this.followed.x - this.xDeadZone;
+        if (this.followed.x - this.x + this.xDeadZone > this.wView) {
+          this.x = this.followed.x - (this.wView - this.xDeadZone);
+        } else if (this.followed.x - this.xDeadZone < this.x) {
+          this.x = this.followed.x - this.xDeadZone;
         }
       }
       if (this.axis == AXIS.VERTICAL || this.axis == AXIS.BOTH) {
         // moves camera on vertical axis based on followed object position
-        if (this.followed.y - this.yView + this.yDeadZone > this.hView) {
-          this.yView = this.followed.y - (this.hView - this.yDeadZone);
-        } else if (this.followed.y - this.yDeadZone < this.yView) {
-          this.yView = this.followed.y - this.yDeadZone;
+        if (this.followed.y - this.y + this.yDeadZone > this.hView) {
+          this.y = this.followed.y - (this.hView - this.yDeadZone);
+        } else if (this.followed.y - this.yDeadZone < this.y) {
+          this.y = this.followed.y - this.yDeadZone;
         }
       }
     }
 
     // update viewportRect
-    this.viewportRect.set(this.xView, this.yView);
+    this.viewportRect.set(this.x, this.y);
 
-    // don't let camera leaves the world's boundary
+    // don't let camera leave the world's boundaries
     if (!this.viewportRect.within(this.worldRect)) {
       if (this.viewportRect.left < this.worldRect.left) {
-        this.xView = this.worldRect.left;
+        this.x = this.worldRect.left;
       }
       if (this.viewportRect.top < this.worldRect.top) {
-        this.yView = this.worldRect.top;
+        this.y = this.worldRect.top;
       }
       if (this.viewportRect.right > this.worldRect.right) {
-        this.xView = this.worldRect.right - this.wView;
+        this.x = this.worldRect.right - this.wView;
       }
       if (this.viewportRect.bottom > this.worldRect.bottom) {
-        this.yView = this.worldRect.bottom - this.hView;
+        this.y = this.worldRect.bottom - this.hView;
       }
     }
   };

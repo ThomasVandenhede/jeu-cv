@@ -169,9 +169,9 @@ var playerFactory = (function() {
     this.t = t1;
   };
 
-  Player.prototype.draw = function(ctx, xView, yView) {
+  Player.prototype.draw = function(ctx, camera) {
     ctx.fillStyle = "#ff0000";
-    ctx.fillRect(this.x - xView, this.y - yView, this.width, this.height);
+    ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
   };
 
   return function(x, y) {
