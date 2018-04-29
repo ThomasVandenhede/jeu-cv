@@ -2,8 +2,8 @@ window.addEventListener("DOMContentLoaded", function() {
   function fitCanvasToClient() {
     var canvas = document.getElementById("canvas");
     console.log("hello");
-    canvas.setAttribute("width", document.documentElement.clientWidth);
-    canvas.setAttribute("height", document.documentElement.clientHeight);
+    canvas.setAttribute("width", window.innerWidth);
+    canvas.setAttribute("height", window.innerHeight);
   }
 
   fitCanvasToClient();
