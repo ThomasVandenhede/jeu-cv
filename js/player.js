@@ -25,6 +25,7 @@ var playerFactory = (function() {
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
       this.isCrouching = true;
+<<<<<<< HEAD
       animationID && clearInterval(animationID);
       animationID = setInterval(function() {
         this.height -= 2;
@@ -33,6 +34,10 @@ var playerFactory = (function() {
           clearInterval(animationID);
         }
       }.bind(this), 10);
+=======
+      this.height = 10;
+      // this.y += 30;
+>>>>>>> 673b21fd1068b0c2847cc1a63ad20ba3f0706c94
     }
   };
 
