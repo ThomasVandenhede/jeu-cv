@@ -20,8 +20,6 @@ Object.defineProperties(Vector.prototype, {
     },
     set: function(norm) {
       var ratio = this.x / this.y;
-      // this.x = norm * Math.cos(this.direction);
-      // this.y = norm * Math.sin(this.direction);
       this.x = norm * ratio / Math.sqrt(1 + ratio ** 2);
       this.y = norm / Math.sqrt(1 + ratio ** 2);
     }

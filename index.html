@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Page Title</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="main.css">
+  <style>
+    #canvas {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
 </head>
+
 <body>
   <noscript>
     Veuillez activer JavaScript.
   </noscript>
   <canvas id='canvas' height=480 width=640>
-    Votre navigateur ne supporte pas la balise canvas. Changez de navigateur ou jetez votre ordinateur.
+    Votre navigateur ne supporte pas la balise canvas. Changez de navigateur ou jetez
+    votre ordinateur.
   </canvas>
   <script src="./js/keyboardManager.js"></script>
+  <script src="./js/rectangle.js"></script>
+  <script src="./js/vector.js"></script>
+  <script src="./js/camera.js"></script>
+  <script src="./js/gameManager.js"></script>
+  <script src="./js/platform.js"></script>
   <script src="./js/player.js"></script>
   <script src="./js/index.js"></script>
 </body>
+
 </html>
