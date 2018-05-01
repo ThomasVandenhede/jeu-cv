@@ -3,6 +3,20 @@ function Vector(x, y) {
   this.y = y || 0;
 }
 
+// static methods
+Vector.determinant = function(v1, v2) {
+  return v1.x * v2.y - v1.y * v2.x;
+};
+
+Vector.dotProduct = function(v1, v2) {
+  return v1.x * v2.x + v1.y * v2.y;
+};
+
+// public non static methods
+Vector.prototype.normalize = function() {
+  return new Vector(this.x / this.norm, this.y / this.norm);
+};
+
 Object.defineProperties(Vector.prototype, {
   direction: {
     get: function() {

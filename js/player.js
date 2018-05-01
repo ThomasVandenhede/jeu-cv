@@ -4,10 +4,7 @@ var playerFactory = (function() {
   var animationID;
 
   function Player(x, y) {
-    this.x = x;
-    this.y = y;
-    this.height = 40;
-    this.width = 40;
+    Rectangle.call(this, x, y, 40, 40); // subclassing Rectangle class
     this.speed = new Vector(0, 0);
     this.acceleration = new Vector();
     this.isCrouching = false;
@@ -21,6 +18,8 @@ var playerFactory = (function() {
     this.collidesWith = []; // actual object collisions
     this.t = Date.now();
   }
+
+  Player.prototype = Object.create(Rectangle.prototype);
 
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
@@ -51,49 +50,31 @@ var playerFactory = (function() {
   };
 
   Player.prototype.collideHorizontally = function(el, dx, dy) {
-    var playerLeft = this.x;
-    var playerTop = this.y;
-    var playerRight = this.x + this.width;
-    var playerBottom = this.y + this.height;
-    var elLeft = el.x;
-    var elTop = el.y;
-    var elRight = el.x + el.width;
-    var elBottom = el.y + el.height;
-
     // detect horizontal collisions
-    if (playerTop < elBottom && playerBottom > elTop) {
+    if (this.top < el.bottom && this.bottom > el.top) {
       // left collision
-      if (playerLeft >= elRight && playerLeft + dx < elRight) {
-        this.isColliding.right = true;
-        this.x = elRight;
+      if (this.left >= el.right && this.left + dx < el.right) {
+        this.isColliding.left = true;
+        this.x = el.right;
       }
       // right collision
-      if (playerRight <= el.x && playerRight + dx > el.x) {
-        this.isColliding.left = true;
+      if (this.right <= el.x && this.right + dx > el.x) {
+        this.isColliding.right = true;
         this.x = el.x - this.width;
       }
     }
   };
 
   Player.prototype.collideVertically = function(el, dx, dy) {
-    var playerLeft = this.x;
-    var playerTop = this.y;
-    var playerRight = this.x + this.width;
-    var playerBottom = this.y + this.height;
-    var elLeft = el.x;
-    var elTop = el.y;
-    var elRight = el.x + el.width;
-    var elBottom = el.y + el.height;
-
     // detect vertical collisioright
-    if (playerLeft < elRight && playerRight > elLeft) {
+    if (this.left < el.right && this.right > el.left) {
       // up collision
-      if (playerTop >= elBottom && playerTop + dy < elBottom) {
+      if (this.top >= el.bottom && this.top + dy < el.bottom) {
         this.isColliding.up = true;
         this.y = el.y + el.height;
       }
       // down collision
-      if (playerBottom <= elTop && playerBottom + dy > elTop) {
+      if (this.bottom <= el.top && this.bottom + dy > el.top) {
         this.isColliding.down = true;
         this.y = el.y - this.height;
       }
