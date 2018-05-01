@@ -4,10 +4,7 @@ var playerFactory = (function() {
   var animationID;
 
   function Player(x, y) {
-    this.x = x;
-    this.y = y;
-    this.height = 40;
-    this.width = 40;
+    Rectangle.call(this, x, y, 40, 40); // subclassing Rectangle class
     this.speed = new Vector(0, 0);
     this.acceleration = new Vector();
     this.isCrouching = false;
@@ -21,6 +18,8 @@ var playerFactory = (function() {
     this.collidesWith = []; // actual object collisions
     this.t = Date.now();
   }
+
+  Player.prototype = Object.create(Rectangle.prototype);
 
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {

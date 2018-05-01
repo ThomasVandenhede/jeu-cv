@@ -3,11 +3,10 @@ var platformFactory = (function() {
   var MAX_SPEED = 100;
 
   function Platform(x, y, width, height) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+    Rectangle.call(this, x, y, width, height); // subclassing Rectangle class
   }
+
+  Platform.prototype = Object.create(Rectangle.prototype);
 
   Platform.prototype.draw = function(ctx, camera) {
     ctx.fillStyle = "black";
