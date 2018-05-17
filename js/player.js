@@ -1,12 +1,10 @@
 // Factory pattern
 var playerFactory = (function() {
   var MAX_SPEED = 100;
+  var animationID;
 
   function Player(x, y) {
-    this.x = x;
-    this.y = y;
-    this.height = 40;
-    this.width = 40;
+    Rectangle.call(this, x, y, 40, 40); // subclassing Rectangle class
     this.speed = new Vector(0, 0);
     this.acceleration = new Vector();
     this.isCrouching = false;
@@ -19,21 +17,39 @@ var playerFactory = (function() {
     this.collidableWith = []; // potential object collisions
     this.collidesWith = []; // actual object collisions
     this.t = Date.now();
+    this.jumpSound = new Sound("./assets/sounds/0274.mp3");
   }
+
+  Player.prototype = Object.create(Rectangle.prototype);
 
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
       this.isCrouching = true;
-      this.height = 10;
-      // this.y += 30;
+      animationID && clearInterval(animationID);
+      animationID = setInterval(
+        function() {
+          this.height -= 2;
+          this.y += 2;
+          if (this.height <= 10) {
+            clearInterval(animationID);
+          }
+        }.bind(this),
+        10
+      );
     }
   };
 
   Player.prototype.stand = function() {
     if (this.isCrouching) {
       this.isCrouching = false;
-      this.height = 40;
-      this.y -= 30;
+      animationID && clearInterval(animationID);
+      animationID = setInterval(() => {
+        this.height += 2;
+        this.y -= 2;
+        if (this.height >= 40) {
+          clearInterval(animationID);
+        }
+      }, 10);
     }
   };
 
@@ -157,9 +173,9 @@ var playerFactory = (function() {
     this.t = t1;
   };
 
-  Player.prototype.draw = function(ctx) {
+  Player.prototype.draw = function(ctx, camera) {
     ctx.fillStyle = "#ff0000";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
   };
 
   return function(x, y) {
