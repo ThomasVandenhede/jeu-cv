@@ -1,6 +1,6 @@
 // Factory pattern
 var playerFactory = (function() {
-  var MAX_SPEED = 100;
+  var MAX_SPEED = 1500;
   var animationID;
 
   function Player(x, y) {
