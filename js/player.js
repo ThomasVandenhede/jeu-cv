@@ -17,6 +17,7 @@ var playerFactory = (function() {
     this.collidableWith = []; // potential object collisions
     this.collidesWith = []; // actual object collisions
     this.t = Date.now();
+    this.jumpSound = new Sound("./assets/sounds/0274.mp3");
   }
 
   Player.prototype = Object.create(Rectangle.prototype);
@@ -25,13 +26,16 @@ var playerFactory = (function() {
     if (!this.isCrouching) {
       this.isCrouching = true;
       animationID && clearInterval(animationID);
-      animationID = setInterval(function() {
-        this.height -= 2;
-        this.y += 2;
-        if (this.height <= 10) {
-          clearInterval(animationID);
-        }
-      }.bind(this), 10);
+      animationID = setInterval(
+        function() {
+          this.height -= 2;
+          this.y += 2;
+          if (this.height <= 10) {
+            clearInterval(animationID);
+          }
+        }.bind(this),
+        10
+      );
     }
   };
 
@@ -101,6 +105,7 @@ var playerFactory = (function() {
 
   Player.prototype.jump = function() {
     if (this.isColliding.down) {
+      this.jumpSound.replay();
       this.isColliding.down = false;
       this.speed.y = -60;
     }
