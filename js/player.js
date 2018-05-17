@@ -32,32 +32,73 @@ var playerFactory = (function() {
 
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
+      var dx = -1,
+        deltaWidth = 2;
       this.isCrouching = true;
       animationID && clearInterval(animationID);
       animationID = setInterval(
         function() {
-          this.height -= 2;
-          this.y += 2;
-          if (this.height <= 10) {
+          this.height -= 4;
+          this.y += 4;
+          for (var i = 0; i < this.collidableWith.length; i++) {
+            var el = this.collidableWith[i];
+            if (this.top < el.bottom && this.bottom > el.top) {
+              // left collision
+              if (
+                this.left >= el.right &&
+                this.left - dx - deltaWidth < el.right
+              ) {
+                this.x += deltaWidth; // snap
+              }
+              // right collision
+              if (this.right <= el.x && this.right + dx + deltaWidth > el.x) {
+                this.x -= deltaWidth; // snap
+              }
+            }
+          }
+          this.x += dx;
+          this.width += deltaWidth;
+          if (this.height <= INITIAL_SIZE / 4) {
             clearInterval(animationID);
           }
         }.bind(this),
-        10
+        20
       );
     }
   };
 
   Player.prototype.stand = function() {
     if (this.isCrouching) {
+      var dx = this.v.x * dt;
+      var targetY = this.y - (INITIAL_SIZE - this.height);
+      // determine if player has enough room to stand
+      for (var i = 0; i < this.collidableWith.length; i++) {
+        var el = this.collidableWith[i];
+        if (
+          this.left + dx < el.right &&
+          this.right + dx > el.left &&
+          this.top >= el.bottom &&
+          targetY < el.bottom
+        ) {
+          return;
+        }
+      }
+
+      // stand
       this.isCrouching = false;
       animationID && clearInterval(animationID);
-      animationID = setInterval(() => {
-        this.height += 2;
-        this.y -= 2;
-        if (this.height >= 40) {
-          clearInterval(animationID);
-        }
-      }, 10);
+      animationID = setInterval(
+        function() {
+          this.height += 4;
+          this.y -= 4;
+          this.x += 1;
+          this.width -= 2;
+          if (this.height >= INITIAL_SIZE) {
+            clearInterval(animationID);
+          }
+        }.bind(this),
+        20
+      );
     }
   };
 
