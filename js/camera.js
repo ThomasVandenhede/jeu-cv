@@ -21,15 +21,9 @@ var Camera = (function() {
     this.followed = null;
 
     this.viewportRect = new Rectangle(this.x, this.y, this.wView, this.hView);
-    console.log(this.viewportRect);
 
     // rectangle that represents the world's boundary (room's boundary)
-    this.worldRect = new Rectangle(
-      0,
-      -500,
-      3000,
-      3000
-    );
+    this.worldRect = new Rectangle(0, -500, 3000, 3000);
   }
 
   Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
