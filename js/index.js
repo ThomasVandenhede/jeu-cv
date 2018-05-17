@@ -1,7 +1,6 @@
 window.addEventListener("DOMContentLoaded", function() {
   function fitCanvasToClient() {
     var canvas = document.getElementById("canvas");
-    console.log("hello");
     canvas.setAttribute("width", window.innerWidth);
     canvas.setAttribute("height", window.innerHeight);
   }
@@ -10,12 +9,13 @@ window.addEventListener("DOMContentLoaded", function() {
   window.addEventListener("resize", fitCanvasToClient);
 
   (function game() {
+    var previousTime, currentTime;
     var keyboard = keyboardManager.getInstance();
     var keyboard1 = keyboardManager.getInstance();
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
     var drawables = [];
-    var player = playerFactory(100, 0);
+    var player = playerFactory(100, -100);
     var ground = platformFactory(0, canvas.height - 10, canvas.width, 10);
     var platform1 = platformFactory(0, 350, 200, 1);
     var platform2 = platformFactory(350, 250, 250, 1);
@@ -72,16 +72,20 @@ window.addEventListener("DOMContentLoaded", function() {
     }
 
     function render() {
+      previousTime = currentTime || Date.now();
+      currentTime = Date.now();
+      dt = (currentTime - previousTime) / 1000;
+
       if (keyboard.RIGHT || keyboard.LEFT) {
         if (keyboard.LEFT) {
-          player.speed.x = -20;
+          player.moveLeft();
         }
 
         if (keyboard.RIGHT) {
-          player.speed.x = 20;
+          player.moveRight();
         }
       } else {
-        player.speed.x = 0;
+        player.v.x = 0;
       }
 
       if (keyboard.UP) {
@@ -98,9 +102,10 @@ window.addEventListener("DOMContentLoaded", function() {
         player.stand();
       }
 
-      player.update();
+      player.applyGravity();
+      player.detectCollisions();
+      player.update(dt);
       camera.update();
-      console.log(camera);
 
       clearCanvas();
       for (var i = 0; i < drawables.length; i++) {
