@@ -22,6 +22,14 @@ var playerFactory = (function() {
 
   Player.prototype = Object.create(Rectangle.prototype);
 
+  Player.prototype.moveLeft = function() {
+    this.v.x = -200;
+  };
+
+  Player.prototype.moveRight = function() {
+    this.v.x = 200;
+  };
+
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
       this.isCrouching = true;
