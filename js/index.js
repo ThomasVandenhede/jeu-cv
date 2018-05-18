@@ -79,6 +79,8 @@ window.addEventListener("DOMContentLoaded", function() {
       var speedEl = debug.querySelector(".player__speed");
       var accelerationEl = debug.querySelector(".player__acceleration");
       var collidingEl = debug.querySelector(".player__is-colliding");
+      var cameraPositionX = debug.querySelector(".camera__positionX");
+      var cameraPositionY = debug.querySelector(".camera__positionY");
 
       var collidingHTML = Object.keys(player.isColliding)
         .filter(function(key) {
@@ -106,6 +108,8 @@ window.addEventListener("DOMContentLoaded", function() {
         " <strong>accelY: </strong>" +
         player.acceleration.y;
       collidingEl.innerHTML = "<strong>colliding : </strong>" + collidingHTML;
+      cameraPositionX.innerHTML = "<strong>camX: </strong>" + camera.x;
+      cameraPositionY.innerHTML = "<strong>camY: </strong>" + camera.y;
     }
 
     setInterval(function() {
