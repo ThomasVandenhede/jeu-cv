@@ -3,7 +3,7 @@ var Game = (function() {
 
   Game.prototype.init = function(config) {
     this.debug = config.debug || false;
-    this.rulers = config.rulers !== undefined ? config.rules : true;
+    this.rulers = config.rulers !== undefined ? config.rulers : true;
     this.previousTime;
     this.currentTime;
     this.canvas = document.getElementById("canvas");
