@@ -1,5 +1,6 @@
-function Sound(src) {
+function Sound(src, volume) {
   this.sound = new Audio(src);
+  this.sound.volume = volume || 1;
 }
 
 Sound.prototype.play = function() {
