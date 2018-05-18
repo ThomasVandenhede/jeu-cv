@@ -28,8 +28,8 @@ var Camera = (function() {
 
   Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
-    // this.xDeadZone = xDeadZone;
-    // this.yDeadZone = yDeadZone;
+    this.xDeadZone = xDeadZone;
+    this.yDeadZone = yDeadZone;
   };
 
   Camera.prototype.update = function() {
