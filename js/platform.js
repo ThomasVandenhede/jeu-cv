@@ -13,6 +13,8 @@ var platformFactory = (function() {
     ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
   };
 
+  Platform.prototype.update = Function.prototype;
+
   return function(x, y, width, height) {
     return new Platform(x, y, width, height);
   };
