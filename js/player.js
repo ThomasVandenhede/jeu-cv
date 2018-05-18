@@ -25,10 +25,13 @@ var playerFactory = (function() {
 
     // sounds
     this.sounds = {
-      jump: new Sound("./assets/sounds/Light swing 1.mp4"),
+      jump: new Sound("./assets/sounds/Light swing 1.mp4", 0.8),
       hit: new Sound("./assets/sounds/Hit 1.mp4", 0.1),
       still: new Sound("./assets/sounds/Medium hum.mp4")
     };
+
+    // shield
+    this.shield = new Shield(this);
   }
 
   Player.prototype = Object.create(Rectangle.prototype);
@@ -235,12 +238,35 @@ var playerFactory = (function() {
   };
 
   Player.prototype.draw = function(ctx, camera) {
+    var r = 5;
+    var left = this.x - camera.x;
+    var top = this.y - camera.y;
+    var right = left + this.width;
+    var bottom = top + this.height;
+
     ctx.save();
     ctx.fillStyle = this.color;
     ctx.shadowColor = this.color;
-    ctx.shadowBlur = 30;
-    ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.moveTo(left, top + r);
+    ctx.arcTo(left, top, left + r, top, r);
+    ctx.lineTo(right - r, top);
+    ctx.arcTo(right, top, right, top + r, r);
+    ctx.lineTo(right, bottom - r);
+    ctx.arcTo(right, bottom, right - r, bottom, r);
+    ctx.lineTo(left + r, bottom);
+    ctx.arcTo(left, bottom, left, bottom - r, r);
+    ctx.fill();
+    ctx.fill();
+    ctx.fill();
+    ctx.fill();
+    ctx.closePath();
     ctx.restore();
+
+    // draw player shield
+    (this.shield.isOpen || this.shield.isAnimating) &&
+      this.shield.draw(ctx, camera);
   };
 
   return function(x, y) {

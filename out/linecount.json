@@ -1,0 +1,252 @@
+{
+    "extension": "linecount",
+    "version": "0.1.7",
+    "workspace": "/home/thomas/Documents/Ifocop/jeu-cv",
+    "linecount": [
+        {
+            "version": "0.1.7",
+            "counttime": "2018-05-18 22:35:25",
+            "filesum": 36,
+            "codesum": 1009,
+            "commentsum": 76,
+            "blanksum": 124,
+            "filelist": [
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": ".gitignore"
+                },
+                {
+                    "filename": "assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/0274.mp3",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Benny-hill-theme.mp3",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Bullet deflect.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Close.mp3",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Close.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Heavy swing 1.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Heavy swing 2.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Heavy swing sequence.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Hit 1.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Hit 2.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Light swing 1 reversed.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Light swing 1.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Light swing 2.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Light swing sequence.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Medium hum.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Open.mp3",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Open.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "assets/sounds/Spin.mp4",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 12,
+                    "code": 88,
+                    "comment": 0,
+                    "filename": "index.html"
+                },
+                {
+                    "blank": 11,
+                    "code": 60,
+                    "comment": 7,
+                    "filename": "js/camera.js"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "js/constants.js"
+                },
+                {
+                    "blank": 24,
+                    "code": 250,
+                    "comment": 4,
+                    "filename": "js/game.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 16,
+                    "comment": 1,
+                    "filename": "js/gameManager.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 28,
+                    "comment": 0,
+                    "filename": "js/index.js"
+                },
+                {
+                    "blank": 5,
+                    "code": 36,
+                    "comment": 7,
+                    "filename": "js/keyboardManager.js"
+                },
+                {
+                    "blank": 5,
+                    "code": 37,
+                    "comment": 4,
+                    "filename": "js/platform.js"
+                },
+                {
+                    "blank": 26,
+                    "code": 203,
+                    "comment": 36,
+                    "filename": "js/player.js"
+                },
+                {
+                    "blank": 5,
+                    "code": 74,
+                    "comment": 2,
+                    "filename": "js/rectangle.js"
+                },
+                {
+                    "blank": 5,
+                    "code": 24,
+                    "comment": 4,
+                    "filename": "js/requestAnimationFrame-polyfill.js"
+                },
+                {
+                    "blank": 9,
+                    "code": 80,
+                    "comment": 8,
+                    "filename": "js/shield.js"
+                },
+                {
+                    "blank": 5,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": "js/sound.js"
+                },
+                {
+                    "blank": 2,
+                    "code": 14,
+                    "comment": 1,
+                    "filename": "js/soundManager.js"
+                },
+                {
+                    "blank": 8,
+                    "code": 58,
+                    "comment": 2,
+                    "filename": "js/vector.js"
+                },
+                {
+                    "blank": 3,
+                    "code": 18,
+                    "comment": 0,
+                    "filename": "main.css"
+                }
+            ]
+        }
+    ]
+}

@@ -1,11 +1,9 @@
 var Game = (function() {
-  function Game(options) {
-    this.options = options || {};
-  }
+  function Game(options) {}
 
   Game.prototype.init = function(config) {
     this.debug = config.debug || false;
-    this.rulers = config.rulers || true;
+    this.rulers = config.rulers !== undefined ? config.rules : true;
     this.previousTime;
     this.currentTime;
     this.canvas = document.getElementById("canvas");
@@ -32,13 +30,13 @@ var Game = (function() {
       platformFactory(0, -100000, 1, 200000)
     ];
 
-    this.starCount = 500;
+    this.starCount = 0;
     this.stars = [];
     for (var i = 0; i < this.starCount; i++) {
       this.stars.push({
         x: Math.floor(Math.random() * (this.canvas.width + 1)),
         y: Math.floor(Math.random() * (this.canvas.height + 1)),
-        r: Math.random() * 0.5 + 0.5,
+        r: Math.random() * 1 + 0.5,
         opacity: Math.random() * 0.5 + 0.4
       });
     }
@@ -83,6 +81,14 @@ var Game = (function() {
     if (this.keyboard.UP || this.keyboard.SPACE) {
       this.player.jump();
     }
+
+    if (this.keyboard.ENTER) {
+      if (!this.player.shield.isAnimating) {
+        this.player.shield.isOpen
+          ? this.player.shield.close()
+          : this.player.shield.open();
+      }
+    }
   };
 
   Game.prototype.updateScene = function() {
@@ -91,6 +97,7 @@ var Game = (function() {
     this.player.detectCollisions();
     // update objects to be rendered
     this.player.update(dt);
+    this.player.shield.update(dt);
     for (var i = 0; i < this.platforms.length; i++) {
       var platform = this.platforms[i];
       platform.update(dt);
@@ -187,6 +194,7 @@ var Game = (function() {
 
   Game.prototype.renderScene = function(ctx) {
     this.rulers && this.drawRulers(ctx);
+
     // optimize rendering by only drawing objects that are on screen
     for (var i = 0; i < this.drawables.length; i++) {
       var drawable = this.drawables[i];
@@ -197,7 +205,8 @@ var Game = (function() {
 
   Game.prototype.start = function() {
     var music = new Sound(
-      "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3"
+      "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
+      0.3
     );
     setTimeout(() => {
       music.play();
