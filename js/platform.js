@@ -1,11 +1,11 @@
 // Factory pattern
-var platformFactory = (function() {
+var Platform = (function() {
   var MAX_SPEED = 100;
-  var COLOR = "#ccc";
 
   function Platform(x, y, width, height) {
     Rectangle.call(this, x, y, width, height); // subclassing Rectangle class
     this.touched = false; // does the player touch the platform
+    this.color = "#fff";
   }
 
   Platform.prototype = Object.create(Rectangle.prototype);
@@ -15,19 +15,34 @@ var platformFactory = (function() {
   };
 
   Platform.prototype.draw = function(ctx, camera) {
+    var that = this;
     ctx.save();
     if (this.touched) {
-      ctx.shadowColor = COLOR;
-      ctx.shadowBlur = 30;
-      ctx.fillStyle = COLOR;
-      ctx.fillRect(
-        this.x - camera.x,
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = this.color;
+      ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+      ctx.fill();
+      ctx.fill();
+      ctx.fill();
+      ctx.shadowOffsetX = -1000000;
+      ctx.shadowOffsetY = 0;
+
+      ctx.globalCompositeOperation = "source-atop";
+      ctx.beginPath();
+      ctx.shadowBlur = 10;
+      ctx.rect(
+        this.x + 1000000 - camera.x,
         this.y - camera.y,
         this.width,
         this.height
       );
+      ctx.stroke();
+      ctx.stroke();
+      ctx.stroke();
     } else {
-      ctx.strokeStyle = COLOR;
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 2;
       ctx.strokeRect(
         this.x - camera.x,
         this.y - camera.y,
@@ -38,7 +53,5 @@ var platformFactory = (function() {
     ctx.restore();
   };
 
-  return function(x, y, width, height) {
-    return new Platform(x, y, width, height);
-  };
+  return Platform;
 })();

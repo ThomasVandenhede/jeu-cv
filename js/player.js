@@ -133,7 +133,6 @@ var playerFactory = (function() {
         // resolve collision
         this.x = el.x - this.width; // snap
         this.v.x = 0;
-        console.log(this.v);
         collision = true;
       }
     }

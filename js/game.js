@@ -16,20 +16,22 @@ var Game = (function() {
     worldRect = new Rectangle(0, -100000, 3000, 102000);
     this.player = playerFactory(100, -600);
     this.platforms = [
-      platformFactory(0, -350, 200, 5),
-      platformFactory(350, -250, 50, 5),
-      platformFactory(0, -130, 180, 5),
-      platformFactory(0, -150, 180, 5),
-      platformFactory(330, -400, 150, 5),
-      platformFactory(150, 200, 50, 5),
-      platformFactory(500, -270, 80, 80),
-      platformFactory(500, -170, 80, 160),
-      platformFactory(500, 10, 80, 120),
-      platformFactory(500, 150, 80, 120),
-      platformFactory(700, -80, 30, 20),
-      platformFactory(350, 70, 30, 20),
-      platformFactory(700, 210, 30, 20),
-      platformFactory(0, -100000, 1, 200000)
+      new Platform(0, -350, 200, 5),
+      new Platform(350, -250, 50, 5),
+      new Platform(0, -130, 180, 5),
+      new Platform(0, -150, 180, 5),
+      new Platform(330, -400, 150, 5),
+      new Platform(150, 200, 50, 5),
+      new Platform(500, -270, 80, 80),
+      new Platform(500, -170, 80, 160),
+      new Platform(500, 10, 80, 120),
+      new Platform(500, 150, 80, 120),
+      new Platform(700, -80, 30, 20),
+      new Platform(350, 70, 30, 20),
+      new Platform(700, 210, 30, 20),
+      new Platform(0, -100000, 1, 200000),
+      new MovingPlatform(200, -500, 100, 5, 400, -500, 200),
+      new MovingPlatform(700, -600, 80, 30, 700, -400, 100)
     ];
 
     this.starCount = 500;
