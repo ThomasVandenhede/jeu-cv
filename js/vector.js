@@ -4,6 +4,20 @@ function Vector(x, y) {
 }
 
 // static methods
+Vector.sum = function() {
+  var x = 0,
+    y = 0;
+  for (var i = 0; i < arguments.length; i++) {
+    x += arguments[i].x;
+    y += arguments[i].y;
+  }
+  return new Vector(x, y);
+};
+
+Vector.subtract = function(v1, v2) {
+  return new Vector(v1.x - v2.x, v1.y - v2.y);
+};
+
 Vector.determinant = function(v1, v2) {
   return v1.x * v2.y - v1.y * v2.x;
 };
@@ -13,8 +27,16 @@ Vector.dotProduct = function(v1, v2) {
 };
 
 // public non static methods
-Vector.prototype.normalize = function() {
-  return new Vector(this.x / this.norm, this.y / this.norm);
+Vector.prototype.multiplyByScalar = function(a) {
+  return new Vector(this.x * a, this.y * a);
+};
+
+Vector.prototype.getUnitVector = function() {
+  return new Vector(this.x, this.y).multiplyByScalar(1 / this.norm);
+};
+
+Vector.prototype.getNormalVector = function() {
+  return new Vector(-this.y, this.x);
 };
 
 Object.defineProperties(Vector.prototype, {
@@ -28,9 +50,14 @@ Object.defineProperties(Vector.prototype, {
       this.y = norm * Math.sin(direction);
     }
   },
+  normSquared: {
+    get: function() {
+      return this.x ** 2 + this.y ** 2;
+    }
+  },
   norm: {
     get: function() {
-      return Math.sqrt(this.x ** 2 + this.y ** 2);
+      return Math.sqrt(this.normSquared);
     },
     set: function(norm) {
       var ratio = this.x / this.y;
