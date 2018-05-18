@@ -38,6 +38,22 @@
       width: 100%;
       height: 100%;
     }
+
+    .debug {
+      position: absolute;
+      padding: 0 1em;
+      top: 1em;
+      right: 1em;
+      width: 400px;
+      background-color: rgba(255, 255, 255, .3);
+      font-family: sans;
+      font-size: .8em;
+    }
+
+    .debut h2 {
+      margin: 0;
+      padding: 0;
+    }
   </style>
 </head>
 
@@ -49,7 +65,24 @@
     </div>
   </div>
 
-  <script src="./js/requestAnimationFrame-polyfill.js"></script>
+
+  <div class="debug">
+    <h2>debug info</h2>
+    <section class="player">
+      <p class="player__position"></p>
+      <p class="player__size"></p>
+      <p class="player__is-crouching"></p>
+      <p class="player__speed"></p>
+      <p class="player__acceleration"></p>
+      <p class="player__is-colliding"></p>
+    </section>
+    <section class="camera-info">
+      <p class="camera__position"></p>
+      <p class="camera__size"></p>
+    </section>
+  </div>
+
+  <!-- <script src="./js/requestAnimationFrame-polyfill.js"></script> -->
   <script src="./js/constants.js"></script>
   <script src="./js/keyboardManager.js"></script>
   <script src="./js/soundManager.js"></script>
@@ -59,7 +92,7 @@
   <script src="./js/camera.js"></script>
   <script src="./js/platform.js"></script>
   <script src="./js/player.js"></script>
-  <script src="./js/game.js"></script>
+  <!-- <script src="./js/game.js"></script> -->
   <script src="./js/index.js"></script>
 </body>
 

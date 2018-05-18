@@ -71,6 +71,47 @@ window.addEventListener("DOMContentLoaded", function() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
+    function updateDebugInfo() {
+      var debug = document.querySelector(".debug");
+      var positionEl = debug.querySelector(".player__position");
+      var sizeEl = debug.querySelector(".player__size");
+      var isCrouchingEl = debug.querySelector(".player__is-crouching");
+      var speedEl = debug.querySelector(".player__speed");
+      var accelerationEl = debug.querySelector(".player__acceleration");
+      var collidingEl = debug.querySelector(".player__is-colliding");
+
+      var collidingHTML = Object.keys(player.isColliding)
+        .filter(function(key) {
+          return player.isColliding[key];
+        })
+        .join(" ");
+
+      positionEl.innerHTML =
+        "<strong>x: </strong>" + player.x + " <strong>y: </strong>" + player.y;
+      sizeEl.innerHTML =
+        "<strong>width: </strong>" +
+        player.width +
+        " <strong>height: </strong>" +
+        player.height;
+      isCrouchingEl.innerHTML =
+        "<strong>crouching: </strong>" + player.isCrouching;
+      speedEl.innerHTML =
+        "<strong>speedX: </strong>" +
+        player.v.x +
+        " <strong>speedY: </strong>" +
+        player.v.y;
+      accelerationEl.innerHTML =
+        "<strong>accelX: </strong>" +
+        player.acceleration.x +
+        " <strong>accelY: </strong>" +
+        player.acceleration.y;
+      collidingEl.innerHTML = "<strong>colliding : </strong>" + collidingHTML;
+    }
+
+    setInterval(function() {
+      updateDebugInfo();
+    }, 50);
+
     function render() {
       previousTime = currentTime || Date.now();
       currentTime = Date.now();
