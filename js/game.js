@@ -232,7 +232,7 @@ var Game = (function() {
       "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
       1
     );
-    setTimeout(() => {
+    setTimeout(function() {
       music.play();
     }, 2000);
     this.main();

@@ -60,7 +60,7 @@ var Segment = (function() {
   Segment.prototype.getPointOfIntersectionWithCircle = function(c) {
     var C = new Vector(c.x, c.y);
     var H = this.getClosestPointOnSegment(C);
-    if ((CH = Vector.subtract(H, C).normSquared < c.r ** 2)) {
+    if ((CH = Vector.subtract(H, C).normSquared < Math.pow(c.r, 2))) {
       return H;
     }
     return false;

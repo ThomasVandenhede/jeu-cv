@@ -52,7 +52,7 @@ Object.defineProperties(Vector.prototype, {
   },
   normSquared: {
     get: function() {
-      return this.x ** 2 + this.y ** 2;
+      return Math.pow(this.x, 2) + Math.pow(this.y, 2);
     }
   },
   norm: {
@@ -61,8 +61,8 @@ Object.defineProperties(Vector.prototype, {
     },
     set: function(norm) {
       var ratio = this.x / this.y;
-      this.x = norm * ratio / Math.sqrt(1 + ratio ** 2);
-      this.y = norm / Math.sqrt(1 + ratio ** 2);
+      this.x = norm * ratio / Math.sqrt(1 + Math.pow(ratio, 2));
+      this.y = norm / Math.sqrt(1 + Math.pow(ratio, 2));
     }
   }
 });
