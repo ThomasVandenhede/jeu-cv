@@ -222,7 +222,7 @@ var Player = (function() {
     };
 
     // detect collision with other collidable elements
-    for (let i = 0; i < this.collidableWith.length; i++) {
+    for (var i = 0; i < this.collidableWith.length; i++) {
       var hasVerticalCollision, hasHorizontalCollision;
       hasHorizontalCollision = this.collideHorizontally(this.collidableWith[i]);
       hasVerticalCollision = this.collideVertically(this.collidableWith[i]);
