@@ -1,20 +1,23 @@
 var Game = (function() {
-  function Game(options) {
-    this.options = options || {};
-  }
+  function Game(options) {}
 
   Game.prototype.init = function(config) {
     this.debug = config.debug || false;
-    this.rulers = config.rulers || true;
+    this.rulers = config.rulers !== undefined ? config.rulers : true;
     this.previousTime;
     this.currentTime;
+    this.paused = false;
     this.canvas = document.getElementById("canvas");
     this.backgroundCanvas = document.getElementById("background");
     this.ctx = this.canvas.getContext("2d");
     this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
+
+    // initialize world size
     worldRect = new Rectangle(0, -100000, 3000, 102000);
-    this.player = playerFactory(100, -600);
+
+    // initialize world objects
+    this.player = new Player(100, -600);
     this.platforms = [
       new Platform(0, -350, 200, 5),
       new Platform(350, -250, 50, 5),
@@ -30,17 +33,19 @@ var Game = (function() {
       new Platform(350, 70, 30, 20),
       new Platform(700, 210, 30, 20),
       new Platform(0, -100000, 1, 200000),
-      new MovingPlatform(200, -500, 100, 5, 400, -500, 200),
-      new MovingPlatform(700, -600, 80, 30, 700, -400, 100)
+      new MovingPlatform(200, -500, 100, 5, 400, -500, 100),
+      new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
+      new MovingPlatform(0, -400, 40, 50, 50, -400, 100)
     ];
 
+    // initialize background
     this.starCount = 500;
     this.stars = [];
     for (var i = 0; i < this.starCount; i++) {
       this.stars.push({
         x: Math.floor(Math.random() * (this.canvas.width + 1)),
         y: Math.floor(Math.random() * (this.canvas.height + 1)),
-        r: Math.random() * 0.5 + 0.5,
+        r: Math.random() * 1 + 0.5,
         opacity: Math.random() * 0.5 + 0.4
       });
     }
@@ -69,6 +74,10 @@ var Game = (function() {
   };
 
   Game.prototype.handleKeyboard = function() {
+    if (this.keyboard.ESCAPE) {
+      this.pause();
+    }
+
     if (this.keyboard.RIGHT || this.keyboard.LEFT) {
       this.keyboard.LEFT && this.player.moveLeft();
       this.keyboard.RIGHT && this.player.moveRight();
@@ -85,18 +94,28 @@ var Game = (function() {
     if (this.keyboard.UP || this.keyboard.SPACE) {
       this.player.jump();
     }
+
+    if (this.keyboard.ENTER) {
+      if (!this.player.shield.isAnimating) {
+        this.player.shield.isOpen
+          ? this.player.shield.close()
+          : this.player.shield.open();
+      }
+    }
   };
 
   Game.prototype.updateScene = function() {
     // apply gravity and resolve collisions
     this.player.applyGravity();
     this.player.detectCollisions();
+
     // update objects to be rendered
-    this.player.update(dt);
+    this.player.shield.update(dt);
     for (var i = 0; i < this.platforms.length; i++) {
       var platform = this.platforms[i];
       platform.update(dt);
     }
+    this.player.update(dt);
     this.camera.update();
   };
 
@@ -189,6 +208,7 @@ var Game = (function() {
 
   Game.prototype.renderScene = function(ctx) {
     this.rulers && this.drawRulers(ctx);
+
     // optimize rendering by only drawing objects that are on screen
     for (var i = 0; i < this.drawables.length; i++) {
       var drawable = this.drawables[i];
@@ -197,10 +217,21 @@ var Game = (function() {
     }
   };
 
+  Game.prototype.pause = function() {
+    this.paused = !this.paused;
+    var gameMenu = document.querySelector(".game-menu");
+    if (this.paused) {
+      gameMenu.classList.remove("hidden");
+    } else {
+      gameMenu.classList.add("hidden");
+    }
+  };
+
   Game.prototype.start = function() {
-    var music = new Sound(
-      "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3"
-    );
+    // var music = new Sound(
+    //   "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
+    //   0.3
+    // );
     setTimeout(() => {
       music.play();
     }, 2000);
@@ -210,7 +241,7 @@ var Game = (function() {
   Game.prototype.main = function() {
     dt = this.updateTimeEllapsed();
     this.handleKeyboard();
-    this.updateScene();
+    !this.paused && this.updateScene();
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx);
     this.renderScene(this.ctx);

@@ -12,28 +12,26 @@ var MovingPlatform = (function() {
     var vNorm = this.v.norm;
     this.v = this.v.multiplyByScalar(this.speed / vNorm);
 
-    this.color = "rgb(0, 199, 255)";
+    this.color = "rgb(0, 100, 255)";
+    this.color = "#686868";
   }
 
   MovingPlatform.prototype = Object.create(Platform.prototype);
 
   MovingPlatform.prototype.update = function(dt) {
-    if (this.x > this.xEnd || this.y > this.yEnd) {
-      console.log("switch direction");
-      this.x = this.xEnd;
-      this.y = this.yEnd;
-      this.v.x *= -1;
-      this.v.y *= -1;
+    var dx = this.v.x * dt;
+    var dy = this.v.y * dt;
+    if (this.x + dx > this.xEnd || this.y + dy > this.yEnd) {
+      this.v.x = -Math.abs(this.v.x);
+      this.v.y = -Math.abs(this.v.y);
     }
-    if (this.x < this.xStart || this.y < this.yStart) {
-      this.x = this.xStart;
-      this.y = this.yStart;
-      this.v.x *= -1;
-      this.v.y *= -1;
+    if (this.x + dx < this.xStart || this.y + dy < this.yStart) {
+      this.v.x = Math.abs(this.v.x);
+      this.v.y = Math.abs(this.v.y);
     }
 
-    this.x += this.v.x * dt;
-    this.y += this.v.y * dt;
+    this.x += dx;
+    this.y += dy;
   };
 
   return MovingPlatform;

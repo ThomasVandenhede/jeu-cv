@@ -1,5 +1,4 @@
-// Factory pattern
-var playerFactory = (function() {
+var Player = (function() {
   var MAX_SPEED = 1500;
   var JUMP_SPEED = -600;
   var COEFFICIENT_OF_RESTITUTION = 0.4;
@@ -12,23 +11,31 @@ var playerFactory = (function() {
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
     this.color = "#22dd00";
-    this.color = "red";
+    this.color = "#37e018";
+    // this.color = "red";
     this.isCrouching = false;
+
+    // collision direction for movement
     this.isColliding = {
       right: false,
       left: false,
       up: false,
       down: false
-    }; // collision direction for movement
+    };
     this.collidableWith = []; // potential object collisions
     this.collidesWith = []; // actual object collisions
 
     // sounds
     this.sounds = {
-      jump: new Sound("./assets/sounds/Light swing 1.mp4"),
+      jump: new Sound("./assets/sounds/Light swing 1.mp4", 0.8),
       hit: new Sound("./assets/sounds/Hit 1.mp4", 0.1),
       still: new Sound("./assets/sounds/Medium hum.mp4")
     };
+
+    // shield
+    this.shield = new Shield(this);
+    // does the player get stuck to the ceiling when jumping?
+    this.stickyJump = false;
   }
 
   Player.prototype = Object.create(Rectangle.prototype);
@@ -117,6 +124,8 @@ var playerFactory = (function() {
     var collision = false;
     var dx = this.v.x * dt;
     var dy = this.v.y * dt;
+    var dxEl = el.v.x * dt;
+    var dyEl = el.v.y * dt;
     // detect horizontal collisions
     if (this.top + dy < el.bottom && this.bottom + dy > el.top) {
       // left collision
@@ -143,22 +152,23 @@ var playerFactory = (function() {
     var collision = false;
     var dx = this.v.x * dt;
     var dy = this.v.y * dt;
+    // var dxEl = el.v.x * dt;
+    // var dyEl = el.v.y * dt;
     // detect vertical collisioright
     if (this.left + dx < el.right && this.right + dx > el.left) {
       // up collision
       if (this.top >= el.bottom && this.top + dy < el.bottom) {
         this.isColliding.up = true;
-        // resolve collision
         this.y = el.y + el.height; // snap
-        // this.v.y = 0; // REMOVE FOR "GLUE" EFFECT WHEN COLLIDING UPWARDS
+        // this.v.y = el.y; // REMOVE FOR "GLUE" EFFECT WHEN COLLIDING UPWARDS
         // this.v.y = -this.v.y * COEFFICIENT_OF_RESTITUTION;
         collision = true;
       }
       // down collision
       if (this.bottom <= el.top && this.bottom + dy > el.top) {
         this.isColliding.down = true;
-        // resolve collision
         this.v.y = -this.v.y * COEFFICIENT_OF_RESTITUTION;
+        this.v.x += el.v.x;
         if (
           this.isCrouching ||
           Math.abs(this.v.y) <= GRAVITY_ACCELERATION * dt + 1
@@ -234,15 +244,36 @@ var playerFactory = (function() {
   };
 
   Player.prototype.draw = function(ctx, camera) {
+    var r = 5;
+    var left = this.x - camera.x;
+    var top = this.y - camera.y;
+    var right = left + this.width;
+    var bottom = top + this.height;
+
     ctx.save();
     ctx.fillStyle = this.color;
     ctx.shadowColor = this.color;
-    ctx.shadowBlur = 30;
-    ctx.fillRect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.moveTo(left, top + r);
+    ctx.arcTo(left, top, left + r, top, r);
+    ctx.lineTo(right - r, top);
+    ctx.arcTo(right, top, right, top + r, r);
+    ctx.lineTo(right, bottom - r);
+    ctx.arcTo(right, bottom, right - r, bottom, r);
+    ctx.lineTo(left + r, bottom);
+    ctx.arcTo(left, bottom, left, bottom - r, r);
+    ctx.fill();
+    ctx.fill();
+    ctx.fill();
+    ctx.fill();
+    ctx.closePath();
     ctx.restore();
+
+    // draw player shield
+    (this.shield.isOpen || this.shield.isAnimating) &&
+      this.shield.draw(ctx, camera);
   };
 
-  return function(x, y) {
-    return new Player(x, y);
-  };
+  return Player;
 })();

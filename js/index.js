@@ -18,8 +18,8 @@ window.addEventListener("DOMContentLoaded", function() {
 
   var game = new Game();
   game.init({
-    debug: true,
-    rulers: false
+    debug: false,
+    rulers: true
   });
   game.start();
 

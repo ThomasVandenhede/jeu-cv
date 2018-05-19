@@ -1,11 +1,12 @@
-// Factory pattern
 var Platform = (function() {
   var MAX_SPEED = 100;
 
   function Platform(x, y, width, height) {
-    Rectangle.call(this, x, y, width, height); // subclassing Rectangle class
-    this.touched = false; // does the player touch the platform
-    this.color = "#fff";
+    Rectangle.call(this, x, y, width, height);
+
+    this.v = new Vector();
+    this.touched = false; // is the player touching the platform
+    this.color = "#ccc";
   }
 
   Platform.prototype = Object.create(Rectangle.prototype);
@@ -15,32 +16,28 @@ var Platform = (function() {
   };
 
   Platform.prototype.draw = function(ctx, camera) {
-    var that = this;
     ctx.save();
     if (this.touched) {
       ctx.shadowColor = this.color;
       ctx.shadowBlur = 20;
       ctx.fillStyle = this.color;
-      ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
-      ctx.fill();
-      ctx.fill();
-      ctx.fill();
-      ctx.shadowOffsetX = -1000000;
-      ctx.shadowOffsetY = 0;
-
-      ctx.globalCompositeOperation = "source-atop";
       ctx.beginPath();
-      ctx.shadowBlur = 10;
-      ctx.rect(
-        this.x + 1000000 - camera.x,
-        this.y - camera.y,
-        this.width,
-        this.height
-      );
+      ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+      ctx.closePath();
+      ctx.fill();
+      // ctx.shadowOffsetX = -1000000;
+      // ctx.shadowOffsetY = 0;
+
+      // inset shadow
+      ctx.shadowBlur = 3;
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
       ctx.stroke();
-      ctx.stroke();
-      ctx.stroke();
+      ctx.closePath();
     } else {
+      ctx.beginPath();
       ctx.strokeStyle = this.color;
       ctx.lineWidth = 2;
       ctx.strokeRect(
@@ -49,6 +46,7 @@ var Platform = (function() {
         this.width,
         this.height
       );
+      ctx.closePath();
     }
     ctx.restore();
   };
