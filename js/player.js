@@ -3,10 +3,11 @@ var Player = (function() {
   var JUMP_SPEED = -600;
   var COEFFICIENT_OF_RESTITUTION = 0.4;
   var animationID;
-  var INITIAL_SIZE = 40;
+  var INITIAL_WIDTH = 5;
+  var INITIAL_HEIGHT = 50;
 
   function Player(x, y) {
-    Rectangle.call(this, x, y, INITIAL_SIZE, INITIAL_SIZE);
+    Rectangle.call(this, x, y, INITIAL_WIDTH, INITIAL_HEIGHT);
 
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
@@ -27,8 +28,14 @@ var Player = (function() {
 
     // sounds
     this.sounds = {
-      jump: new Sound("./assets/sounds/Light swing 1.mp4", 0.8),
-      hit: new Sound("./assets/sounds/Hit 1.mp4", 0.1),
+      jump: [
+        new Sound("./assets/sounds/Light swing 2.mp4", 0.8),
+        new Sound("./assets/sounds/Light swing 1.mp4", 0.8)
+      ],
+      hit: [
+        new Sound("./assets/sounds/Hit 1.mp4", 0.07),
+        new Sound("./assets/sounds/Hit 2.mp4", 0.07)
+      ],
       still: new Sound("./assets/sounds/Medium hum.mp4")
     };
 
@@ -50,33 +57,33 @@ var Player = (function() {
 
   Player.prototype.crouch = function() {
     if (!this.isCrouching) {
-      var dx = -1,
-        deltaWidth = 2;
+      var deltaSize = 5,
+        dx = deltaSize / 2;
       this.isCrouching = true;
       animationID && clearInterval(animationID);
       animationID = setInterval(
         function() {
-          this.height -= 4;
-          this.y += 4;
+          this.height -= deltaSize;
+          this.y += deltaSize;
           for (var i = 0; i < this.collidableWith.length; i++) {
             var el = this.collidableWith[i];
             if (this.top < el.bottom && this.bottom > el.top) {
               // left collision
               if (
                 this.left >= el.right &&
-                this.left - dx - deltaWidth < el.right
+                this.left - dx - deltaSize < el.right
               ) {
-                this.x += deltaWidth; // snap
+                this.x += deltaSize; // snap
               }
               // right collision
-              if (this.right <= el.x && this.right + dx + deltaWidth > el.x) {
-                this.x -= deltaWidth; // snap
+              if (this.right <= el.x && this.right + dx + deltaSize > el.x) {
+                this.x -= deltaSize; // snap
               }
             }
           }
-          this.x += dx;
-          this.width += deltaWidth;
-          if (this.height <= INITIAL_SIZE / 4) {
+          this.x -= dx;
+          this.width += deltaSize;
+          if (this.height <= INITIAL_WIDTH) {
             clearInterval(animationID);
           }
         }.bind(this),
@@ -87,8 +94,9 @@ var Player = (function() {
 
   Player.prototype.stand = function() {
     if (this.isCrouching) {
-      var dx = this.v.x * dt;
-      var targetY = this.y - (INITIAL_SIZE - this.height);
+      var dx = this.v.x * dt,
+        deltaSize = 5;
+      var targetY = this.y - (INITIAL_HEIGHT - this.height);
       // determine if player has enough room to stand
       for (var i = 0; i < this.collidableWith.length; i++) {
         var el = this.collidableWith[i];
@@ -107,11 +115,11 @@ var Player = (function() {
       animationID && clearInterval(animationID);
       animationID = setInterval(
         function() {
-          this.height += 4;
-          this.y -= 4;
-          this.x += 1;
-          this.width -= 2;
-          if (this.height >= INITIAL_SIZE) {
+          this.height += deltaSize;
+          this.y -= deltaSize;
+          this.x += deltaSize / 2;
+          this.width -= deltaSize;
+          if (this.height >= INITIAL_HEIGHT) {
             clearInterval(animationID);
           }
         }.bind(this),
@@ -184,7 +192,7 @@ var Player = (function() {
 
   Player.prototype.jump = function() {
     if (this.isColliding.down) {
-      this.sounds.jump.replay();
+      this.sounds.jump[Math.floor(Math.random() * 2)].replay();
       this.isColliding.down = false;
       this.v.y = JUMP_SPEED;
     }
@@ -218,7 +226,7 @@ var Player = (function() {
       hasVerticalCollision = this.collideVertically(this.collidableWith[i]);
 
       if (hasVerticalCollision && this.v.y) {
-        this.sounds.hit.play();
+        this.sounds.hit[Math.floor(Math.random() * 2)].replay();
       }
 
       this.collidableWith[i].touched =
@@ -244,7 +252,7 @@ var Player = (function() {
   };
 
   Player.prototype.draw = function(ctx, camera) {
-    var r = 5;
+    var r = Math.min(INITIAL_WIDTH, INITIAL_HEIGHT) / 2;
     var left = this.x - camera.x;
     var top = this.y - camera.y;
     var right = left + this.width;
