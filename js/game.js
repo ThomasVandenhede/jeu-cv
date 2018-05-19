@@ -228,10 +228,10 @@ var Game = (function() {
   };
 
   Game.prototype.start = function() {
-    // var music = new Sound(
-    //   "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
-    //   0.3
-    // );
+    var music = new Sound(
+      "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
+      1
+    );
     setTimeout(() => {
       music.play();
     }, 2000);

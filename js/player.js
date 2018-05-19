@@ -29,18 +29,19 @@ var Player = (function() {
     // sounds
     this.sounds = {
       jump: [
-        new Sound("./assets/sounds/Light swing 2.mp4", 0.8),
-        new Sound("./assets/sounds/Light swing 1.mp4", 0.8)
+        new Sound("./assets/sounds/Light swing 2.mp4", 1),
+        new Sound("./assets/sounds/Light swing 1.mp4", 1)
       ],
       hit: [
-        new Sound("./assets/sounds/Hit 1.mp4", 0.07),
-        new Sound("./assets/sounds/Hit 2.mp4", 0.07)
+        new Sound("./assets/sounds/Hit 1.mp4", 0.2),
+        new Sound("./assets/sounds/Hit 2.mp4", 0.2)
       ],
-      still: new Sound("./assets/sounds/Medium hum.mp4")
+      still: new Sound("./assets/sounds/Medium hum.mp4", 0.15)
     };
 
     // shield
     this.shield = new Shield(this);
+
     // does the player get stuck to the ceiling when jumping?
     this.stickyJump = false;
   }
@@ -196,6 +197,7 @@ var Player = (function() {
       this.isColliding.down = false;
       this.v.y = JUMP_SPEED;
     }
+    this.sounds.still.play();
   };
 
   Player.prototype.applyGravity = function() {
