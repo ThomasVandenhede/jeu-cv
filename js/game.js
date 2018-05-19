@@ -1,7 +1,7 @@
-var Game = (function() {
-  function Game(options) {}
+var Game = (function () {
+  function Game(options) { }
 
-  Game.prototype.init = function(config) {
+  Game.prototype.init = function (config) {
     this.debug = config.debug || false;
     this.rulers = config.rulers !== undefined ? config.rulers : true;
     this.previousTime;
@@ -32,10 +32,11 @@ var Game = (function() {
       new Platform(700, -80, 30, 20),
       new Platform(350, 70, 30, 20),
       new Platform(700, 210, 30, 20),
+      new Platform(200, -400, 5, 100),
       new Platform(0, -100000, 1, 200000),
       new MovingPlatform(200, -500, 100, 5, 400, -500, 100),
-      new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
-      new MovingPlatform(0, -400, 40, 50, 50, -400, 100)
+      new MovingPlatform(700, -400, 80, 30, 700, -100, 100)
+      // new MovingPlatform(0, -400, 40, 50, 50, -400, 100)
     ];
 
     // initialize background
@@ -54,7 +55,7 @@ var Game = (function() {
     this.drawables.push(this.player);
     this.drawables = this.drawables.concat(this.platforms);
 
-    this.player.collidableWith = this.drawables.filter(function(el) {
+    this.player.collidableWith = this.drawables.filter(function (el) {
       return el !== this.player;
     });
 
@@ -73,7 +74,7 @@ var Game = (function() {
     );
   };
 
-  Game.prototype.handleKeyboard = function() {
+  Game.prototype.handleKeyboard = function () {
     if (this.keyboard.ESCAPE) {
       this.pause();
     }
@@ -104,7 +105,7 @@ var Game = (function() {
     }
   };
 
-  Game.prototype.updateScene = function() {
+  Game.prototype.updateScene = function () {
     // apply gravity and resolve collisions
     this.player.applyGravity();
     this.player.detectCollisions();
@@ -119,13 +120,13 @@ var Game = (function() {
     this.camera.update();
   };
 
-  Game.prototype.updateTimeEllapsed = function() {
+  Game.prototype.updateTimeEllapsed = function () {
     this.previousTime = this.currentTime || Date.now();
     this.currentTime = Date.now();
     return (this.currentTime - this.previousTime) / 1000;
   };
 
-  Game.prototype.renderBackground = function(ctx) {
+  Game.prototype.renderBackground = function (ctx) {
     this.fillCanvas(ctx, "#111");
     ctx.save();
     for (var i = 0; i < this.starCount; i++) {
@@ -145,16 +146,16 @@ var Game = (function() {
     ctx.restore();
   };
 
-  Game.prototype.clearCanvas = function(ctx) {
+  Game.prototype.clearCanvas = function (ctx) {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
-  Game.prototype.fillCanvas = function(ctx, color) {
+  Game.prototype.fillCanvas = function (ctx, color) {
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
-  Game.prototype.drawRulers = function(ctx) {
+  Game.prototype.drawRulers = function (ctx) {
     var minX,
       maxX,
       minY,
@@ -206,7 +207,7 @@ var Game = (function() {
     ctx.restore();
   };
 
-  Game.prototype.renderScene = function(ctx) {
+  Game.prototype.renderScene = function (ctx) {
     this.rulers && this.drawRulers(ctx);
 
     // optimize rendering by only drawing objects that are on screen
@@ -217,7 +218,7 @@ var Game = (function() {
     }
   };
 
-  Game.prototype.pause = function() {
+  Game.prototype.pause = function () {
     this.paused = !this.paused;
     var gameMenu = document.querySelector(".game-menu");
     if (this.paused) {
@@ -227,18 +228,18 @@ var Game = (function() {
     }
   };
 
-  Game.prototype.start = function() {
+  Game.prototype.start = function () {
     var music = new Sound(
       "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
       1
     );
-    setTimeout(function() {
+    setTimeout(function () {
       music.play();
     }, 2000);
     this.main();
   };
 
-  Game.prototype.main = function() {
+  Game.prototype.main = function () {
     dt = this.updateTimeEllapsed();
     this.handleKeyboard();
     !this.paused && this.updateScene();
@@ -249,7 +250,7 @@ var Game = (function() {
     requestAnimationFrame(this.main.bind(this));
   };
 
-  Game.prototype.updateDebugInfo = function() {
+  Game.prototype.updateDebugInfo = function () {
     var debug = document.querySelector(".debug");
     var positionEl = debug.querySelector(".player__position");
     var sizeEl = debug.querySelector(".player__size");
@@ -262,7 +263,7 @@ var Game = (function() {
 
     var collidingHTML = Object.keys(this.player.isColliding)
       .filter(
-        function(key) {
+        function (key) {
           return this.player.isColliding[key];
         }.bind(this)
       )

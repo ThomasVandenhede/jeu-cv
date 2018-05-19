@@ -1,4 +1,4 @@
-window.addEventListener("DOMContentLoaded", function() {
+window.addEventListener("DOMContentLoaded", function () {
   function fitCanvasToContainer() {
     var canvases = document.getElementsByTagName("canvas");
     for (var i = 0; i < canvases.length; i++) {
@@ -18,13 +18,13 @@ window.addEventListener("DOMContentLoaded", function() {
 
   var game = new Game();
   game.init({
-    debug: false,
+    debug: true,
     rulers: true
   });
   game.start();
 
   game.debug &&
-    setInterval(function() {
+    setInterval(function () {
       game.updateDebugInfo();
     }, 50);
 });

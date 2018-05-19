@@ -1,7 +1,6 @@
-var Shield = (function() {
+var Shield = (function () {
   var MIN_SIZE = 0;
   var MAX_SIZE = 40;
-  var opacity = 1;
 
   function Shield(shielded) {
     this.shielded = shielded || null; // object benefitting from the shield
@@ -20,31 +19,29 @@ var Shield = (function() {
     };
   }
 
-  Shield.prototype.open = function() {
+  Shield.prototype.open = function () {
     this.sounds.close.stop();
     this.sounds.open.play();
     this.isOpen = true;
     this.isAnimating = true;
   };
 
-  Shield.prototype.close = function() {
+  Shield.prototype.close = function () {
     this.sounds.open.stop();
     this.sounds.close.play();
     this.isOpen = false;
     this.isAnimating = true;
   };
 
-  Shield.prototype.update = function(dt) {
+  Shield.prototype.update = function (dt) {
     var dr;
     if (this.isOpen) {
       dr = (MAX_SIZE - MIN_SIZE) / this.openingDuration * dt;
       // shield opening
       if (this.r + dr < MAX_SIZE) {
         this.r += dr;
-        opacity = (this.r - MIN_SIZE) / (MAX_SIZE - MIN_SIZE);
       } else {
         this.r = MAX_SIZE;
-        opacity = 1;
         this.isAnimating = false;
       }
     } else {
@@ -52,21 +49,16 @@ var Shield = (function() {
       // shield closing
       if (this.r - dr > MIN_SIZE) {
         this.r -= dr;
-        opacity = (this.r - MIN_SIZE) / (MAX_SIZE - MIN_SIZE);
-        console.log(opacity);
       } else {
         this.r = MIN_SIZE;
-        opacity = 0;
         this.isAnimating = false;
       }
     }
   };
 
-  Shield.prototype.draw = function(ctx, camera) {
+  Shield.prototype.draw = function (ctx, camera) {
     ctx.save();
     ctx.strokeStyle = this.shielded.color || "#fff";
-    // ctx.strokeStyle = "rgba(255, 165, 0, " + opacity + ")";
-    // ctx.strokeStyle = "rgba(128, 128, 128, " + opacity + ")";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(
@@ -92,7 +84,7 @@ var Shield = (function() {
     ctx.restore();
   };
 
-  Shield.prototype.draw = function(ctx, camera) {
+  Shield.prototype.draw = function (ctx, camera) {
     var r = 5 + this.r;
     var left = this.shielded.x - this.r - camera.x;
     var top = this.shielded.y - this.r - camera.y;
