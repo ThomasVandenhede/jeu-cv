@@ -21,21 +21,12 @@ var Camera = (function() {
     this.followed = null;
 
     this.viewportRect = new Rectangle(this.x, this.y, this.wView, this.hView);
-    console.log(this.viewportRect);
-
-    // rectangle that represents the world's boundary (room's boundary)
-    this.worldRect = new Rectangle(
-      0,
-      -500,
-      3000,
-      3000
-    );
   }
 
   Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
-    // this.xDeadZone = xDeadZone;
-    // this.yDeadZone = yDeadZone;
+    this.xDeadZone = xDeadZone;
+    this.yDeadZone = yDeadZone;
   };
 
   Camera.prototype.update = function() {
@@ -59,24 +50,26 @@ var Camera = (function() {
       }
     }
 
-    // update viewportRect
-    this.viewportRect.set(this.x, this.y);
-
     // don't let camera leave the world's boundaries
-    if (!this.viewportRect.within(this.worldRect)) {
-      if (this.viewportRect.left < this.worldRect.left) {
-        this.x = this.worldRect.left;
+    if (
+      !new Rectangle(this.x, this.y, this.wView, this.hView).within(worldRect)
+    ) {
+      if (this.x < worldRect.left) {
+        this.x = worldRect.left;
       }
-      if (this.viewportRect.top < this.worldRect.top) {
-        this.y = this.worldRect.top;
+      if (this.y < worldRect.top) {
+        this.y = worldRect.top;
       }
-      if (this.viewportRect.right > this.worldRect.right) {
-        this.x = this.worldRect.right - this.wView;
+      if (this.x + this.wView > worldRect.right) {
+        this.x = worldRect.right - this.wView;
       }
-      if (this.viewportRect.bottom > this.worldRect.bottom) {
-        this.y = this.worldRect.bottom - this.hView;
+      if (this.y + this.hView > worldRect.bottom) {
+        this.y = worldRect.bottom - this.hView;
       }
     }
+
+    // update viewportRect
+    this.viewportRect.set(this.x, this.y);
   };
 
   return Camera;

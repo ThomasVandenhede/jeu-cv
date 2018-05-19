@@ -60,11 +60,6 @@ Rectangle.prototype.move = function(dx, dy) {
   this.y += dy;
 };
 
-Rectangle.prototype.moveTo = function(x, y) {
-  this.x = x;
-  this.y = y;
-};
-
 Rectangle.prototype.within = function(r) {
   return (
     r.left <= this.left &&
