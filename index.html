@@ -18,6 +18,10 @@
       box-sizing: inherit;
     }
 
+    body {
+      position: relative;
+    }
+
     .page {
       height: 100vh;
       display: flex;
@@ -39,6 +43,15 @@
       height: 100%;
     }
 
+    .game-menu {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 3rem;
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
     .debug {
       position: absolute;
       padding: 0 1em;
@@ -54,6 +67,12 @@
       margin: 0;
       padding: 0;
     }
+
+    /* utility classes */
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -65,6 +84,9 @@
     </div>
   </div>
 
+  <div class="game-menu hidden">
+    GAME PAUSED
+  </div>
 
   <div class="debug">
     <h2>debug info</h2>

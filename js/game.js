@@ -6,6 +6,7 @@ var Game = (function() {
     this.rulers = config.rulers !== undefined ? config.rulers : true;
     this.previousTime;
     this.currentTime;
+    this.paused = false;
     this.canvas = document.getElementById("canvas");
     this.backgroundCanvas = document.getElementById("background");
     this.ctx = this.canvas.getContext("2d");
@@ -65,6 +66,10 @@ var Game = (function() {
   };
 
   Game.prototype.handleKeyboard = function() {
+    if (this.keyboard.ESCAPE) {
+      this.pause();
+    }
+
     if (this.keyboard.RIGHT || this.keyboard.LEFT) {
       this.keyboard.LEFT && this.player.moveLeft();
       this.keyboard.RIGHT && this.player.moveRight();
@@ -95,6 +100,7 @@ var Game = (function() {
     // apply gravity and resolve collisions
     this.player.applyGravity();
     this.player.detectCollisions();
+
     // update objects to be rendered
     this.player.update(dt);
     this.player.shield.update(dt);
@@ -203,6 +209,16 @@ var Game = (function() {
     }
   };
 
+  Game.prototype.pause = function() {
+    this.paused = !this.paused;
+    var gameMenu = document.querySelector(".game-menu");
+    if (this.paused) {
+      gameMenu.classList.remove("hidden");
+    } else {
+      gameMenu.classList.add("hidden");
+    }
+  };
+
   Game.prototype.start = function() {
     var music = new Sound(
       "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
@@ -217,7 +233,7 @@ var Game = (function() {
   Game.prototype.main = function() {
     dt = this.updateTimeEllapsed();
     this.handleKeyboard();
-    this.updateScene();
+    !this.paused && this.updateScene();
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx);
     this.renderScene(this.ctx);
