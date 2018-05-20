@@ -1,45 +1,62 @@
 // Singleton pattern
-var keyboardManager = (function() {
+var keyboardManager = (function () {
   var instance;
 
   function KeyboardManager() {
     var that = this;
-    var keyMappings = {
-      ArrowUp: "UP",
+    var codeMappings = {
       ArrowLeft: "LEFT",
-      ArrowDown: "DOWN",
+      ArrowUp: "UP",
       ArrowRight: "RIGHT",
-      KeyW: "UP",
-      KeyA: "LEFT",
-      KeyS: "DOWN",
-      KeyD: "RIGHT",
+      ArrowDown: "DOWN",
+      // KeyW: "UP",
+      // KeyA: "LEFT",
+      // KeyS: "DOWN",
+      // KeyD: "RIGHT",
       Enter: "ENTER",
       Space: "SPACE",
       Escape: "ESCAPE"
     };
-
-    window.onkeydown = function(event) {
-      if (keyMappings[event.code] && !that[keyMappings[event.code]]) {
-        that[keyMappings[event.code]] = true;
-      }
+    var keyCodeMappings = {
+      37: "LEFT",
+      38: "UP",
+      39: "RIGHT",
+      40: "DOWN",
+      // KeyW: "UP",
+      // KeyA: "LEFT",
+      // KeyS: "DOWN",
+      // KeyD: "RIGHT",
+      13: "ENTER",
+      32: "SPACE",
+      27: "ESCAPE"
     };
 
-    window.onkeyup = function(event) {
-      if (keyMappings[event.code]) {
-        that[keyMappings[event.code]] = false;
+    window.addEventListener("keydown", function (event) {
+      var code = event.code || event.keyCode;
+      var mappings = (event.code) ? codeMappings : keyCodeMappings;
+      if (mappings[code] && !that[mappings[code]]) {
+        that[mappings[code]] = true;
       }
-    };
+    });
 
-    // this.UP = false;
-    // this.DOWN = false;
-    // this.RIGHT = false;
-    // this.LEFT = false;
-    // this.ENTER = false;
-    // this.SPACE = false;
+    window.addEventListener("keyup", function (event) {
+      var code = event.code || event.keyCode;
+      var mappings = (event.code) ? codeMappings : keyCodeMappings;
+      if (mappings[code]) {
+        that[mappings[code]] = false;
+      }
+    });
+
+    this.UP = false;
+    this.DOWN = false;
+    this.RIGHT = false;
+    this.LEFT = false;
+    this.ENTER = false;
+    this.SPACE = false;
   }
 
   return {
-    getInstance: function() {
+    getInstance: function () {
       if (!instance) {
         instance = new KeyboardManager();
       }
