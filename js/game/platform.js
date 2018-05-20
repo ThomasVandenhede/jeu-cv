@@ -1,21 +1,21 @@
-var Platform = (function() {
+var Platform = (function () {
   var MAX_SPEED = 100;
 
   function Platform(x, y, width, height) {
-    Rectangle.call(this, x, y, width, height);
+    AABB.call(this, x, y, width, height);
 
     this.v = new Vector();
     this.touched = false; // is the player touching the platform
     this.color = "#ccc";
   }
 
-  Platform.prototype = Object.create(Rectangle.prototype);
+  Platform.prototype = Object.create(AABB.prototype);
 
-  Platform.prototype.update = function(dt) {
+  Platform.prototype.update = function () {
     // update
   };
 
-  Platform.prototype.draw = function(ctx, camera) {
+  Platform.prototype.draw = function (ctx, camera) {
     ctx.save();
     if (this.touched) {
       ctx.shadowColor = this.color;

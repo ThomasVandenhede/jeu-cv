@@ -14,8 +14,8 @@ var Shield = (function () {
 
     // sounds
     this.sounds = {
-      open: new Sound("./assets/sounds/Open.mp3", 0.3),
-      close: new Sound("./assets/sounds/Close.mp3", 0.5)
+      open: new Sound("./assets/sounds/Open.mp3", 0.4),
+      close: new Sound("./assets/sounds/Close.mp3", 0.6)
     };
   }
 
@@ -33,7 +33,7 @@ var Shield = (function () {
     this.isAnimating = true;
   };
 
-  Shield.prototype.update = function (dt) {
+  Shield.prototype.update = function () {
     var dr;
     if (this.isOpen) {
       dr = (MAX_SIZE - MIN_SIZE) / this.openingDuration * dt;

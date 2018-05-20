@@ -1,0 +1,20 @@
+{
+  "name": "jeu-cv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasVandenhede/jeu-cv.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThomasVandenhede/jeu-cv/issues"
+  },
+  "homepage": "https://github.com/ThomasVandenhede/jeu-cv#readme"
+}

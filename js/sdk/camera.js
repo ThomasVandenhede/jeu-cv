@@ -1,4 +1,4 @@
-var Camera = (function() {
+var Camera = (function () {
   var AXIS = {
     NONE: "none",
     HORIZONTAL: "horizontal",
@@ -15,21 +15,25 @@ var Camera = (function() {
 
     this.wView = canvas.width;
     this.hView = canvas.height;
+    this.zoomLevel = 1; // TODO: implement a camera zoom
 
     this.axis = AXIS.BOTH;
 
     this.followed = null;
 
-    this.viewportRect = new Rectangle(this.x, this.y, this.wView, this.hView);
+    this.viewportRect = new AABB(this.x, this.y, this.wView, this.hView);
   }
 
-  Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
+  Camera.prototype.follow = function (gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
     this.xDeadZone = xDeadZone;
     this.yDeadZone = yDeadZone;
   };
 
-  Camera.prototype.update = function() {
+  Camera.prototype.update = function () {
+    this.hView = canvas.height;
+    this.wView = canvas.width;
+
     // keep following the player (or other desired object)
     if (this.followed != null) {
       if (this.axis == AXIS.HORIZONTAL || this.axis == AXIS.BOTH) {
@@ -52,7 +56,7 @@ var Camera = (function() {
 
     // don't let camera leave the world's boundaries
     if (
-      !new Rectangle(this.x, this.y, this.wView, this.hView).within(worldRect)
+      !new AABB(this.x, this.y, this.wView, this.hView).within(worldRect)
     ) {
       if (this.x < worldRect.left) {
         this.x = worldRect.left;

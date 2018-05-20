@@ -63,7 +63,7 @@
       font-size: .8em;
     }
 
-    .debut h2 {
+    .debug h2 {
       margin: 0;
       padding: 0;
     }
@@ -104,22 +104,34 @@
     </section>
   </div>
 
-  <script src="./js/requestAnimationFrame-polyfill.js"></script>
-  <script src="./js/constants.js"></script>
-  <script src="./js/keyboardManager.js"></script>
-  <script src="./js/soundManager.js"></script>
-  <script src="./js/sound.js"></script>
-  <script src="./js/vector.js"></script>
-  <script src="./js/rectangle.js"></script>
-  <script src="./js/particle.js"></script>
-  <script src="./js/segment.js"></script>
-  <script src="./js/laser.js"></script>
-  <script src="./js/camera.js"></script>
-  <script src="./js/platform.js"></script>
-  <script src="./js/movingPlatform.js"></script>
-  <script src="./js/shield.js"></script>
-  <script src="./js/player.js"></script>
-  <script src="./js/game.js"></script>
+  <!-- polyfills -->
+  <script src="./js/polyfills/requestAnimationFrame-polyfill.js"></script>
+  <script src="./js/helpers.js"></script>
+  <!-- basic shapes -->
+  <script src="./js/sdk/vector.js"></script>
+  <script src="./js/sdk/rectangle.js"></script>
+  <script src="./js/sdk/particle.js"></script>
+  <script src="./js/sdk/segment.js"></script>
+  <!-- user input -->
+  <script src="./js/sdk/keyboardManager.js"></script>
+  <!-- sound -->
+  <script src="./js/sdk/sound.js"></script>
+  <script src="./js/sdk/soundManager.js"></script>
+  <!-- levels -->
+  <script src="./js/sdk/level.js"></script>
+  <script src="./js/sdk/levelManager.js"></script>
+  <!-- camera -->
+  <script src="./js/sdk/camera.js"></script>
+  <!-- game specific -->
+  <script src="./js/game/platform.js"></script>
+  <script src="./js/game/movingPlatform.js"></script>
+  <script src="./js/game/shield.js"></script>
+  <script src="./js/game/laser.js"></script>
+  <script src="./js/game/ennemy.js"></script>
+  <script src="./js/game/player.js"></script>
+  <script src="./js/game/game.js"></script>
+  <script src="./js/game/gameData.js"></script>
+  <!-- entry point -->
   <script src="./js/index.js"></script>
 </body>
 

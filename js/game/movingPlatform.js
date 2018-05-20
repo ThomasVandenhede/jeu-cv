@@ -1,4 +1,4 @@
-var MovingPlatform = (function() {
+var MovingPlatform = (function () {
   function MovingPlatform(xStart, yStart, width, height, xEnd, yEnd, speed) {
     Platform.call(this, xStart, yStart, width, height);
 
@@ -13,12 +13,12 @@ var MovingPlatform = (function() {
     this.v = this.v.multiplyByScalar(this.speed / vNorm);
 
     this.color = "rgb(0, 100, 255)";
-    this.color = "#686868";
+    this.color = "darkorange";
   }
 
   MovingPlatform.prototype = Object.create(Platform.prototype);
 
-  MovingPlatform.prototype.update = function(dt) {
+  MovingPlatform.prototype.update = function () {
     var dx = this.v.x * dt;
     var dy = this.v.y * dt;
     if (this.x + dx > this.xEnd || this.y + dy > this.yEnd) {

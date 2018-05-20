@@ -1,32 +1,32 @@
-function Rectangle(x, y, width, height) {
+function AABB(x, y, width, height) {
   this.x = x;
   this.y = y;
   this.width = width;
   this.height = height;
 }
 
-Object.defineProperties(Rectangle.prototype, {
+Object.defineProperties(AABB.prototype, {
   left: {
-    get: function() {
+    get: function () {
       return this.x;
     },
-    set: function(left) {
+    set: function (left) {
       this.x = left;
     }
   },
   top: {
-    get: function() {
+    get: function () {
       return this.y;
     },
-    set: function(left) {
+    set: function (left) {
       this.y = bottom;
     }
   },
   right: {
-    get: function() {
+    get: function () {
       return this.x + this.width;
     },
-    set: function(right) {
+    set: function (right) {
       if (this.width === Number.POSITIVE_INFINITY) {
         this.x = Number.NEGATIVE_INFINITY; // edge case
       } else {
@@ -35,10 +35,10 @@ Object.defineProperties(Rectangle.prototype, {
     }
   },
   bottom: {
-    get: function() {
+    get: function () {
       return this.y + this.height;
     },
-    set: function(bottom) {
+    set: function (bottom) {
       if (this.height === Number.POSITIVE_INFINITY) {
         this.y = Number.NEGATIVE_INFINITY; // edge case
       } else {
@@ -48,19 +48,25 @@ Object.defineProperties(Rectangle.prototype, {
   }
 });
 
-Rectangle.prototype.set = function(x, y, width, height) {
+// static methods
+AABB.minkowskiDifference = function (r1, r2) {
+  return new AABB(r1.left - r2.right, r1.top - r2.bottom, r1.width + r2.width, r1.height + r2.height);
+}
+
+// public methods
+AABB.prototype.set = function (x, y, width, height) {
   this.x = x;
   this.y = y;
   this.width = width || this.width;
   this.height = height || this.height;
 };
 
-Rectangle.prototype.move = function(dx, dy) {
+AABB.prototype.move = function (dx, dy) {
   this.x += dx;
   this.y += dy;
 };
 
-Rectangle.prototype.within = function(r) {
+AABB.prototype.within = function (r) {
   return (
     r.left <= this.left &&
     r.right >= this.right &&
@@ -69,7 +75,7 @@ Rectangle.prototype.within = function(r) {
   );
 };
 
-Rectangle.prototype.overlaps = function(r) {
+AABB.prototype.overlaps = function (r) {
   return (
     this.left < r.right &&
     r.left < this.right &&

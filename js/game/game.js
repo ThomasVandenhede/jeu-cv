@@ -12,9 +12,11 @@ var Game = (function () {
     this.ctx = this.canvas.getContext("2d");
     this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
+    this.soundManager = soundManager.getInstance();
+    this.soundManager.init(gameData.sounds);
 
     // initialize world size
-    worldRect = new Rectangle(0, -100000, 3000, 102000);
+    worldRect = new AABB(0, -100000, 3000, 102000);
 
     // initialize world objects
     this.player = new Player(100, -600);
@@ -55,17 +57,16 @@ var Game = (function () {
     this.drawables.push(this.player);
     this.drawables = this.drawables.concat(this.platforms);
 
+    var that = this;
     this.player.collidableWith = this.drawables.filter(function (el) {
-      return el !== this.player;
+      return el !== that.player;
     });
 
     this.camera = new Camera(
       0,
       0,
       this.canvas.width,
-      this.canvas.height,
-      2000,
-      2000
+      this.canvas.height
     );
     this.camera.follow(
       this.player,
@@ -111,19 +112,28 @@ var Game = (function () {
     this.player.detectCollisions();
 
     // update objects to be rendered
-    this.player.shield.update(dt);
+    this.player.shield.update();
     for (var i = 0; i < this.platforms.length; i++) {
       var platform = this.platforms[i];
-      platform.update(dt);
+      platform.update();
     }
-    this.player.update(dt);
+    this.player.update();
     this.camera.update();
   };
+
+  // function toFixedPrecision(number, precision) {
+  //   return +Number(Math.round(number * Math.pow(10, precision)) / Math.pow(10, precision)).toFixed(precision);
+  // }
+
+  function toFixedPrecision(number, precision) {
+    var X = Math.pow(10, precision);
+    return Math.round(number * X) / X;
+  }
 
   Game.prototype.updateTimeEllapsed = function () {
     this.previousTime = this.currentTime || Date.now();
     this.currentTime = Date.now();
-    return (this.currentTime - this.previousTime) / 1000;
+    return toFixedPrecision((this.currentTime - this.previousTime) / 1000, 2);
   };
 
   Game.prototype.renderBackground = function (ctx) {
@@ -134,8 +144,8 @@ var Game = (function () {
       ctx.fillStyle = "rgba(255, 255, 255, " + star.opacity + ")";
       ctx.beginPath();
       ctx.arc(
-        (star.x - this.camera.x + this.canvas.width) % this.canvas.width,
-        (star.y - this.camera.y + this.canvas.height) % this.canvas.height,
+        (star.x - this.camera.x * 0.7 + this.canvas.width) % this.canvas.width,
+        (star.y - this.camera.y * 0.7 + this.canvas.height) % this.canvas.height,
         star.r,
         0,
         Math.PI * 2

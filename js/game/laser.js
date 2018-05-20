@@ -1,4 +1,4 @@
-var Laser = (function() {
+var Laser = (function () {
   function Laser(A, B, color) {
     Segment.call(this, A, B);
 

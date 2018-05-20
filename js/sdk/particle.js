@@ -1,4 +1,4 @@
-var Particle = (function() {
+var Particle = (function () {
   function Particle(x, y, size, color, vx, vy) {
     Vector.call(this, x, y);
 
@@ -11,12 +11,12 @@ var Particle = (function() {
 
   Particle.prototype = Object.create(Vector.prototype);
 
-  Particle.prototype.update = function(dt) {
+  Particle.prototype.update = function () {
     this.x += this.v.x * dt;
     this.y += this.v.y * dt;
   };
 
-  Particle.prototype.draw = function() {
+  Particle.prototype.draw = function () {
     ctx.save();
     ctx.fillStyle = this.color;
     ctx.beginPath();
@@ -25,4 +25,6 @@ var Particle = (function() {
     ctx.fill();
     ctx.restore();
   };
+
+  return Particle;
 })();
