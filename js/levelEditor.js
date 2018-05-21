@@ -1,4 +1,4 @@
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", function() {
   function fitCanvasToContainer() {
     var canvases = document.getElementsByTagName("canvas");
     for (var i = 0; i < canvases.length; i++) {
@@ -17,9 +17,9 @@ window.addEventListener("DOMContentLoaded", function () {
   fitCanvasToContainer();
 
   // start level editor
-  var levelEditor = new LevelEditor();
+  window.levelEditor = new LevelEditor();
   levelEditor.init({
     rulers: true
-  })
+  });
   levelEditor.start();
 });
