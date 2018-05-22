@@ -1,7 +1,7 @@
-var Game = (function () {
-  function Game(options) { }
+var Game = (function() {
+  function Game(options) {}
 
-  Game.prototype.init = function (config) {
+  Game.prototype.init = function(config) {
     this.debug = config.debug || false;
     this.rulers = config.rulers !== undefined ? config.rulers : true;
     this.previousTime;
@@ -58,16 +58,11 @@ var Game = (function () {
     this.drawables = this.drawables.concat(this.platforms);
 
     var that = this;
-    this.player.collidableWith = this.drawables.filter(function (el) {
+    this.player.collidableWith = this.drawables.filter(function(el) {
       return el !== that.player;
     });
 
-    this.camera = new Camera(
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
+    this.camera = new Camera(0, 0, this.canvas.width, this.canvas.height);
     this.camera.follow(
       this.player,
       (this.canvas.width - this.player.width) / 2 - 10,
@@ -75,7 +70,7 @@ var Game = (function () {
     );
   };
 
-  Game.prototype.handleKeyboard = function () {
+  Game.prototype.handleKeyboard = function() {
     if (this.keyboard.ESCAPE) {
       this.pause();
     }
@@ -106,7 +101,7 @@ var Game = (function () {
     }
   };
 
-  Game.prototype.updateScene = function () {
+  Game.prototype.updateScene = function() {
     // apply gravity and resolve collisions
     this.player.applyGravity();
     this.player.detectCollisions();
@@ -130,13 +125,13 @@ var Game = (function () {
     return Math.round(number * X) / X;
   }
 
-  Game.prototype.updateTimeEllapsed = function () {
+  Game.prototype.updateTimeEllapsed = function() {
     this.previousTime = this.currentTime || Date.now();
     this.currentTime = Date.now();
     return toFixedPrecision((this.currentTime - this.previousTime) / 1000, 2);
   };
 
-  Game.prototype.renderBackground = function (ctx) {
+  Game.prototype.renderBackground = function(ctx) {
     this.fillCanvas(ctx, "#111");
     ctx.save();
     for (var i = 0; i < this.starCount; i++) {
@@ -145,27 +140,27 @@ var Game = (function () {
       ctx.beginPath();
       ctx.arc(
         (star.x - this.camera.x * 0.7 + this.canvas.width) % this.canvas.width,
-        (star.y - this.camera.y * 0.7 + this.canvas.height) % this.canvas.height,
+        (star.y - this.camera.y * 0.7 + this.canvas.height) %
+          this.canvas.height,
         star.r,
         0,
         Math.PI * 2
       );
       ctx.fill();
-      ctx.closePath();
     }
     ctx.restore();
   };
 
-  Game.prototype.clearCanvas = function (ctx) {
+  Game.prototype.clearCanvas = function(ctx) {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
-  Game.prototype.fillCanvas = function (ctx, color) {
+  Game.prototype.fillCanvas = function(ctx, color) {
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
-  Game.prototype.drawRulers = function (ctx) {
+  Game.prototype.drawRulers = function(ctx) {
     var minX,
       maxX,
       minY,
@@ -173,7 +168,7 @@ var Game = (function () {
       crossSize = 3;
     ctx.save();
     ctx.font = "bold 16px Arial";
-    ctx.fillStyle = "#ffd700"; // Star Wars yellow
+    ctx.fillStyle = gameData.colors.STAR_WARS_YELLOW; // Star Wars yellow
     ctx.strokeStyle = "white";
     minX = Math.floor(this.camera.x / 100, 2) * 100;
     maxX = Math.ceil((this.camera.x + this.camera.wView) / 100, 2) * 100;
@@ -185,7 +180,7 @@ var Game = (function () {
       ctx.moveTo(i - this.camera.x, this.canvas.height - 10);
       ctx.lineTo(i - this.camera.x, this.canvas.height);
       ctx.stroke();
-      ctx.closePath();
+
       ctx.fillText(i, i + 10 - this.camera.x, 20);
       ctx.fillText(i, i + 10 - this.camera.x, this.canvas.height - 10);
     }
@@ -199,7 +194,7 @@ var Game = (function () {
       ctx.moveTo(this.canvas.width - 10, i - this.camera.y);
       ctx.lineTo(this.canvas.width, i - this.camera.y);
       ctx.stroke();
-      ctx.closePath();
+
       ctx.fillText(-i, 20, i - this.camera.y);
       ctx.fillText(-i, this.canvas.width - 50, i - this.camera.y);
     }
@@ -211,13 +206,12 @@ var Game = (function () {
         ctx.moveTo(i - this.camera.x, j - crossSize - this.camera.y);
         ctx.lineTo(i - this.camera.x, j + crossSize - this.camera.y);
         ctx.stroke();
-        ctx.closePath();
       }
     }
     ctx.restore();
   };
 
-  Game.prototype.renderScene = function (ctx) {
+  Game.prototype.renderScene = function(ctx) {
     this.rulers && this.drawRulers(ctx);
 
     // optimize rendering by only drawing objects that are on screen
@@ -228,7 +222,7 @@ var Game = (function () {
     }
   };
 
-  Game.prototype.pause = function () {
+  Game.prototype.pause = function() {
     this.paused = !this.paused;
     var gameMenu = document.querySelector(".game-menu");
     if (this.paused) {
@@ -238,18 +232,18 @@ var Game = (function () {
     }
   };
 
-  Game.prototype.start = function () {
+  Game.prototype.start = function() {
     var music = new Sound(
       "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
       1
     );
-    setTimeout(function () {
+    setTimeout(function() {
       music.play();
     }, 2000);
     this.main();
   };
 
-  Game.prototype.main = function () {
+  Game.prototype.main = function() {
     dt = this.updateTimeEllapsed();
     this.handleKeyboard();
     !this.paused && this.updateScene();
@@ -260,7 +254,7 @@ var Game = (function () {
     requestAnimationFrame(this.main.bind(this));
   };
 
-  Game.prototype.updateDebugInfo = function () {
+  Game.prototype.updateDebugInfo = function() {
     var debug = document.querySelector(".debug");
     var positionEl = debug.querySelector(".player__position");
     var sizeEl = debug.querySelector(".player__size");
@@ -273,7 +267,7 @@ var Game = (function () {
 
     var collidingHTML = Object.keys(this.player.isColliding)
       .filter(
-        function (key) {
+        function(key) {
           return this.player.isColliding[key];
         }.bind(this)
       )

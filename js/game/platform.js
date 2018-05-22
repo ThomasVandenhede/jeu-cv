@@ -1,4 +1,4 @@
-var Platform = (function () {
+var Platform = (function() {
   var MAX_SPEED = 100;
 
   function Platform(x, y, width, height) {
@@ -11,11 +11,11 @@ var Platform = (function () {
 
   Platform.prototype = Object.create(AABB.prototype);
 
-  Platform.prototype.update = function () {
+  Platform.prototype.update = function() {
     // update
   };
 
-  Platform.prototype.draw = function (ctx, camera) {
+  Platform.prototype.draw = function(ctx, camera) {
     ctx.save();
     if (this.touched) {
       ctx.shadowColor = this.color;
@@ -23,10 +23,7 @@ var Platform = (function () {
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
-      ctx.closePath();
       ctx.fill();
-      // ctx.shadowOffsetX = -1000000;
-      // ctx.shadowOffsetY = 0;
 
       // inset shadow
       ctx.shadowBlur = 3;
@@ -35,7 +32,6 @@ var Platform = (function () {
       ctx.beginPath();
       ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
       ctx.stroke();
-      ctx.closePath();
     } else {
       ctx.beginPath();
       ctx.strokeStyle = this.color;
@@ -46,7 +42,6 @@ var Platform = (function () {
         this.width,
         this.height
       );
-      ctx.closePath();
     }
     ctx.restore();
   };
