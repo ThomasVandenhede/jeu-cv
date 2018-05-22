@@ -2,7 +2,9 @@ html {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
@@ -17,6 +19,4 @@ canvas {
   display: block;
   height: 480px;
   width: 640px;
-  cursor: grab;
-  cursor: none;
 }
