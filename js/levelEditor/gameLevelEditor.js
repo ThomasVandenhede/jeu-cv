@@ -1,6 +1,115 @@
 var LevelEditor = (function() {
   function LevelEditor(options) {}
 
+  function handleMouseDown(e) {
+    this.canvas.style.cursor = "grabbing";
+    this.clickX = e.clientX + this.canvas.offsetLeft;
+    this.clickY = e.clientY + this.canvas.offsetTop;
+
+    this.buttons[e.button] = true;
+    switch (e.button) {
+      case 0:
+        // left mouse button
+        break;
+      case 1:
+        // mouse wheel
+        this.grabbed = this.context.camera;
+        this.grabbedStartingX = this.grabbed.x;
+        this.grabbedStartingY = this.grabbed.y;
+        break;
+      case 2:
+        // right mouse button
+        break;
+      default:
+        break;
+    }
+  }
+
+  function handleMouseUp(e) {
+    this.canvas.style.cursor = "grab";
+    this.releaseX = e.clientX + this.canvas.offsetLeft;
+    this.releaseY = e.clientY + this.canvas.offsetTop;
+    switch (e.button) {
+      case 0:
+        // left mouse button
+        this.buttons[0] = false;
+        // this.grabbed = null;
+        break;
+      case 1:
+        // mouse wheel
+        this.buttons[1] = false;
+        this.grabbed = null;
+        break;
+      case 2:
+        // right mouse button
+        this.buttons[2] = false;
+        // this.grabbed = null;
+        break;
+      default:
+        break;
+    }
+  }
+
+  function handleMouseMove(e) {
+    var newX = e.clientX + this.canvas.offsetLeft;
+    var newY = e.clientY + this.canvas.offsetTop;
+
+    this.dx = newX - this.x;
+    this.dy = newY - this.y;
+    this.x = newX;
+    this.y = newY;
+  }
+
+  function handleWheel(e) {
+    var grid = this.context.grid;
+    var camera = this.context.camera;
+    var zoomingRatePerScroll = 1.2;
+    var unapplyCamera = camera.unapplyCamera.bind(camera);
+    var deltaY = e.deltaY;
+    var mouseX = e.clientX + this.canvas.offsetLeft;
+    var mouseY = e.clientY + this.canvas.offsetTop;
+    var mouseGamePos = unapplyCamera(mouseX, mouseY);
+    var snappedMouseGamePos = new Vector(
+      Math.round(mouseGamePos.x / 10) * 10,
+      Math.round(mouseGamePos.y / 10) * 10
+    );
+
+    if (deltaY > 0) {
+      camera.zoomLevel /= zoomingRatePerScroll;
+      if (camera.zoomLevel < 0.02) {
+        camera.zoomLevel = 0.02;
+      } else {
+        camera.x =
+          (camera.x - mouseGamePos.x) * zoomingRatePerScroll + mouseGamePos.x;
+        camera.y =
+          (camera.y - mouseGamePos.y) * zoomingRatePerScroll + mouseGamePos.y;
+      }
+    } else {
+      camera.zoomLevel *= zoomingRatePerScroll;
+      if (camera.zoomLevel > 8) {
+        camera.zoomLevel = 8;
+      } else {
+        camera.x =
+          (camera.x - mouseGamePos.x) / zoomingRatePerScroll + mouseGamePos.x;
+        camera.y =
+          (camera.y - mouseGamePos.y) / zoomingRatePerScroll + mouseGamePos.y;
+      }
+    }
+
+    // update mouse precision for performance
+    if (camera.zoomLevel <= 0.3) {
+      grid.innerGridSize = 1000;
+    } else if (camera.zoomLevel < 0.5) {
+      grid.innerGridSize = 100;
+    } else if (camera.zoomLevel < 3) {
+      grid.innerGridSize = 50;
+    } else if (camera.zoomLevel < 5) {
+      grid.innerGridSize = 10;
+    }
+    grid.precisionAreaSize = grid.innerGridSize;
+    grid.precisionGridSize = grid.precisionAreaSize / 10;
+  }
+
   LevelEditor.prototype.init = function(config) {
     this.rulers = config.rulers !== undefined ? config.rulers : true;
     this.canvas = document.getElementById("canvas");
@@ -11,6 +120,10 @@ var LevelEditor = (function() {
     this.keyboard = keyboardManager.getInstance();
     this.mouse = mouse.getInstance();
     this.mouse.init(this); // pass the game object to the mouse as its context
+    this.mouse.on("mousedown", handleMouseDown);
+    this.mouse.on("mousemove", handleMouseMove);
+    this.mouse.on("mouseup", handleMouseUp);
+    this.mouse.on("wheel", handleWheel, { passive: true });
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData.sounds);
     this.grid = new Grid(this);
@@ -22,7 +135,7 @@ var LevelEditor = (function() {
     };
 
     // initialize world size
-    worldRect = new AABB(0, 0, 20000, 20000);
+    worldRect = new AABB(0, 0, 10000, 10000);
 
     // initialize world objects
     this.drawables = [];
@@ -88,7 +201,6 @@ var LevelEditor = (function() {
         Math.PI * 2
       );
       ctx.fill();
-      ctx.closePath();
     }
     ctx.restore();
   };
@@ -136,7 +248,7 @@ var LevelEditor = (function() {
       )
     );
     ctx.stroke();
-    ctx.closePath();
+
     ctx.restore();
   };
 

@@ -6,12 +6,11 @@ var Grid = (function() {
     this.mouse = this.context.mouse;
 
     // grid config
-    this.crossSize = 5;
     this.cursorSize = 10;
     this.cursorColor = "white";
-    this.precision = 10;
     this.innerGridSize = 100;
-    this.precisionAreaSize = 100;
+    this.precisionAreaSize = this.innerGridSize;
+    this.precisionGridSize = this.innerGridSize / 10;
     this.isPrecisionAreaRound = false; // otherwise square
   }
 
@@ -19,61 +18,73 @@ var Grid = (function() {
     var camera = this.camera;
     var applyCam = camera.applyCamera.bind(camera);
     var unapplyCam = camera.unapplyCamera.bind(camera);
-    var precision = this.precision;
+    var precisionGridSize = this.precisionGridSize;
     var mouse = this.mouse;
 
     var mouseGamePos = unapplyCam(mouse.x, mouse.y);
     var snappedMouseGamePos = new Vector(
-      Math.round(mouseGamePos.x / precision) * precision,
-      Math.round(mouseGamePos.y / precision) * precision
+      Math.round(mouseGamePos.x / precisionGridSize) * precisionGridSize,
+      Math.round(mouseGamePos.y / precisionGridSize) * precisionGridSize
     );
     return applyCam(snappedMouseGamePos.x, snappedMouseGamePos.y);
   };
 
   Grid.prototype._drawRulers = function(ctx, camera) {
+    var applyCam = camera.applyCamera.bind(camera);
     var applyCamToArr = function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
-    var minX = Math.floor(camera.left / 100, 2) * 100;
-    var maxX = Math.ceil(camera.right / 100, 2) * 100;
-    var minY = Math.floor(camera.top / 100, 2) * 100;
-    var maxY = Math.ceil(camera.bottom / 100, 2) * 100;
+    var innerGridSize = this.innerGridSize;
+    var minX = Math.floor(camera.left / innerGridSize, 2) * innerGridSize;
+    var maxX = Math.ceil(camera.right / innerGridSize, 2) * innerGridSize;
+    var minY = Math.floor(camera.top / innerGridSize, 2) * innerGridSize;
+    var maxY = Math.ceil(camera.bottom / innerGridSize, 2) * innerGridSize;
 
     ctx.save();
-    ctx.font = "bold " + 16 * camera.zoomLevel + "px Arial";
-    ctx.fillStyle = "#ffd700"; // Star Wars yellow
+    ctx.font = "bold 16px Arial";
+    ctx.fillStyle = gameData.colors.STAR_WARS_YELLOW; // Star Wars yellow
     ctx.strokeStyle = "white";
-    for (var i = minX; i <= maxX; i += 100) {
-      ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.top));
-      ctx.lineTo.apply(ctx, applyCamToArr(i, camera.top + 10));
-      ctx.stroke();
-      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.bottom - 10));
-      ctx.lineTo.apply(ctx, applyCamToArr(i, camera.bottom));
-      ctx.stroke();
-      ctx.closePath();
-      ctx.fillText.apply(
-        ctx,
-        [i].concat(applyCamToArr(i + 10, camera.top + 20))
-      );
-      ctx.fillText.apply(
-        ctx,
-        [i].concat(applyCamToArr(i + 10, camera.bottom - 20))
-      );
+    for (var i = minX; i <= maxX; i += innerGridSize) {
+      if (i % (innerGridSize * 5) === 0) {
+        ctx.fillText.apply(
+          ctx,
+          [i].concat(
+            Object.values(
+              Vector.sum(applyCam(i, camera.top0), new Vector(10, 20))
+            )
+          )
+        );
+        ctx.fillText.apply(
+          ctx,
+          [i].concat(
+            Object.values(
+              Vector.sum(applyCam(i, camera.bottom), new Vector(10, -10))
+            )
+          )
+        );
+      }
     }
-    for (var i = minY; i <= maxY; i += 100) {
-      ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(camera.left, i));
-      ctx.lineTo.apply(ctx, applyCamToArr(camera.left + 10, i));
-      ctx.stroke();
-      ctx.moveTo.apply(ctx, applyCamToArr(camera.right - 10, i));
-      ctx.lineTo.apply(ctx, applyCamToArr(camera.right, i));
-      ctx.stroke();
-      ctx.closePath();
-      ctx.textAlign = "left";
-      ctx.fillText.apply(ctx, [-i].concat(applyCamToArr(camera.left + 20, i)));
-      ctx.textAlign = "right";
-      ctx.fillText.apply(ctx, [-i].concat(applyCamToArr(camera.right - 20, i)));
+    for (var j = minY; j <= maxY; j += innerGridSize) {
+      if (j % (innerGridSize * 5) === 0) {
+        ctx.textAlign = "left";
+        ctx.fillText.apply(
+          ctx,
+          [-j].concat(
+            Object.values(
+              Vector.sum(applyCam(camera.left, j), new Vector(10, -10))
+            )
+          )
+        );
+        ctx.textAlign = "right";
+        ctx.fillText.apply(
+          ctx,
+          [-j].concat(
+            Object.values(
+              Vector.sum(applyCam(camera.right, j), new Vector(-10, -10))
+            )
+          )
+        );
+      }
     }
   };
 
@@ -82,24 +93,32 @@ var Grid = (function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
     var innerGridSize = this.innerGridSize;
-    var minX = Math.floor(camera.x / innerGridSize, 2) * innerGridSize;
-    var maxX =
-      Math.ceil((camera.x + camera.width) / innerGridSize, 2) * innerGridSize;
-    var minY = Math.floor(camera.y / innerGridSize, 2) * innerGridSize;
-    var maxY =
-      Math.ceil((camera.y + camera.height) / innerGridSize, 2) * innerGridSize;
+    var minX = Math.floor(camera.left / innerGridSize, 2) * innerGridSize;
+    var maxX = Math.ceil(camera.right / innerGridSize, 2) * innerGridSize;
+    var minY = Math.floor(camera.top / innerGridSize, 2) * innerGridSize;
+    var maxY = Math.ceil(camera.bottom / innerGridSize, 2) * innerGridSize;
 
     for (var i = minX; i <= maxX; i += innerGridSize) {
-      for (var j = minY; j <= maxY; j += innerGridSize) {
-        ctx.strokeStyle = "rgba(255, 255, 255, 1)";
-        ctx.beginPath();
-        ctx.moveTo.apply(ctx, applyCamToArr(i - this.crossSize, j));
-        ctx.lineTo.apply(ctx, applyCamToArr(i + this.crossSize, j));
-        ctx.moveTo.apply(ctx, applyCamToArr(i, j - this.crossSize));
-        ctx.lineTo.apply(ctx, applyCamToArr(i, j + this.crossSize));
-        ctx.stroke();
-        ctx.closePath();
+      if (i % (innerGridSize * 5) === 0) {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+      } else {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
       }
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.top));
+      ctx.lineTo.apply(ctx, applyCamToArr(i, camera.bottom));
+      ctx.stroke();
+    }
+    for (var j = minY; j <= maxY; j += innerGridSize) {
+      if (j % (innerGridSize * 5) === 0) {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+      } else {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+      }
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(camera.left, j));
+      ctx.lineTo.apply(ctx, applyCamToArr(camera.right, j));
+      ctx.stroke();
     }
   };
 
@@ -107,47 +126,40 @@ var Grid = (function() {
     var applyCamToArr = function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
-    var camPrecisionAreaSize = this.precisionAreaSize * camera.zoomLevel;
+    var unapplyCam = camera.unapplyCamera.bind(camera);
     var mousePos = this._getMousePosSnappedToGrid();
+    var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
+    var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
+    var minX = mousePos.x - precisionAreaGameSize / 2;
+    var maxX = mousePos.x + precisionAreaGameSize / 2;
+    var minY = mousePos.y - precisionAreaGameSize / 2;
+    var maxY = mousePos.y + precisionAreaGameSize / 2;
     ctx.strokeStyle = "grey";
-    for (
-      var i = mousePos.x - camPrecisionAreaSize / 2;
-      i <= mousePos.x + camPrecisionAreaSize / 2;
-      i += this.precision * camera.zoomLevel
-    ) {
-      for (
-        var j = mousePos.y - camPrecisionAreaSize / 2;
-        j <= mousePos.y + camPrecisionAreaSize / 2;
-        j += this.precision * camera.zoomLevel
-      ) {
-        if (
-          !this.isPrecisionAreaRound ||
-          Math.pow(i - mousePos.x, 2) + Math.pow(j - mousePos.y, 2) <=
-            Math.pow(camPrecisionAreaSize / 2, 2)
-        ) {
-          ctx.beginPath();
-          ctx.moveTo(i - this.crossSize, j);
-          ctx.lineTo(i + this.crossSize, j);
-          ctx.moveTo(i, j - this.crossSize);
-          ctx.lineTo(i, j + this.crossSize);
-          ctx.stroke();
-          ctx.closePath();
-        }
-      }
+    for (var i = minX; i <= maxX; i += precisionGridSize) {
+      ctx.beginPath();
+      ctx.moveTo(i, minY);
+      ctx.lineTo(i, maxY);
+      ctx.stroke();
+    }
+    for (var j = minY; j <= maxY; j += precisionGridSize) {
+      ctx.beginPath();
+      ctx.moveTo(minX, j);
+      ctx.lineTo(maxX, j);
+      ctx.stroke();
     }
   };
 
   Grid.prototype._drawCursor = function(ctx, camera) {
     var mousePos = this._getMousePosSnappedToGrid();
+    var cursorSize = this.cursorSize;
     ctx.strokeStyle = this.cursorColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(mousePos.x - this.cursorSize / 2, mousePos.y);
-    ctx.lineTo(mousePos.x + this.cursorSize / 2, mousePos.y);
-    ctx.moveTo(mousePos.x, mousePos.y - this.cursorSize / 2);
-    ctx.lineTo(mousePos.x, mousePos.y + this.cursorSize / 2);
+    ctx.moveTo(mousePos.x - cursorSize / 2, mousePos.y);
+    ctx.lineTo(mousePos.x + cursorSize / 2, mousePos.y);
+    ctx.moveTo(mousePos.x, mousePos.y - cursorSize / 2);
+    ctx.lineTo(mousePos.x, mousePos.y + cursorSize / 2);
     ctx.stroke();
-    ctx.closePath();
     ctx.restore();
   };
 
