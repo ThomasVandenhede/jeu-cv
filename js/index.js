@@ -18,13 +18,18 @@ window.addEventListener("DOMContentLoaded", function () {
 
   var game = new Game();
   game.init({
-    debug: true,
-    rulers: true
+    shouldDisplayDebug: false,
+    shouldDisplayRulers: true
   });
-  game.start();
+  game.startGame();
 
-  game.debug &&
-    setInterval(function () {
+  var debug = document.querySelector(".debug");
+  if (game.shouldDisplayDebug) {
+    debug.classList.remove("hidden");
+    setInterval(function() {
       game.updateDebugInfo();
     }, 50);
+  } else {
+    debug.classList.add("hidden");
+  }
 });
