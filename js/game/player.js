@@ -287,18 +287,26 @@ var Player = (function() {
     return deltaWidth;
   };
 
-  // Player.prototype.updatePlayerSize = function (deltaWidth) {
-  //   this.width += deltaWidth;
-  //   this.height -= deltaWidth;
-  //   this.x -= deltaWidth / 2;
-  //   this.y += deltaWidth;
-  // }
-
   Player.prototype.updatePlayerSize = function(deltaWidth) {
     this.width = toFixedPrecision(this.width + deltaWidth, 3);
     this.height = toFixedPrecision(this.height - deltaWidth, 3);
     this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
     this.y = toFixedPrecision(this.y + deltaWidth, 3);
+  };
+
+  Player.prototype.getNextState = function() {
+    // apply gravity if player is free falling
+    var ay = this.GRAVITY_ACCELERATION;
+
+    // compute new speed based on acceleration and time ellapsed
+    var vy = this.v.y + ay * dt;
+    vy = Math.abs(vy) > MAX_FALL_SPEED ? Math.sign(vy) * MAX_FALL_SPEED : vy;
+    return new AABB(
+      this.x + this.v.x * dt,
+      this.y + vy * dt,
+      this.width,
+      this.height
+    );
   };
 
   Player.prototype.update = function() {

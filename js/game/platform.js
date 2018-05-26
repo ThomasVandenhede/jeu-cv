@@ -6,14 +6,16 @@ var Platform = (function() {
 
     this.v = new Vector();
     this.touched = false; // is the player touching the platform
-    this.color = "#ccc";
+    this.color = "#ddd";
   }
 
   Platform.prototype = Object.create(AABB.prototype);
 
-  Platform.prototype.update = function() {
-    // update
+  Platform.prototype.getNextState = function() {
+    return this;
   };
+
+  Platform.prototype.update = function() {};
 
   Platform.prototype.draw = function(ctx, camera) {
     ctx.save();
