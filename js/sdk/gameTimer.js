@@ -30,9 +30,18 @@ var GameTimer = (function() {
   GameTimer.prototype.draw = function(ctx) {
     var totalTime = new Date();
     totalTime.setTime(this.totalTime);
+    seconds = totalTime.getSeconds();
+    minutes = totalTime.getMinutes();
+
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(27, 229, 0)";
     ctx.font = "32px Arial";
     ctx.textAlign = "center";
-    ctx.fillText(totalTime.toISOString("mm:ss"), canvas.width / 2, 80);
+    ctx.fillText(minutes + ":" + seconds, canvas.width / 2, 80);
+    ctx.restore();
   };
 
   return GameTimer;
