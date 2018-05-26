@@ -6,62 +6,60 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Level Editor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="main.css">
-  <style>
-    html {
-      box-sizing: border-box
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: inherit;
-    }
-
-    body {
-      position: relative;
-    }
-
-    .page {
-      height: 100vh;
-      display: flex;
-    }
-
-    .container {
-      position: relative;
-      height: 100vh;
-      width: 100vw;
-      margin: auto;
-    }
-
-    .ui {
-      flex-basis: 20%;
-    }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* utility classes */
-
-    .hidden {
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/level-editor.css">
 </head>
 
 <body>
   <div class="page">
-    <div class="container">
+    <div class="canvas-container">
       <canvas id="background" height=480 width=640></canvas>
       <canvas id="canvas" height=480 width=640></canvas>
     </div>
-    <div class="ui">
 
+    <div class="toolbar" id="toolbar">
+      <h2>Toolbar</h2>
+      <form action="" id="toolbar-form">
+        <p>
+          <label for="level-name">
+            Level Name
+            <input type="text" name="level-name" id="level-name" class="form-control">
+          </label>
+        </p>
+        <p>
+          <h3>World</h3>
+          <label for="world-x">
+            x
+            <input type="text" name="world-x" id="world-x" class="form-control">
+          </label>
+          <label for="world-y">
+            y
+            <input type="text" name="world-y" id="world-y" class="form-control">
+          </label>
+          <label for="world-width">
+            width
+            <input type="text" name="world-width" id="world-width" class="form-control">
+          </label>
+          <label for="world-height">
+            height
+            <input type="text" name="world-height" id="world-height" class="form-control">
+          </label>
+        </p>
+        <div>
+          <button id="button-select" class="btn">select</button>
+          <button id="button-create" class="btn">create</button>
+          <button id="button-move" class="btn">move</button>
+        </div>
+        <select name="" id="">
+          <option value="player">player</option>
+          <option value="platform">platform</option>
+          <option value="moving platform">moving platform</option>
+          <option value="ennemy">ennemy</option>
+          <option value="skill">skill</option>
+        </select>
+
+        <button id="button-download" class="btn btn-primary">GET DOWNLOAD LINK</button>
+      </form>
     </div>
   </div>
 
@@ -70,18 +68,18 @@
   <script src="./js/helpers.js"></script>
   <!-- basic shapes -->
   <script src="./js/sdk/vector.js"></script>
-  <script src="./js/sdk/rectangle.js"></script>
+  <script src="./js/sdk/AABB.js"></script>
   <script src="./js/sdk/particle.js"></script>
   <script src="./js/sdk/segment.js"></script>
   <!-- user input -->
   <script src="./js/sdk/keyboardManager.js"></script>
-  <script src="./js/levelEditor/mouseManager.js"></script>
+  <script src="./js/sdk/mouseManager.js"></script>
   <!-- sound -->
   <script src="./js/sdk/sound.js"></script>
   <script src="./js/sdk/soundManager.js"></script>
   <!-- levels -->
-  <script src="./js/sdk/level.js"></script>
-  <script src="./js/sdk/levelManager.js"></script>
+  <!-- <script src="./js/sdk/level.js"></script>
+  <script src="./js/sdk/levelManager.js"></script> -->
   <!-- camera -->
   <script src="./js/sdk/camera.js"></script>
   <!-- game specific -->
@@ -92,6 +90,9 @@
   <script src="./js/game/ennemy.js"></script>
   <script src="./js/game/player.js"></script>
   <script src="./js/game/gameData.js"></script>
+  <!-- level editor -->
+  <script src="./js/levelEditor/contextManager.js"></script>
+  <script src="./js/levelEditor/toolbar.js"></script>
   <script src="./js/levelEditor/grid.js"></script>
   <script src="./js/levelEditor/gameLevelEditor.js"></script>
   <!-- entry point -->
