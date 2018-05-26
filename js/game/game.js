@@ -15,10 +15,8 @@ var Game = (function() {
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
 
-    // initialize world size
-    worldRect = new AABB(0, -100000, 3000, 102000);
-
-    // initialize world objects
+    // create level
+    worldRect = new AABB(0, -10000, 3000, 2000);
     this.player = new Player(100, -600);
     this.platforms = [
       new Platform(0, -350, 200, 5),
@@ -62,7 +60,7 @@ var Game = (function() {
       return el !== that.player;
     });
 
-    this.camera = new Camera(0, 0, this.canvas.width, this.canvas.height);
+    this.camera = new Camera(this);
     this.camera.follow(
       this.player,
       (this.canvas.width - this.player.width) / 2 - 10,
@@ -160,65 +158,50 @@ var Game = (function() {
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
-  Game.prototype.drawRulers = function(ctx) {
-    var minX,
-      maxX,
-      minY,
-      maxY,
-      crossSize = 3;
+  Game.prototype.drawRulers = function(ctx, camera) {
+    var minX = Math.floor(this.camera.left / 100, 2) * 100;
+    var maxX = Math.ceil(this.camera.right / 100, 2) * 100;
+    var minY = Math.floor(this.camera.top / 100, 2) * 100;
+    var maxY = Math.ceil(this.camera.bottom / 100, 2) * 100;
+
     ctx.save();
-    ctx.font = "bold 16px Arial";
+    ctx.font = "bold 14px Arial";
     ctx.fillStyle = gameData.colors.STAR_WARS_YELLOW; // Star Wars yellow
     ctx.strokeStyle = "white";
-    minX = Math.floor(this.camera.x / 100, 2) * 100;
-    maxX = Math.ceil((this.camera.x + this.camera.wView) / 100, 2) * 100;
     for (var i = minX; i <= maxX; i += 100) {
       ctx.beginPath();
-      ctx.moveTo(i - this.camera.x, 0);
-      ctx.lineTo(i - this.camera.x, 10);
+      ctx.moveTo(i - camera.left, 0);
+      ctx.lineTo(i - camera.left, 10);
       ctx.stroke();
-      ctx.moveTo(i - this.camera.x, this.canvas.height - 10);
-      ctx.lineTo(i - this.camera.x, this.canvas.height);
+      ctx.moveTo(i - camera.left, this.canvas.height - 10);
+      ctx.lineTo(i - camera.left, this.canvas.height);
       ctx.stroke();
 
-      ctx.fillText(i, i + 10 - this.camera.x, 20);
-      ctx.fillText(i, i + 10 - this.camera.x, this.canvas.height - 10);
+      ctx.fillText(i, i + 10 - camera.left, 20);
+      ctx.fillText(i, i + 10 - camera.left, this.canvas.height - 10);
     }
-    minY = Math.floor(this.camera.y / 100, 2) * 100;
-    maxY = Math.ceil((this.camera.y + this.camera.hView) / 100, 2) * 100;
     for (var i = minY; i <= maxY; i += 100) {
       ctx.beginPath();
-      ctx.moveTo(0, i - this.camera.y);
-      ctx.lineTo(10, i - this.camera.y);
+      ctx.moveTo(0, i - camera.top);
+      ctx.lineTo(10, i - camera.top);
       ctx.stroke();
-      ctx.moveTo(this.canvas.width - 10, i - this.camera.y);
-      ctx.lineTo(this.canvas.width, i - this.camera.y);
+      ctx.moveTo(this.canvas.width - 10, i - camera.top);
+      ctx.lineTo(this.canvas.width, i - camera.top);
       ctx.stroke();
 
-      ctx.fillText(-i, 20, i - this.camera.y);
-      ctx.fillText(-i, this.canvas.width - 50, i - this.camera.y);
-    }
-    for (var i = minX + 100; i <= maxX - 100; i += 100) {
-      for (var j = minY + 100; j <= maxY - 100; j += 100) {
-        ctx.beginPath();
-        ctx.moveTo(i - crossSize - this.camera.x, j - this.camera.y);
-        ctx.lineTo(i + crossSize - this.camera.x, j - this.camera.y);
-        ctx.moveTo(i - this.camera.x, j - crossSize - this.camera.y);
-        ctx.lineTo(i - this.camera.x, j + crossSize - this.camera.y);
-        ctx.stroke();
-      }
+      ctx.fillText(-i, 20, i - camera.top);
+      ctx.fillText(-i, this.canvas.width - 50, i - camera.top);
     }
     ctx.restore();
   };
 
-  Game.prototype.renderScene = function(ctx) {
-    this.rulers && this.drawRulers(ctx);
+  Game.prototype.renderScene = function(ctx, camera) {
+    this.shouldDisplayRulers && this.drawRulers(ctx, camera);
 
-    // optimize rendering by only drawing objects that are on screen
+    // only drawing objects that are in the viewport
     for (var i = 0; i < this.drawables.length; i++) {
       var drawable = this.drawables[i];
-      drawable.overlaps(this.camera.viewportRect) &&
-        drawable.draw(ctx, this.camera);
+      drawable.overlaps(this.camera) && drawable.draw(ctx, camera);
     }
   };
 
@@ -248,8 +231,8 @@ var Game = (function() {
     this.handleKeyboard();
     !this.paused && this.updateScene();
     this.clearCanvas(this.ctx);
-    this.renderBackground(this.ctx);
-    this.renderScene(this.ctx);
+    this.renderBackground(this.ctx, this.camera);
+    this.renderScene(this.ctx, this.camera);
 
     requestAnimationFrame(this.main.bind(this));
   };
