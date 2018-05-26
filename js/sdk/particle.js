@@ -1,5 +1,5 @@
 var Particle = (function() {
-  function Particle(x, y, size, color, vx, vy) {
+  function Particle(x, y, size, color, vx, vy, maxLife) {
     Vector.call(this, x, y);
 
     this.size = size;
@@ -7,6 +7,7 @@ var Particle = (function() {
 
     this.v = new Vector(vx, vy);
     this.createdAt = Date.now();
+    this.maxLife = maxLife;
   }
 
   Particle.prototype = Object.create(Vector.prototype);
@@ -21,8 +22,10 @@ var Particle = (function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
     var color = this.color;
+    // var alpha = Math.max(0, 1 - (Date.now() - this.createdAt) / this.maxLife);
     ctx.save();
     ctx.fillStyle = color;
+    // ctx.globalAlpha = alpha;
     ctx.beginPath();
     ctx.arc.apply(
       ctx,
@@ -33,6 +36,7 @@ var Particle = (function() {
       ])
     );
     ctx.fill();
+    ctx.restore();
   };
 
   return Particle;

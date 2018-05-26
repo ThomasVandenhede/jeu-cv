@@ -20,9 +20,11 @@ var Player = (function() {
       maxCount: 50,
       particles: {},
       color: that.color,
+      minSpeed: 5,
+      maxSpeed: 20,
       size: 2,
       maxLife: 500,
-      addNewParticles: function() {
+      addNewParticle: function() {
         if (Object.keys(this.particles).length < this.maxCount) {
           this.particleIndex++;
           var position;
@@ -31,36 +33,35 @@ var Player = (function() {
               position = {
                 x: randInt(that.left, that.right),
                 y: that.top,
-                vx: randInt(-20, 20),
-                vy: randInt(-20, -5)
+                vx: randInt(-this.maxSpeed, this.maxSpeed),
+                vy: randInt(-this.maxSpeed, -this.minSpeed)
               };
               break;
             case 1:
               position = {
                 x: randInt(that.left, that.right),
                 y: that.bottom,
-                vx: randInt(-20, 20),
-                vy: randInt(5, 20)
+                vx: randInt(-this.maxSpeed, this.maxSpeed),
+                vy: randInt(this.minSpeed, this.maxSpeed)
               };
               break;
             case 2:
               position = {
                 x: that.left,
                 y: randInt(that.top, that.bottom),
-                vx: randInt(-20, -5),
-                vy: randInt(-20, 20)
+                vx: randInt(-this.maxSpeed, -this.minSpeed),
+                vy: randInt(-this.maxSpeed, this.maxSpeed)
               };
               break;
             case 3:
               position = {
                 x: that.right,
                 y: randInt(that.top, that.bottom),
-                vx: randInt(5, 20),
-                vy: randInt(-20, 20)
+                vx: randInt(this.minSpeed, this.maxSpeed),
+                vy: randInt(-this.maxSpeed, this.maxSpeed)
               };
               break;
           }
-          [];
           var color = this.color;
           // var color =
           //   "rgb(" +
@@ -76,18 +77,19 @@ var Player = (function() {
             this.size,
             color,
             position.vx,
-            position.vy
+            position.vy,
+            this.maxLife
           );
           particle.id = this.particleIndex;
           this.particles[this.particleIndex] = particle;
         }
       },
       update: function() {
-        this.addNewParticles();
+        this.addNewParticle();
         for (var id in this.particles) {
           var particle = this.particles[id];
           particle.update();
-          if (Date.now() - particle.createdAt > this.maxLife) {
+          if (Date.now() - particle.createdAt >= this.maxLife) {
             delete this.particles[id];
           }
         }
