@@ -1,18 +1,29 @@
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", function() {
   function fitCanvasToContainer() {
+    var canvasContainer = document.getElementById("canvas-container");
     var canvases = document.getElementsByTagName("canvas");
     for (var i = 0; i < canvases.length; i++) {
       var canvas = canvases[i];
-      canvas.setAttribute(
-        "width",
-        parseFloat(window.getComputedStyle(canvas).width)
+      var canvasWidth = parseFloat(window.getComputedStyle(canvas).width);
+      var canvasHeight = Math.min(
+        canvasWidth / 21 * 9,
+        parseFloat(window.getComputedStyle(canvasContainer).height)
       );
-      canvas.setAttribute(
-        "height",
-        parseFloat(window.getComputedStyle(canvas).height)
-      );
+      // change resolution
+      canvas.setAttribute("width", canvasWidth);
+      canvas.setAttribute("height", canvasHeight);
+
+      // change size to preserve aspect ratio
+      canvas.style.height = canvasHeight + "px";
     }
   }
+
+  var canvas = document.getElementById("canvas");
+  window.addEventListener("blur", function(e) {
+    if (game) {
+      game.pause();
+    }
+  });
   window.addEventListener("resize", fitCanvasToContainer);
   fitCanvasToContainer();
 
