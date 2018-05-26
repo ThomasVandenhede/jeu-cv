@@ -1,4 +1,4 @@
-var MovingPlatform = (function () {
+var MovingPlatform = (function() {
   function MovingPlatform(xStart, yStart, width, height, xEnd, yEnd, speed) {
     Platform.call(this, xStart, yStart, width, height);
 
@@ -18,7 +18,16 @@ var MovingPlatform = (function () {
 
   MovingPlatform.prototype = Object.create(Platform.prototype);
 
-  MovingPlatform.prototype.update = function () {
+  MovingPlatform.prototype.getNextState = function() {
+    return new AABB(
+      this.x + this.v.x * dt,
+      this.y + this.v.y * dt,
+      this.width,
+      this.height
+    );
+  };
+
+  MovingPlatform.prototype.update = function() {
     var dx = this.v.x * dt;
     var dy = this.v.y * dt;
     if (this.x + dx > this.xEnd || this.y + dy > this.yEnd) {

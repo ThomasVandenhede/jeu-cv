@@ -1,10 +1,10 @@
 var Player = (function() {
-  var MAX_SPEED = 1500;
-  var JUMP_SPEED = -600;
-  var COEFFICIENT_OF_RESTITUTION = 0.4;
+  var ABS_JUMP_SPEED = 600;
+  var MAX_FALL_SPEED = 1000;
   var animationID;
   var INITIAL_WIDTH = 5;
   var INITIAL_HEIGHT = 70;
+  var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
   function Player(x, y) {
     AABB.call(this, x, y, INITIAL_WIDTH, INITIAL_HEIGHT);
@@ -12,6 +12,7 @@ var Player = (function() {
     var that = this;
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
+    this.COEFFICIENT_OF_RESTITUTION = 0.4;
     this.color = "#22dd00";
     this.color = "#37e018";
 
@@ -104,17 +105,20 @@ var Player = (function() {
 
     // crouching / standing state and animations
     this.isCrouching = false;
-    this.crouchStandAnimationDuration = 0.2;
+    CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
     // collision direction for movement
     this.isColliding = {
-      right: false,
-      left: false,
-      up: false,
-      down: false
+      right: 0,
+      left: 0,
+      up: 0,
+      down: 0
     };
+
+    this.isColliding = [0, 0]; // [horizontal, vertical]
     this.collidableWith = []; // potential object collisions
     this.collidesWith = []; // actual object collisions
+    this.shield = new Shield(this);
 
     // sounds
     this.sounds = {
@@ -129,11 +133,11 @@ var Player = (function() {
       still: new Sound("./assets/sounds/Medium hum.mp4", 0.15)
     };
 
-    // shield
-    this.shield = new Shield(this);
-
-    // does the player get stuck to the ceiling when jumping?
+    // should the player get stuck to the ceiling when jumping?
     this.stickyJump = false;
+
+    // player's own gravity
+    this.GRAVITY_ACCELERATION = gameData.constants.GRAVITY_ACCELERATION;
   }
 
   Player.prototype = Object.create(AABB.prototype);
@@ -155,126 +159,34 @@ var Player = (function() {
   };
 
   Player.prototype.jump = function() {
-    if (this.isColliding.down) {
+    if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
       this.isCrouching
         ? this.sounds.jump[1].replay()
         : this.sounds.jump[0].replay();
-      this.isColliding.down = false;
-      this.v.y = JUMP_SPEED;
+      this.isColliding[1] = 0;
+      this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
     }
-    this.sounds.still.play(); // REMOVE THIS FROM HERE
+    this.sounds.still.play();
   };
 
-  Player.prototype.collideHorizontally = function(el) {
-    var collision = false;
-    var dx = this.v.x * dt;
-    var dy = this.v.y * dt;
-
-    var deltaWidth = this.getDeltaWidth();
-
-    // detect horizontal collisions
-    if (this.top + dy < el.bottom && this.bottom + dy > el.top) {
-      // left collision
-      if (this.left >= el.right && this.left + dx - deltaWidth < el.right) {
-        this.isColliding.left = true;
-        // resolve collision
-        this.x = el.right + deltaWidth + 1; // snap
-        this.v.x = 0;
-        collision = true;
-      }
-      // right collision
-      if (this.right <= el.x && this.right + dx + deltaWidth > el.x) {
-        this.isColliding.right = true;
-        // resolve collision
-        this.x = el.x - this.width - deltaWidth - 1; // snap
-        this.v.x = 0;
-        collision = true;
-      }
-    }
-    return collision;
+  Player.prototype.reverseGravity = function() {
+    this.GRAVITY_ACCELERATION = -this.GRAVITY_ACCELERATION;
   };
 
-  Player.prototype.collideVertically = function(el) {
-    var collision = false;
-    var dx = this.v.x * dt;
-    var dy = this.v.y * dt;
-
-    // detect vertical collision right
-    if (this.left + dx < el.right && this.right + dx > el.left) {
-      // up collision
-      if (this.top >= el.bottom && this.top + dy < el.bottom) {
-        this.isColliding.up = true;
-        this.y = el.y + el.height; // snap
-        // this.v.y = el.y; // REMOVE FOR "GLUE" EFFECT WHEN COLLIDING UPWARDS
-        // this.v.y = -this.v.y * COEFFICIENT_OF_RESTITUTION;
-        collision = true;
-      }
-      // down collision
-      if (this.bottom <= el.top && this.bottom + dy > el.top) {
-        this.isColliding.down = true;
-        this.v.y = -this.v.y * COEFFICIENT_OF_RESTITUTION;
-        this.v.x += el.v.x;
-        if (
-          this.isCrouching ||
-          Math.abs(this.v.y) <= gameData.constants.GRAVITY_ACCELERATION * dt + 1
-        ) {
-          this.v.y = 0;
-          this.y = el.y - this.height; // snap
-        }
-        collision = true;
-      }
-    }
-    return collision;
-  };
-
-  Player.prototype.applyGravity = function() {
-    // apply gravity if player is free falling
-    this.acceleration.y = gameData.constants.GRAVITY_ACCELERATION;
-
-    // compute new speed based on acceleration and time ellapsed since last rendering
-    this.v.y += this.acceleration.y * dt;
-    this.v.y =
-      Math.abs(this.v.y) > MAX_SPEED
-        ? Math.sign(this.v.y) * MAX_SPEED
-        : this.v.y;
-  };
-
-  Player.prototype.detectCollisions = function() {
-    // reset collisions
-    this.isColliding = {
-      right: false,
-      left: false,
-      up: false,
-      down: false
-    };
-
-    // detect collision with other collidable elements
-    for (var i = 0; i < this.collidableWith.length; i++) {
-      var hasVerticalCollision = false,
-        hasHorizontalCollision = false;
-      var rect = this.collidableWith[i];
-      // // TEST
-      // hasVerticalCollision = this.overlaps(this.collidableWith[i]);
-      // hasVerticalCollision && console.log(this.collidableWith[i]);
-      // if (hasVerticalCollision) {
-      //   this.v.y = 0;
-      // }
-
-      hasHorizontalCollision = this.collideHorizontally(rect);
-      hasVerticalCollision = this.collideVertically(rect);
-
-      if (hasVerticalCollision && this.v.y) {
-        this.sounds.hit[Math.floor(Math.random() * 2)].replay();
-      }
-
-      rect.touched = hasVerticalCollision || hasHorizontalCollision;
+  Player.prototype.zeroGravity = function() {
+    if (this.GRAVITY_ACCELERATION) {
+      this.GRAVITY_ACCELERATION = 0;
+    } else {
+      this.GRAVITY_ACCELERATION = gameData.constants.GRAVITY_ACCELERATION;
     }
   };
+
+  Player.prototype.die = function() {};
 
   Player.prototype.getDeltaWidth = function() {
     var deltaWidth;
     var computedDelta =
-      dt / this.crouchStandAnimationDuration * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
+      dt / CROUCH_STAND_ANIMATION_DURATION * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
     if (this.isCrouching) {
       deltaWidth =
         this.height - computedDelta < INITIAL_WIDTH
@@ -289,18 +201,41 @@ var Player = (function() {
     return deltaWidth;
   };
 
-  // Player.prototype.updatePlayerSize = function (deltaWidth) {
-  //   this.width += deltaWidth;
-  //   this.height -= deltaWidth;
-  //   this.x -= deltaWidth / 2;
-  //   this.y += deltaWidth;
-  // }
-
   Player.prototype.updatePlayerSize = function(deltaWidth) {
     this.width = toFixedPrecision(this.width + deltaWidth, 3);
     this.height = toFixedPrecision(this.height - deltaWidth, 3);
     this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
-    this.y = toFixedPrecision(this.y + deltaWidth, 3);
+    this.y =
+      this.GRAVITY_ACCELERATION < 0
+        ? toFixedPrecision(this.y, 3)
+        : toFixedPrecision(this.y + deltaWidth, 3);
+  };
+
+  Player.prototype.applyGravity = function() {
+    // apply gravity if player is free falling
+    this.acceleration.y = this.GRAVITY_ACCELERATION;
+
+    // compute new speed based on acceleration and time ellapsed
+    this.v.y += this.acceleration.y * dt;
+    this.v.y =
+      Math.abs(this.v.y) > MAX_FALL_SPEED
+        ? Math.sign(this.v.y) * MAX_FALL_SPEED
+        : this.v.y;
+  };
+
+  Player.prototype.getNextState = function() {
+    // apply gravity if player is free falling
+    var ay = this.GRAVITY_ACCELERATION;
+
+    // compute new speed based on acceleration and time ellapsed
+    var vy = this.v.y + ay * dt;
+    vy = Math.abs(vy) > MAX_FALL_SPEED ? Math.sign(vy) * MAX_FALL_SPEED : vy;
+    return new AABB(
+      this.x + this.v.x * dt,
+      this.y + vy * dt,
+      this.width,
+      this.height
+    );
   };
 
   Player.prototype.update = function() {
@@ -309,11 +244,11 @@ var Player = (function() {
 
     this.updatePlayerSize(this.getDeltaWidth());
     // apply natural position increments if no collision detected
-    if (!this.isColliding.down && !this.isColliding.up) {
+    if (!this.isColliding[1]) {
       this.y = toFixedPrecision(this.y + dy, 2);
     }
 
-    if (!this.isColliding.right && !this.isColliding.left) {
+    if (!this.isColliding[0]) {
       this.x = toFixedPrecision(this.x + dx, 2);
     }
 
@@ -346,7 +281,7 @@ var Player = (function() {
     ctx.fill();
     ctx.fill();
     ctx.fill();
-    ctx.shadowBlur = 60;
+    ctx.shadowBlur = 40;
     ctx.fill();
     ctx.fill();
     ctx.fill();

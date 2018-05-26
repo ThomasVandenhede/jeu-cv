@@ -1,18 +1,17 @@
 // Singleton pattern
-var keyboardManager = (function () {
+var keyboardManager = (function() {
   var instance;
 
   function KeyboardManager() {
-    var that = this;
     var codeMappings = {
       ArrowLeft: "LEFT",
       ArrowUp: "UP",
       ArrowRight: "RIGHT",
       ArrowDown: "DOWN",
-      // KeyW: "UP",
-      // KeyA: "LEFT",
-      // KeyS: "DOWN",
-      // KeyD: "RIGHT",
+      KeyW: "UP",
+      KeyA: "LEFT",
+      KeyS: "DOWN",
+      KeyD: "RIGHT",
       Enter: "ENTER",
       Space: "SPACE",
       Escape: "ESCAPE"
@@ -22,30 +21,53 @@ var keyboardManager = (function () {
       38: "UP",
       39: "RIGHT",
       40: "DOWN",
-      // KeyW: "UP",
-      // KeyA: "LEFT",
-      // KeyS: "DOWN",
-      // KeyD: "RIGHT",
+      90: "UP",
+      81: "LEFT",
+      93: "DOWN",
+      68: "RIGHT",
       13: "ENTER",
       32: "SPACE",
       27: "ESCAPE"
     };
 
-    window.addEventListener("keydown", function (event) {
-      var code = event.code || event.keyCode;
-      var mappings = (event.code) ? codeMappings : keyCodeMappings;
-      if (mappings[code] && !that[mappings[code]]) {
-        that[mappings[code]] = true;
-      }
-    });
+    window.addEventListener(
+      "keydown",
+      function(event) {
+        var code = event.code || event.keyCode;
+        var mappings = event.code ? codeMappings : keyCodeMappings;
+        if (mappings[code] && !this[mappings[code]]) {
+          if (this[mappings[code]]) {
+            this.keyRepeat[code] = true;
+          }
+          this[mappings[code]] = true;
+        }
 
-    window.addEventListener("keyup", function (event) {
-      var code = event.code || event.keyCode;
-      var mappings = (event.code) ? codeMappings : keyCodeMappings;
-      if (mappings[code]) {
-        that[mappings[code]] = false;
-      }
-    });
+        switch (event.keyCode) {
+          case 27:
+            this.app.isPaused ? this.app.unpause() : this.app.pause();
+            break;
+          case 71:
+            this.app.player.reverseGravity();
+            break;
+          case 72:
+            this.app.player.zeroGravity();
+            break;
+          default:
+        }
+      }.bind(this)
+    );
+
+    window.addEventListener(
+      "keyup",
+      function(event) {
+        var code = event.code || event.keyCode;
+        var mappings = event.code ? codeMappings : keyCodeMappings;
+        if (mappings[code]) {
+          this.keyRepeat[code] = false;
+          this[mappings[code]] = false;
+        }
+      }.bind(this)
+    );
 
     this.UP = false;
     this.DOWN = false;
@@ -53,10 +75,16 @@ var keyboardManager = (function () {
     this.LEFT = false;
     this.ENTER = false;
     this.SPACE = false;
+
+    this.keyRepeat = {};
   }
 
+  KeyboardManager.prototype.init = function(app) {
+    this.app = app;
+  };
+
   return {
-    getInstance: function () {
+    getInstance: function() {
       if (!instance) {
         instance = new KeyboardManager();
       }

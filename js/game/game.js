@@ -23,10 +23,13 @@ var Game = (function() {
 
     // initalize canvas(es)
     this.canvas = document.getElementById("canvas");
-    this.backgroundCanvas = document.getElementById("background");
     this.ctx = this.canvas.getContext("2d");
-    this.bgCtx = this.backgroundCanvas.getContext("2d");
+    // this.backgroundCanvas = document.getElementById("background");
+    // this.bgCtx = this.backgroundCanvas.getContext("2d");
+
+    // keyboard & sound
     this.keyboard = keyboardManager.getInstance();
+    this.keyboard.init(this);
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
 
@@ -47,28 +50,33 @@ var Game = (function() {
       new Platform(700, -80, 30, 20),
       new Platform(350, 70, 30, 20),
       new Platform(700, 210, 30, 20),
-      new Platform(200, -400, 5, 100),
-      new Platform(0, -100000, 1, 200000),
-      new MovingPlatform(200, -500, 100, 5, 400, -500, 100),
-      new MovingPlatform(700, -400, 80, 30, 700, -100, 100)
-      // new MovingPlatform(0, -400, 40, 50, 50, -400, 100)
+      new Platform(200, -470, 5, 170),
+      new Platform(0, -10000, 0, 20000),
+      new Platform(110, -10000, 0, 20000),
+      new MovingPlatform(200, -430, 100, 5, 400, -430, 100),
+      new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
+      new MovingPlatform(0, -200, 40, 50, 50, 400, 100)
     ];
 
     // initialize background
-    this.starCount = 500;
-    this.stars = [];
-    for (var i = 0; i < this.starCount; i++) {
-      this.stars.push({
-        x: Math.floor(Math.random() * (this.canvas.width + 1)),
-        y: Math.floor(Math.random() * (this.canvas.height + 1)),
-        r: Math.random() * 1 + 0.5,
-        opacity: Math.random() * 0.5 + 0.4
-      });
-    }
+    this.canvas.style.backgroundImage =
+      "url(./assets/images/background_2000_stars.png";
+    this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
+    // this.starCount = 500;
+    // this.stars = [];
+    // for (var i = 0; i < this.starCount; i++) {
+    //   this.stars.push({
+    //     x: Math.floor(Math.random() * (this.canvas.width + 1)),
+    //     y: Math.floor(Math.random() * (this.canvas.height + 1)),
+    //     r: Math.random() * 1 + 0.5,
+    //     opacity: Math.random() * 0.5 + 0.4
+    //   });
+    // }
 
     this.drawables = [];
     this.drawables.push(this.player);
     this.drawables = this.drawables.concat(this.platforms);
+    // this.drawables = this.drawables.concat(this.walls);
 
     var that = this;
     this.player.collidableWith = this.drawables.filter(function(el) {
@@ -84,10 +92,6 @@ var Game = (function() {
   };
 
   Game.prototype.handleKeyboard = function() {
-    if (this.keyboard.ESCAPE) {
-      this.pause();
-    }
-
     if (this.keyboard.RIGHT || this.keyboard.LEFT) {
       this.keyboard.LEFT && this.player.moveLeft();
       this.keyboard.RIGHT && this.player.moveRight();
@@ -96,12 +100,20 @@ var Game = (function() {
     }
 
     if (this.keyboard.DOWN) {
-      this.player.crouch();
+      this.player.GRAVITY_ACCELERATION > 0
+        ? this.player.crouch()
+        : this.player.jump();
     } else {
       this.player.stand();
     }
 
-    if (this.keyboard.UP || this.keyboard.SPACE) {
+    if (this.keyboard.UP) {
+      this.player.GRAVITY_ACCELERATION > 0
+        ? this.player.jump()
+        : this.player.crouch();
+    }
+
+    if (this.keyboard.SPACE) {
       this.player.jump();
     }
 
@@ -115,10 +127,6 @@ var Game = (function() {
   };
 
   Game.prototype.updateScene = function() {
-    // apply gravity and resolve collisions
-    this.player.applyGravity();
-    this.player.detectCollisions();
-
     // update objects to be rendered
     this.player.shield.update();
     for (var i = 0; i < this.platforms.length; i++) {
@@ -129,39 +137,37 @@ var Game = (function() {
     this.camera.update();
   };
 
-  // function toFixedPrecision(number, precision) {
-  //   return +Number(Math.round(number * Math.pow(10, precision)) / Math.pow(10, precision)).toFixed(precision);
-  // }
+  Game.prototype.renderBackground = function(ctx, camera) {
+    // this.fillCanvas(ctx, "#111");
+    // ctx.save();
+    // for (var i = 0; i < this.starCount; i++) {
+    //   var star = this.stars[i];
+    //   ctx.fillStyle = "rgba(255, 255, 255, " + star.opacity + ")";
+    //   ctx.beginPath();
+    //   ctx.arc(
+    //     (star.x - this.camera.x * 0.7 + this.canvas.width) % this.canvas.width,
+    //     (star.y - this.camera.y * 0.7 + this.canvas.height) %
+    //       this.canvas.height,
+    //     star.r,
+    //     0,
+    //     Math.PI * 2
+    //   );
+    //   ctx.fill();
+    // }
+    // ctx.restore();
 
-  function toFixedPrecision(number, precision) {
-    var X = Math.pow(10, precision);
-    return Math.round(number * X) / X;
-  }
-
-  Game.prototype.updateTimeEllapsed = function() {
-    this.previousTime = this.currentTime || Date.now();
-    this.currentTime = Date.now();
-    return toFixedPrecision((this.currentTime - this.previousTime) / 1000, 2);
-  };
-
-  Game.prototype.renderBackground = function(ctx) {
-    this.fillCanvas(ctx, "#111");
-    ctx.save();
-    for (var i = 0; i < this.starCount; i++) {
-      var star = this.stars[i];
-      ctx.fillStyle = "rgba(255, 255, 255, " + star.opacity + ")";
-      ctx.beginPath();
-      ctx.arc(
-        (star.x - this.camera.x * 0.7 + this.canvas.width) % this.canvas.width,
-        (star.y - this.camera.y * 0.7 + this.canvas.height) %
-          this.canvas.height,
-        star.r,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-    }
-    ctx.restore();
+    this.canvas.style.backgroundPosition =
+      -camera.x * 0.502 + "px " + -camera.y * 0.502 + "px";
+    // death star
+    var deathStar = new Image();
+    deathStar.src = "./assets/images/death_star.png";
+    ctx.drawImage(
+      deathStar,
+      1000 - camera.x * 0.5,
+      -100 - camera.y * 0.5,
+      500,
+      500
+    );
   };
 
   Game.prototype.clearCanvas = function(ctx) {
@@ -223,16 +229,151 @@ var Game = (function() {
   };
 
   Game.prototype.pause = function() {
-    this.paused = !this.paused;
-    var gameMenu = document.querySelector(".game-menu");
-    if (this.paused) {
-      gameMenu.classList.remove("hidden");
-    } else {
-      gameMenu.classList.add("hidden");
+    this.isPaused = true;
+    this.timer.pause();
+    this.soundManager.pauseAll();
+
+    var gameMenuEl = document.querySelector(".game-menu");
+    gameMenuEl.classList.remove("hidden");
+  };
+
+  Game.prototype.unpause = function() {
+    this.isPaused = false;
+    this.timer.play();
+    this.soundManager.playPaused();
+
+    var gameMenuEl = document.querySelector(".game-menu");
+    gameMenuEl.classList.add("hidden");
+
+    // finally resume game loop
+    this.main();
+  };
+
+  Game.prototype.detectVerticalCollision = function(
+    player,
+    el,
+    playerNext,
+    elNext
+  ) {
+    var hasVerticalCollision = false;
+
+    // detect vertical collision
+    if (player.left < el.right && player.right > el.left) {
+      if (
+        player.v.y <= el.v.y &&
+        player.top >= el.bottom &&
+        playerNext.top < elNext.bottom
+      ) {
+        // up collision
+        hasVerticalCollision = true;
+        collisionY = elNext.bottom;
+        player.isColliding[1] = -1;
+      } else if (
+        player.v.y >= el.v.y &&
+        player.bottom <= el.top &&
+        playerNext.bottom > elNext.top
+      ) {
+        // down collision
+        hasVerticalCollision = true;
+        collisionY = elNext.top - player.height;
+        player.isColliding[1] = 1;
+      }
+
+      // resolve collision
+      if (hasVerticalCollision) {
+        if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
+          player.v.x += el.v.x; // fix player to platform
+          // apply rebound
+          player.v.y = -player.v.y * player.COEFFICIENT_OF_RESTITUTION;
+          if (
+            player.isCrouching ||
+            Math.abs(player.v.y) <=
+              Math.abs(el.v.y - player.GRAVITY_ACCELERATION * dt) + 10
+          ) {
+            player.v.y = el.v.y;
+            player.y = collisionY; // snap
+          }
+        }
+      }
+    }
+
+    return hasVerticalCollision;
+  };
+
+  Game.prototype.detectHorizontalCollision = function(
+    player,
+    el,
+    playerNext,
+    elNext,
+    relV
+  ) {
+    var hasHorizontalCollision = false;
+
+    // detect horizontal collisions
+    if (player.top < el.bottom && player.bottom > el.top) {
+      // left collision
+      if (player.left >= el.right && playerNext.left < elNext.right) {
+        player.isColliding[0] = -1;
+        // resolve collision
+        player.x = elNext.right; // snap
+        player.v.x = 0;
+        hasHorizontalCollision = true;
+      }
+      // right collision
+      if (player.right <= el.left && playerNext.right > elNext.left) {
+        player.isColliding[0] = 1;
+        // resolve collision
+        player.x = elNext.left - player.width; // snap
+        player.v.x = 0;
+        hasHorizontalCollision = true;
+      }
+    }
+
+    return hasHorizontalCollision;
+  };
+
+  Game.prototype.detectCollisions = function() {
+    var player = this.player;
+    var collidableWith = this.drawables.filter(
+      function(el) {
+        return el !== player && el.overlaps(this.camera);
+      }.bind(this)
+    );
+
+    // apply gravity acceleration and reset collisions
+    player.applyGravity();
+    this.player.isColliding = [0, 0];
+    for (var i = 0; i < collidableWith.length; i++) {
+      var verticalCollision = false;
+      var horizontalCollision = false;
+      var el = collidableWith[i];
+      var playerNext = player.getNextState();
+      var elNext = el.getNextState();
+      var relV = Vector.subtract(el.v, player.v);
+
+      if (player.v.x * el.v.x >= 0 && Math.sign(player.v.x) * relV.x < 0) {
+        horizontalCollision = this.detectHorizontalCollision(
+          player,
+          el,
+          playerNext,
+          elNext,
+          relV
+        );
+      }
+      if (player.v.y * el.v.y >= 0 && Math.sign(player.v.y) * relV.y < 0) {
+        verticalCollision = this.detectVerticalCollision(
+          player,
+          el,
+          playerNext,
+          elNext,
+          relV
+        );
+      }
+      el.touched = verticalCollision || horizontalCollision;
     }
   };
 
-  Game.prototype.start = function() {
+  Game.prototype.startGame = function() {
     var music = new Sound(
       "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
       1
@@ -257,7 +398,7 @@ var Game = (function() {
     this.timer.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.handleKeyboard();
-    // this.detectCollisions();
+    this.detectCollisions();
     this.updateScene();
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
@@ -276,14 +417,6 @@ var Game = (function() {
     var collidingEl = debug.querySelector(".player__is-colliding");
     var cameraPositionX = debug.querySelector(".camera__positionX");
     var cameraPositionY = debug.querySelector(".camera__positionY");
-
-    var collidingHTML = Object.keys(this.player.isColliding)
-      .filter(
-        function(key) {
-          return this.player.isColliding[key];
-        }.bind(this)
-      )
-      .join(" ");
 
     positionEl.innerHTML =
       "<strong>x: </strong>" +
@@ -309,7 +442,8 @@ var Game = (function() {
       this.player.acceleration.x +
       " <strong>accelY: </strong>" +
       this.player.acceleration.y;
-    collidingEl.innerHTML = "<strong>colliding: </strong>" + collidingHTML;
+    collidingEl.innerHTML =
+      "<strong>colliding: </strong>" + this.player.isColliding;
     cameraPositionX.innerHTML = "<strong>camX: </strong>" + this.camera.x;
     cameraPositionY.innerHTML = "<strong>camY: </strong>" + this.camera.y;
   };
