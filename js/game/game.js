@@ -2,11 +2,26 @@ var Game = (function() {
   function Game(options) {}
 
   Game.prototype.init = function(config) {
-    this.debug = config.debug || false;
-    this.rulers = config.rulers !== undefined ? config.rulers : true;
-    this.previousTime;
-    this.currentTime;
-    this.paused = false;
+    // config
+    if (config) {
+      this.shouldDisplayDebug = config.shouldDisplayDebug || false;
+      this.shouldDisplayRulers =
+        config.shouldDisplayRulers !== undefined
+          ? config.shouldDisplayRulers
+          : true;
+    }
+
+    // time management
+    this.timer = new GameTimer();
+
+    // // game state
+    // this.state = {
+    //   inPauseMenu: false,
+    //   inMainMenu: false,
+    //   inGame: true
+    // };
+
+    // initalize canvas(es)
     this.canvas = document.getElementById("canvas");
     this.backgroundCanvas = document.getElementById("background");
     this.ctx = this.canvas.getContext("2d");
@@ -226,15 +241,27 @@ var Game = (function() {
     this.main();
   };
 
+  /*
+    GAME LOOPS
+  */
+
+  // intro loop
+  Game.prototype.introLoop = function() {
+    requestAnimationFrame(this.intro.bind(this));
+  };
+
+  // main game loop
   Game.prototype.main = function() {
-    dt = this.updateTimeEllapsed();
+    this.timer.update();
+    dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.handleKeyboard();
-    !this.paused && this.updateScene();
+    // this.detectCollisions();
+    this.updateScene();
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
     this.renderScene(this.ctx, this.camera);
 
-    requestAnimationFrame(this.main.bind(this));
+    !this.isPaused && requestAnimationFrame(this.main.bind(this));
   };
 
   Game.prototype.updateDebugInfo = function() {
