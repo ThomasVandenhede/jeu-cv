@@ -218,6 +218,8 @@ var Game = (function() {
       var drawable = this.drawables[i];
       drawable.overlaps(this.camera) && drawable.draw(ctx, camera);
     }
+
+    this.timer.draw(ctx);
   };
 
   Game.prototype.pause = function() {
