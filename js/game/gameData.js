@@ -38,7 +38,7 @@ var gameData = {
       }
     ]
   },
-  music: {
+  musics: {
     location: "./assets/music/",
     files: [
       {

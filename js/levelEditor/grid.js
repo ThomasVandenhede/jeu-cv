@@ -1,9 +1,9 @@
 var Grid = (function() {
-  function Grid(context) {
-    this.context = context;
-    this.camera = this.context.camera;
-    this.canvas = this.context.canvas;
-    this.mouse = this.context.mouse;
+  function Grid(app) {
+    this.app = app;
+    this.camera = this.app.camera;
+    this.canvas = this.app.canvas;
+    this.mouse = this.app.mouse;
 
     // grid config
     this.cursorSize = 10;
@@ -177,7 +177,22 @@ var Grid = (function() {
   };
 
   Grid.prototype.draw = function(ctx, camera) {
-    this.context.rulers && this._drawRulers(ctx, camera);
+    var camera = this.camera;
+
+    // update mouse precision for performance
+    if (camera.zoomLevel <= 0.3) {
+      this.innerGridSize = 1000;
+    } else if (camera.zoomLevel < 0.5) {
+      this.innerGridSize = 100;
+    } else if (camera.zoomLevel < 3) {
+      this.innerGridSize = 50;
+    } else if (camera.zoomLevel < 5) {
+      this.innerGridSize = 10;
+    }
+    this.precisionAreaSize = this.innerGridSize;
+    this.precisionGridSize = this.precisionAreaSize / 10;
+
+    this.app.shouldDisplayRulers && this._drawRulers(ctx, camera);
     this._drawInnerGrid(ctx, camera);
     this._drawPrecisionArea(ctx, camera);
     this._drawCursor(ctx, camera);

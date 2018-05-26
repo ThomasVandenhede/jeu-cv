@@ -6,10 +6,14 @@ var Camera = (function() {
     BOTH: "both"
   };
 
-  function Camera(context, x, y, worldWidth, worldHeight) {
+  function Camera(context, x, y, zoomLevel) {
     AABB.call(this, x, y, canvas.width, canvas.height);
 
     this.context = context;
+
+    this.zoomLevel = zoomLevel || 1;
+    this.height = canvas.height / this.zoomLevel;
+    this.width = canvas.width / this.zoomLevel;
 
     this.x = x || 0;
     this.y = y || 0;
@@ -17,15 +21,10 @@ var Camera = (function() {
     this.xDeadZone = canvas.width / 3; // min distance to horizontal borders
     this.yDeadZone = canvas.height / 3; // min distance to vertical borders
 
-    this.width = canvas.width;
-    this.height = canvas.height;
-    this.zoomLevel = 1; // TODO: implement a camera zoom
-
     this.axis = AXIS.BOTH;
 
     this.followed = null;
 
-    this.viewportRect = new AABB(this.x, this.y, this.width, this.height);
     this.shouldStayWithinWorldBounds = false;
   }
 
@@ -79,9 +78,6 @@ var Camera = (function() {
         this.y = worldRect.bottom - this.height;
       }
     }
-
-    // update viewportRect
-    this.viewportRect.set(this.x, this.y);
   };
 
   Camera.prototype.applyCamera = function(x, y) {
