@@ -1,11 +1,11 @@
-var Vector = (function () {
+var Vector = (function() {
   function Vector(x, y) {
     this.x = x || 0;
     this.y = y || 0;
   }
 
-  // static methods
-  Vector.sum = function () {
+  // public static methods
+  Vector.sum = function() {
     var x = 0,
       y = 0;
     for (var i = 0; i < arguments.length; i++) {
@@ -15,52 +15,57 @@ var Vector = (function () {
     return new Vector(x, y);
   };
 
-  Vector.subtract = function (v1, v2) {
+  Vector.subtract = function(v1, v2) {
     return new Vector(v1.x - v2.x, v1.y - v2.y);
   };
 
-  Vector.determinant = function (v1, v2) {
+  Vector.determinant = function(v1, v2) {
     return v1.x * v2.y - v1.y * v2.x;
   };
 
-  Vector.dotProduct = function (v1, v2) {
+  Vector.dotProduct = function(v1, v2) {
     return v1.x * v2.x + v1.y * v2.y;
   };
 
   // public non static methods
-  Vector.prototype.multiplyByScalar = function (a) {
+  Vector.prototype.multiplyByScalar = function(a) {
     return new Vector(this.x * a, this.y * a);
   };
 
-  Vector.prototype.getUnitVector = function () {
-    return new Vector(this.x, this.y).multiplyByScalar(1 / this.norm);
+  Vector.prototype.getUnitVector = function() {
+    var norm = this.norm;
+    if (norm === 0) {
+      return new Vector();
+    } else {
+      return new Vector(this.x, this.y).multiplyByScalar(1 / norm);
+    }
   };
 
-  Vector.prototype.getNormalVector = function () {
+  Vector.prototype.getNormalVector = function() {
     return new Vector(-this.y, this.x);
   };
 
   Object.defineProperties(Vector.prototype, {
     direction: {
-      get: function () {
+      get: function() {
         return Math.atan2(this.y, this.x);
       },
-      set: function (direction) {
+      set: function(direction) {
         var norm = this.norm;
         this.x = norm * Math.cos(direction);
         this.y = norm * Math.sin(direction);
       }
     },
     normSquared: {
-      get: function () {
+      get: function() {
         return Math.pow(this.x, 2) + Math.pow(this.y, 2);
       }
     },
     norm: {
-      get: function () {
+      get: function() {
         return Math.sqrt(this.normSquared);
       },
-      set: function (norm) {
+      set: function(norm) {
         var ratio = this.x / this.y;
         this.x = norm * ratio / Math.sqrt(1 + Math.pow(ratio, 2));
         this.y = norm / Math.sqrt(1 + Math.pow(ratio, 2));
