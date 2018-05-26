@@ -13,7 +13,7 @@ var Game = (function() {
     this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
     this.soundManager = soundManager.getInstance();
-    this.soundManager.init(gameData.sounds);
+    this.soundManager.init(gameData);
 
     // initialize world size
     worldRect = new AABB(0, -100000, 3000, 102000);
