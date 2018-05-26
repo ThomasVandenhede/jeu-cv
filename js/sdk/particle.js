@@ -6,7 +6,7 @@ var Particle = (function() {
     this.color = color;
 
     this.v = new Vector(vx, vy);
-    this.a = new Vector();
+    this.createdAt = Date.now();
   }
 
   Particle.prototype = Object.create(Vector.prototype);
@@ -16,13 +16,23 @@ var Particle = (function() {
     this.y += this.v.y * dt;
   };
 
-  Particle.prototype.draw = function() {
+  Particle.prototype.draw = function(ctx, camera) {
+    var applyCamToArr = function() {
+      return Object.values(camera.applyCamera.apply(camera, arguments));
+    };
+    var color = this.color;
     ctx.save();
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.arc.apply(
+      ctx,
+      applyCamToArr(this.x, this.y).concat([
+        this.size / camera.zoomLevel,
+        0,
+        Math.PI * 2
+      ])
+    );
     ctx.fill();
-    ctx.restore();
   };
 
   return Particle;

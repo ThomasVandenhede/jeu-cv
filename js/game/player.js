@@ -9,11 +9,96 @@ var Player = (function() {
   function Player(x, y) {
     AABB.call(this, x, y, INITIAL_WIDTH, INITIAL_HEIGHT);
 
+    var that = this;
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
     this.color = "#22dd00";
     this.color = "#37e018";
-    this.color = "red";
+
+    this.particlesManager = {
+      particleIndex: 0,
+      maxCount: 50,
+      particles: {},
+      color: that.color,
+      size: 2,
+      maxLife: 500,
+      addNewParticles: function() {
+        if (Object.keys(this.particles).length < this.maxCount) {
+          this.particleIndex++;
+          var position;
+          switch (randInt(0, 3)) {
+            case 0:
+              position = {
+                x: randInt(that.left, that.right),
+                y: that.top,
+                vx: randInt(-20, 20),
+                vy: randInt(-20, -5)
+              };
+              break;
+            case 1:
+              position = {
+                x: randInt(that.left, that.right),
+                y: that.bottom,
+                vx: randInt(-20, 20),
+                vy: randInt(5, 20)
+              };
+              break;
+            case 2:
+              position = {
+                x: that.left,
+                y: randInt(that.top, that.bottom),
+                vx: randInt(-20, -5),
+                vy: randInt(-20, 20)
+              };
+              break;
+            case 3:
+              position = {
+                x: that.right,
+                y: randInt(that.top, that.bottom),
+                vx: randInt(5, 20),
+                vy: randInt(-20, 20)
+              };
+              break;
+          }
+          [];
+          var color = this.color;
+          // var color =
+          //   "rgb(" +
+          //   randInt(0, 255) +
+          //   ", " +
+          //   randInt(0, 255) +
+          //   ", " +
+          //   randInt(0, 255) +
+          //   ")";
+          var particle = new Particle(
+            position.x,
+            position.y,
+            this.size,
+            color,
+            position.vx,
+            position.vy
+          );
+          particle.id = this.particleIndex;
+          this.particles[this.particleIndex] = particle;
+        }
+      },
+      update: function() {
+        this.addNewParticles();
+        for (var id in this.particles) {
+          var particle = this.particles[id];
+          particle.update();
+          if (Date.now() - particle.createdAt > this.maxLife) {
+            delete this.particles[id];
+          }
+        }
+      },
+      draw: function(ctx, camera) {
+        for (var id in this.particles) {
+          var particle = this.particles[id];
+          particle.draw(ctx, camera);
+        }
+      }
+    };
 
     // crouching / standing state and animations
     this.isCrouching = false;
@@ -229,6 +314,8 @@ var Player = (function() {
     if (!this.isColliding.right && !this.isColliding.left) {
       this.x = toFixedPrecision(this.x + dx, 2);
     }
+
+    this.particlesManager.update();
   };
 
   Player.prototype.draw = function(ctx, camera) {
@@ -237,10 +324,11 @@ var Player = (function() {
     var top = this.y - camera.y;
     var right = left + this.width;
     var bottom = top + this.height;
+    var color = this.color;
 
     ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.shadowColor = this.color;
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
     ctx.shadowBlur = 15;
     ctx.beginPath();
     ctx.moveTo(left, top + r);
@@ -265,6 +353,8 @@ var Player = (function() {
     // draw player shield
     (this.shield.isOpen || this.shield.isAnimating) &&
       this.shield.draw(ctx, camera);
+
+    this.particlesManager.draw(ctx, camera);
   };
 
   return Player;
