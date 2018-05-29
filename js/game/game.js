@@ -255,127 +255,84 @@ var Game = (function() {
     this.main();
   };
 
-  Game.prototype.detectVerticalCollision = function(
-    player,
-    el,
-    playerNext,
-    elNext
-  ) {
-    var hasVerticalCollision = false;
-
-    // detect vertical collision
-    if (player.left < el.right && player.right > el.left) {
-      if (
-        player.v.y <= el.v.y &&
-        player.top >= el.bottom &&
-        playerNext.top < elNext.bottom
-      ) {
-        // up collision
-        hasVerticalCollision = true;
-        collisionY = elNext.bottom;
-        player.isColliding[1] = -1;
-      } else if (
-        player.v.y >= el.v.y &&
-        player.bottom <= el.top &&
-        playerNext.bottom > elNext.top
-      ) {
-        // down collision
-        hasVerticalCollision = true;
-        collisionY = elNext.top - player.height;
-        player.isColliding[1] = 1;
-      }
-
-      // resolve collision
-      if (hasVerticalCollision) {
-        if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
-          player.v.x += el.v.x; // fix player to platform
-          // apply rebound
-          player.v.y = -player.v.y * player.COEFFICIENT_OF_RESTITUTION;
-          if (
-            player.isCrouching ||
-            Math.abs(player.v.y) <=
-              Math.abs(el.v.y - player.GRAVITY_ACCELERATION * dt) + 10
-          ) {
-            player.v.y = el.v.y;
-            player.y = collisionY; // snap
-          }
-        }
-      }
-    }
-
-    return hasVerticalCollision;
-  };
-
-  Game.prototype.detectHorizontalCollision = function(
-    player,
-    el,
-    playerNext,
-    elNext,
-    relV
-  ) {
-    var hasHorizontalCollision = false;
-
-    // detect horizontal collisions
-    if (player.top < el.bottom && player.bottom > el.top) {
-      // left collision
-      if (player.left >= el.right && playerNext.left < elNext.right) {
-        player.isColliding[0] = -1;
-        // resolve collision
-        player.x = elNext.right; // snap
-        player.v.x = 0;
-        hasHorizontalCollision = true;
-      }
-      // right collision
-      if (player.right <= el.left && playerNext.right > elNext.left) {
-        player.isColliding[0] = 1;
-        // resolve collision
-        player.x = elNext.left - player.width; // snap
-        player.v.x = 0;
-        hasHorizontalCollision = true;
-      }
-    }
-
-    return hasHorizontalCollision;
+  Game.prototype.getCollidableObjectsInViewport = function() {
+    return this.drawables.filter(
+      function(box) {
+        return box !== this.player && box.overlaps(this.camera);
+      }.bind(this)
+    );
   };
 
   Game.prototype.detectCollisions = function() {
     var player = this.player;
-    var collidableWith = this.drawables.filter(
-      function(el) {
-        return el !== player && el.overlaps(this.camera);
-      }.bind(this)
-    );
+    var collidableWith = this.getCollidableObjectsInViewport();
+    var collisions = []; // contains objects describing collisions
 
     // apply gravity acceleration and reset collisions
     player.applyGravity();
-    this.player.isColliding = [0, 0];
-    for (var i = 0; i < collidableWith.length; i++) {
-      var verticalCollision = false;
-      var horizontalCollision = false;
-      var el = collidableWith[i];
-      var playerNext = player.getNextState();
-      var elNext = el.getNextState();
-      var relV = Vector.subtract(el.v, player.v);
+    player.isColliding = [0, 0];
 
-      if (player.v.x * el.v.x >= 0 && Math.sign(player.v.x) * relV.x < 0) {
-        horizontalCollision = this.detectHorizontalCollision(
-          player,
-          el,
-          playerNext,
-          elNext,
-          relV
-        );
+    // loop over each collidable object and store collision data
+    for (var i = 0; i < collidableWith.length; i++) {
+      var box = collidableWith[i];
+      md = AABB.minkowskiDifference(box, player);
+
+      // // if no collision detected
+      // if (!md.contains(0, 0)) {
+      //   console.log("continue");
+      //   continue;
+      // }
+
+      var relMotion = Vector.subtract(player.v, box.v).multiplyByScalar(dt);
+      var colInfo = collision.segmentAABB(new Vector(), relMotion, md);
+      var t = colInfo.t;
+      var side = colInfo.side;
+
+      if (t < Number.POSITIVE_INFINITY) {
+        /*
+          REFACTOR THIS SHIT
+        */
+        player.isColliding[0] = side[0] ? side[0] : player.isColliding[0];
+        // player.isColliding[1] = side[1] !== 0 ? side[1] : player.isColliding[1];
+        player.isColliding[1] = side[1] * relMotion.y > 0 ? side[1] : 0;
+
+        if (relMotion.y === 0) {
+          console.log("STOP\nSTOP\nSTOP\nSTOP\nSTOP");
+        }
+        if (side[0] * relMotion.x <= 0) {
+          player.isColliding[0] = 0;
+        }
+        if (side[1] * relMotion.y <= 0) {
+          player.isColliding[1] = 0;
+        }
+        /*
+          END REFACTOR
+        */
+
+        // vertical collision
       }
-      if (player.v.y * el.v.y >= 0 && Math.sign(player.v.y) * relV.y < 0) {
-        verticalCollision = this.detectVerticalCollision(
-          player,
-          el,
-          playerNext,
-          elNext,
-          relV
-        );
+
+      // RESOLVE COLLISION HERE
+      if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
+        player.y =
+          player.isColliding[1] > 0
+            ? box.top - player.height + box.v.y * dt
+            : box.bottom + box.v.y * dt;
+        player.v.y = box.v.y + player.GRAVITY_ACCELERATION * dt;
+        player.v.x += box.v.x;
       }
-      el.touched = verticalCollision || horizontalCollision;
+
+      // horizontal collision
+      if (player.isColliding[0]) {
+        player.x =
+          player.isColliding[0] < 0
+            ? box.right + box.v.x * dt
+            : box.left - player.width + box.v.x * dt; // snap
+        player.v.x = box.v.x;
+      }
+      // (HINT: go through all collisions)
+
+      box.touched = player.isColliding[0] || player.isColliding[1];
     }
   };
 
@@ -401,6 +358,7 @@ var Game = (function() {
 
   // main game loop
   Game.prototype.main = function() {
+    // time management
     this.timer.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.handleKeyboard();
