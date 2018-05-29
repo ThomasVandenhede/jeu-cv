@@ -169,6 +169,25 @@ var Game = (function() {
     );
   };
 
+  Game.prototype.renderScene = function(ctx, camera) {
+    this.shouldDisplayRulers && this.drawRulers(ctx, camera);
+
+    // only drawing objects that are in the viewport
+    for (var i = 0; i < this.drawables.length; i++) {
+      var drawable = this.drawables[i];
+      drawable.overlaps(this.camera) && drawable.draw(ctx, camera);
+    }
+
+    if (window.md) {
+      ctx.save();
+      ctx.fillStyle = "yellow";
+      ctx.fillRect(md.x - camera.x, md.y - camera.y, md.width, md.height);
+      ctx.restore();
+    }
+
+    this.timer.draw(ctx);
+  };
+
   Game.prototype.clearCanvas = function(ctx) {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   };
@@ -213,18 +232,6 @@ var Game = (function() {
       ctx.fillText(-i, this.canvas.width - 50, i - camera.top);
     }
     ctx.restore();
-  };
-
-  Game.prototype.renderScene = function(ctx, camera) {
-    this.shouldDisplayRulers && this.drawRulers(ctx, camera);
-
-    // only drawing objects that are in the viewport
-    for (var i = 0; i < this.drawables.length; i++) {
-      var drawable = this.drawables[i];
-      drawable.overlaps(this.camera) && drawable.draw(ctx, camera);
-    }
-
-    this.timer.draw(ctx);
   };
 
   Game.prototype.pause = function() {
