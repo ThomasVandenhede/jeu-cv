@@ -88,3 +88,13 @@ AABB.prototype.overlaps = function(r) {
     r.top < this.bottom
   );
 };
+
+AABB.prototype.contains = function(x, y) {
+  return (
+    x >= this.left && this <= this.right && y >= this.top && y <= this.bottom
+  );
+};
+
+AABB.prototype.containsStrict = function(x, y) {
+  return x > this.left && this < this.right && y > this.top && y < this.bottom;
+};
