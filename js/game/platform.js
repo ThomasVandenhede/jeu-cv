@@ -11,9 +11,9 @@ var Platform = (function() {
 
   Platform.prototype = Object.create(AABB.prototype);
 
-  Platform.prototype.getNextState = function() {
-    return this;
-  };
+  // Platform.prototype.getNextState = function() {
+  //   return this;
+  // };
 
   Platform.prototype.update = function() {};
 
