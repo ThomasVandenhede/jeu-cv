@@ -37,11 +37,11 @@ var Game = (function() {
     worldRect = new AABB(0, -10000, 3000, 2000);
     this.player = new Player(100, -600);
     this.platforms = [
-      new Platform(0, -350, 200, 5),
+      new Platform(-20, -350, 220, 5),
       new Platform(350, -250, 50, 5),
       new Platform(0, -130, 180, 5),
       new Platform(0, -150, 180, 5),
-      new Platform(330, -400, 150, 5),
+      new Platform(330, -390, 150, 5),
       new Platform(150, 200, 50, 5),
       new Platform(500, -270, 80, 80),
       new Platform(500, -170, 80, 160),
@@ -52,7 +52,6 @@ var Game = (function() {
       new Platform(700, 210, 30, 20),
       new Platform(200, -470, 5, 170),
       new Platform(0, -10000, 0, 20000),
-      new Platform(110, -10000, 0, 20000),
       new MovingPlatform(200, -430, 100, 5, 400, -430, 100),
       new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
       new MovingPlatform(0, -200, 40, 50, 50, 400, 100)
