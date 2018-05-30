@@ -108,16 +108,9 @@ var Player = (function() {
     CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
     // collision direction for movement
-    this.isColliding = {
-      right: 0,
-      left: 0,
-      up: 0,
-      down: 0
-    };
-
     this.isColliding = [0, 0]; // [horizontal, vertical]
     this.collidableWith = []; // potential object collisions
-    this.collidesWith = []; // actual object collisions
+    this.collidingWith = [null, null]; // actual object collisions
     this.shield = new Shield(this);
 
     // sounds

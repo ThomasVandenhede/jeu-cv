@@ -54,7 +54,7 @@ var Game = (function() {
       new Platform(0, -10000, 0, 20000),
       new MovingPlatform(200, -430, 100, 5, 400, -430, 100),
       new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
-      new MovingPlatform(0, -200, 40, 50, 50, 400, 100)
+      new MovingPlatform(0, -200, 200, 50, 1, 400, 100)
     ];
 
     // initialize background
@@ -91,36 +91,39 @@ var Game = (function() {
   };
 
   Game.prototype.handleKeyboard = function() {
-    if (this.keyboard.RIGHT || this.keyboard.LEFT) {
-      this.keyboard.LEFT && this.player.moveLeft();
-      this.keyboard.RIGHT && this.player.moveRight();
+    var keyboard = this.keyboard;
+    var player = this.player;
+
+    player.v.y = player.isColliding[1]
+      ? player.collidingWith[1].v.y
+      : player.v.y;
+    if (keyboard.RIGHT || keyboard.LEFT) {
+      keyboard.LEFT && player.moveLeft();
+      keyboard.RIGHT && player.moveRight();
     } else {
-      this.player.v.x = 0;
+      player.v.x =
+        player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
+          ? player.collidingWith[1].v.x
+          : 0;
     }
 
-    if (this.keyboard.DOWN) {
-      this.player.GRAVITY_ACCELERATION > 0
-        ? this.player.crouch()
-        : this.player.jump();
+    if (keyboard.DOWN) {
+      player.GRAVITY_ACCELERATION > 0 ? player.crouch() : player.jump();
     } else {
-      this.player.stand();
+      player.stand();
     }
 
-    if (this.keyboard.UP) {
-      this.player.GRAVITY_ACCELERATION > 0
-        ? this.player.jump()
-        : this.player.crouch();
+    if (keyboard.UP) {
+      player.GRAVITY_ACCELERATION > 0 ? player.jump() : player.crouch();
     }
 
-    if (this.keyboard.SPACE) {
-      this.player.jump();
+    if (keyboard.SPACE) {
+      player.jump();
     }
 
-    if (this.keyboard.ENTER) {
-      if (!this.player.shield.isAnimating) {
-        this.player.shield.isOpen
-          ? this.player.shield.close()
-          : this.player.shield.open();
+    if (keyboard.ENTER) {
+      if (!player.shield.isAnimating) {
+        player.shield.isOpen ? player.shield.close() : player.shield.open();
       }
     }
   };
@@ -258,7 +261,12 @@ var Game = (function() {
   Game.prototype.getCollidableObjectsInViewport = function() {
     return this.drawables.filter(
       function(box) {
-        return box !== this.player && box.overlaps(this.camera);
+        if (box !== this.player) {
+          box.touched = false;
+          box.overlaps(this.camera);
+          return true;
+        }
+        return false;
       }.bind(this)
     );
   };
@@ -271,68 +279,90 @@ var Game = (function() {
     // apply gravity acceleration and reset collisions
     player.applyGravity();
     player.isColliding = [0, 0];
+    var boxH, boxV;
 
     // loop over each collidable object and store collision data
     for (var i = 0; i < collidableWith.length; i++) {
       var box = collidableWith[i];
-      md = AABB.minkowskiDifference(box, player);
-
-      // // if no collision detected
-      // if (!md.contains(0, 0)) {
-      //   console.log("continue");
-      //   continue;
-      // }
-
+      var md = AABB.minkowskiDifference(box, player);
+      // window.md = md; // remove this when everything's working
       var relMotion = Vector.subtract(player.v, box.v).multiplyByScalar(dt);
-      var colInfo = collision.segmentAABB(new Vector(), relMotion, md);
+      var colInfo = physics.collision.segmentAABB(new Vector(), relMotion, md);
       var t = colInfo.t;
       var side = colInfo.side;
 
+      // create array of all collisions for that frame
       if (t < Number.POSITIVE_INFINITY) {
-        /*
-          REFACTOR THIS SHIT
-        */
-        player.isColliding[0] = side[0] ? side[0] : player.isColliding[0];
-        // player.isColliding[1] = side[1] !== 0 ? side[1] : player.isColliding[1];
-        player.isColliding[1] = side[1] * relMotion.y > 0 ? side[1] : 0;
-
-        if (relMotion.y === 0) {
-          console.log("STOP\nSTOP\nSTOP\nSTOP\nSTOP");
-        }
-        if (side[0] * relMotion.x <= 0) {
-          player.isColliding[0] = 0;
-        }
-        if (side[1] * relMotion.y <= 0) {
-          player.isColliding[1] = 0;
-        }
-        /*
-          END REFACTOR
-        */
-
-        // vertical collision
+        var d = side[0] ? relMotion.x * side[0] : relMotion.y * side[1];
+        // there is a collision along one of the axes
+        // Add collision to the array of collision characteristics
+        d > 0 &&
+          collisions.push({
+            side: side,
+            box: box,
+            d: d
+          });
       }
+    }
 
-      // RESOLVE COLLISION HERE
-      if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
-        player.y =
-          player.isColliding[1] > 0
-            ? box.top - player.height + box.v.y * dt
-            : box.bottom + box.v.y * dt;
-        player.v.y = box.v.y + player.GRAVITY_ACCELERATION * dt;
-        player.v.x += box.v.x;
+    /**
+     * COLLISION RESOLUTION
+     **/
+    // no collision detected, return
+    if (!collisions.length) {
+      return;
+    }
+
+    // determine FINAL COLLISION characteristics
+    var dH = 0,
+      dV = 0;
+    for (var i = 0; i < collisions.length; i++) {
+      var collision = collisions[i];
+      var side = collision.side;
+      var d = collision.d;
+      var box = collision.box;
+
+      // set player collisions [0, 1] + [-1, 0] -> [-1, 1]
+      player.isColliding[0] = side[0] ? side[0] : player.isColliding[0];
+      player.isColliding[1] = side[1] ? side[1] : player.isColliding[1];
+
+      // if new value of d is greater than the old one then the new box is the one in contact with the player
+      if (side[0]) {
+        if (d > dH) {
+          dH = d;
+          boxH = box;
+        }
+      } else {
+        if (d > dV) {
+          dV = d;
+          boxV = box;
+        }
       }
+    }
 
-      // horizontal collision
-      if (player.isColliding[0]) {
-        player.x =
-          player.isColliding[0] < 0
-            ? box.right + box.v.x * dt
-            : box.left - player.width + box.v.x * dt; // snap
-        player.v.x = box.v.x;
-      }
-      // (HINT: go through all collisions)
+    boxV && console.log(boxV.v.x, boxV.v.y);
+    // horizontal collision
+    if (player.isColliding[0]) {
+      player.x =
+        player.isColliding[0] > 0
+          ? boxH.left + boxH.v.x * dt - player.width // snap
+          : boxH.right + boxH.v.x * dt;
+    }
+    // vertical collision
+    if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
+      player.y =
+        player.isColliding[1] > 0
+          ? boxV.top + boxV.v.y * dt - player.height
+          : boxV.bottom + boxV.v.y * dt;
+    }
 
-      box.touched = player.isColliding[0] || player.isColliding[1];
+    // tell the player which objects it's colliding with
+    player.collidingWith = [boxH, boxV];
+    if (boxH) {
+      boxH.touched = true;
+    }
+    if (boxV) {
+      boxV.touched = true;
     }
   };
 

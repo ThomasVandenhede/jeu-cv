@@ -29,7 +29,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
   var game = new Game();
   game.init({
-    shouldDisplayDebug: false,
+    shouldDisplayDebug: true,
     shouldDisplayRulers: true
   });
   game.startGame();
