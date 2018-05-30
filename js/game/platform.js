@@ -11,10 +11,6 @@ var Platform = (function() {
 
   Platform.prototype = Object.create(AABB.prototype);
 
-  // Platform.prototype.getNextState = function() {
-  //   return this;
-  // };
-
   Platform.prototype.update = function() {};
 
   Platform.prototype.draw = function(ctx, camera) {

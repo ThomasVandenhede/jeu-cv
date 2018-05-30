@@ -18,15 +18,6 @@ var MovingPlatform = (function() {
 
   MovingPlatform.prototype = Object.create(Platform.prototype);
 
-  // MovingPlatform.prototype.getNextState = function() {
-  //   return new AABB(
-  //     this.x + this.v.x * dt,
-  //     this.y + this.v.y * dt,
-  //     this.width,
-  //     this.height
-  //   );
-  // };
-
   MovingPlatform.prototype.update = function() {
     var dx = this.v.x * dt;
     var dy = this.v.y * dt;

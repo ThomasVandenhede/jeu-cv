@@ -223,21 +223,6 @@ var Player = (function() {
         : this.v.y;
   };
 
-  // Player.prototype.getNextState = function() {
-  //   // apply gravity if player is free falling
-  //   var ay = this.GRAVITY_ACCELERATION;
-
-  //   // compute new speed based on acceleration and time ellapsed
-  //   var vy = this.v.y + ay * dt;
-  //   vy = Math.abs(vy) > MAX_FALL_SPEED ? Math.sign(vy) * MAX_FALL_SPEED : vy;
-  //   return new AABB(
-  //     this.x + this.v.x * dt,
-  //     this.y + vy * dt,
-  //     this.width,
-  //     this.height
-  //   );
-  // };
-
   Player.prototype.update = function() {
     var dx = this.v.x * dt,
       dy = this.v.y * dt;
