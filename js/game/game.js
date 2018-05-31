@@ -349,7 +349,7 @@ var Game = (function() {
           : toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
     }
     // vertical collision
-    if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
+    if (player.isColliding[1]) {
       player.y =
         player.isColliding[1] > 0
           ? toFixedPrecision(boxV.top + boxV.v.y * dt - player.height, 2)
