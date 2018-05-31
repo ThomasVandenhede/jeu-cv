@@ -243,8 +243,8 @@ var Player = (function() {
 
     ctx.save();
     ctx.fillStyle = color;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 15;
+    // ctx.shadowColor = color;
+    // ctx.shadowBlur = 15;
     ctx.beginPath();
     ctx.moveTo(left, top + r);
     ctx.arcTo(left, top, left + r, top, r);
@@ -256,13 +256,13 @@ var Player = (function() {
     ctx.arcTo(left, bottom, left, bottom - r, r);
     ctx.closePath();
     ctx.fill();
-    ctx.fill();
-    ctx.fill();
-    ctx.fill();
-    ctx.shadowBlur = 40;
-    ctx.fill();
-    ctx.fill();
-    ctx.fill();
+    // ctx.fill();
+    // ctx.fill();
+    // ctx.fill();
+    // ctx.shadowBlur = 40;
+    // ctx.fill();
+    // ctx.fill();
+    // ctx.fill();
     ctx.restore();
 
     // draw player shield
