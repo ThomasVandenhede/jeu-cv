@@ -54,7 +54,7 @@ var Game = (function() {
       new Platform(0, -10000, 0, 20000),
       new MovingPlatform(200, -430, 100, 5, 400, -430, 100),
       new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
-      new MovingPlatform(0, -200, 200, 50, 1, 400, 100)
+      new MovingPlatform(0, -200, 200, 50, 30, 400, 100)
     ];
 
     // initialize background
@@ -94,9 +94,10 @@ var Game = (function() {
     var keyboard = this.keyboard;
     var player = this.player;
 
-    player.v.y = player.isColliding[1]
-      ? player.collidingWith[1].v.y
-      : player.v.y;
+    player.v.y =
+      player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
+        ? player.collidingWith[1].v.y
+        : player.v.y;
     if (keyboard.RIGHT || keyboard.LEFT) {
       keyboard.LEFT && player.moveLeft();
       keyboard.RIGHT && player.moveRight();
