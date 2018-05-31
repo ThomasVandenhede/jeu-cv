@@ -341,20 +341,19 @@ var Game = (function() {
       }
     }
 
-    boxV && console.log(boxV.v.x, boxV.v.y);
     // horizontal collision
     if (player.isColliding[0]) {
       player.x =
         player.isColliding[0] > 0
-          ? boxH.left + boxH.v.x * dt - player.width // snap
-          : boxH.right + boxH.v.x * dt;
+          ? toFixedPrecision(boxH.left + boxH.v.x * dt - player.width, 2) // snap
+          : toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
     }
     // vertical collision
     if (Math.sign(player.GRAVITY_ACCELERATION) === player.isColliding[1]) {
       player.y =
         player.isColliding[1] > 0
-          ? boxV.top + boxV.v.y * dt - player.height
-          : boxV.bottom + boxV.v.y * dt;
+          ? toFixedPrecision(boxV.top + boxV.v.y * dt - player.height, 2)
+          : toFixedPrecision(boxV.bottom + boxV.v.y * dt, 2);
     }
 
     // tell the player which objects it's colliding with
