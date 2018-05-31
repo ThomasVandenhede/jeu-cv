@@ -1,4 +1,4 @@
-var Camera = (function() {
+var Camera = (function () {
   var AXIS = {
     NONE: "none",
     HORIZONTAL: "horizontal",
@@ -30,13 +30,13 @@ var Camera = (function() {
 
   Camera.prototype = Object.create(AABB.prototype);
 
-  Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
+  Camera.prototype.follow = function (gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
     this.xDeadZone = xDeadZone;
     this.yDeadZone = yDeadZone;
   };
 
-  Camera.prototype.update = function() {
+  Camera.prototype.update = function () {
     this.height = canvas.height / this.zoomLevel;
     this.width = canvas.width / this.zoomLevel;
 
@@ -80,17 +80,17 @@ var Camera = (function() {
     }
   };
 
-  Camera.prototype.applyCamera = function(x, y) {
+  Camera.prototype.applyCamera = function (x, y) {
     var screenX, screenY;
-    screenX = (x - this.x) * this.zoomLevel;
-    screenY = (y - this.y) * this.zoomLevel;
+    screenX = toFixedPrecision((x - this.x) * this.zoomLevel, 2);
+    screenY = toFixedPrecision((y - this.y) * this.zoomLevel, 2);
     return new Vector(screenX, screenY);
   };
 
-  Camera.prototype.unapplyCamera = function(x, y) {
+  Camera.prototype.unapplyCamera = function (x, y) {
     var gameX, gameY;
-    gameX = x / this.zoomLevel + this.x;
-    gameY = y / this.zoomLevel + this.y;
+    gameX = toFixedPrecision(x / this.zoomLevel + this.x, 2);
+    gameY = toFixedPrecision(y / this.zoomLevel + this.y, 2);
     return new Vector(gameX, gameY);
   };
 
