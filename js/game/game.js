@@ -392,6 +392,11 @@ var Game = (function() {
     this.timer.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.handleKeyboard();
+    for (var i = 0; i < this.drawables.length; i++) {
+      var drawable = this.drawables[i];
+      typeof drawable.updateVelocity === "function" &&
+        drawable.updateVelocity();
+    }
     this.detectCollisions();
     this.updateScene();
     this.clearCanvas(this.ctx);
