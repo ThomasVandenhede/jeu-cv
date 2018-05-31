@@ -14,7 +14,7 @@ var physics = {
       var OP = Vector.subtract(P, O);
       var numerator = -(A.x * OP.y - O.x * OP.y - OP.x * A.y + OP.x * O.y);
       var denominator = Vector.determinant(AB, OP);
-      k = numerator / denominator;
+      k = toFixedPrecision(numerator / denominator);
 
       if (k < 0 || k > 1) {
         return Number.POSITIVE_INFINITY;
