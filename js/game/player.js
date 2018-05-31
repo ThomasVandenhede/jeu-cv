@@ -2,8 +2,8 @@ var Player = (function() {
   var ABS_JUMP_SPEED = 600;
   var MAX_FALL_SPEED = 1000;
   var animationID;
-  var INITIAL_WIDTH = 5;
-  var INITIAL_HEIGHT = 70;
+  var INITIAL_WIDTH = 40;
+  var INITIAL_HEIGHT = 40;
   var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
   function Player(x, y) {
