@@ -1,4 +1,4 @@
-var contextManager = (function() {
+var contextManager = (function () {
   var instance = null;
 
   var contextID = 0; // context
@@ -246,7 +246,7 @@ var contextManager = (function() {
           options: undefined
         },
         mousemove: {
-          handler: function() {
+          handler: function () {
             console.log("YOU ARE (NOT YET) MOVING OBJECTS!");
           },
           options: undefined
@@ -260,11 +260,11 @@ var contextManager = (function() {
     }
   };
 
-  function ContextManager() {}
+  function ContextManager() { }
 
   Object.defineProperties(ContextManager.prototype, {
     context: {
-      set: function(id) {
+      set: function (id) {
         console.log(id);
         if (id !== contextID) {
           this.setEventHandlersForContext(id);
@@ -274,27 +274,36 @@ var contextManager = (function() {
     }
   });
 
-  ContextManager.prototype.init = function(app) {
+  ContextManager.prototype.init = function (app) {
     this.app = app;
     this.setEventHandlersForContext(contextID);
   };
 
-  ContextManager.prototype.setEventHandlersForContext = function(id) {
+  ContextManager.prototype.setEventHandlersForContext = function (id) {
     var app = this.app;
+    var entries;
     // unset previous event handlers
-    for (var [key, value] of Object.entries(
+    entries = Object.entries(
       contextEventHandlers[contextID].mouse
-    )) {
+    )
+    for (var i = 0; i < entries.length; i++) {
+      var key = entries[i][0];
+      var value = entries[i][1];
       app.mouse.off(window, key, value.handler, value.options);
     }
     // set new event handlers
-    for (var [key, value] of Object.entries(contextEventHandlers[id].mouse)) {
+    entries = Object.entries(
+      contextEventHandlers[id].mouse
+    )
+    for (var i = 0; i < entries.length; i++) {
+      var key = entries[i][0];
+      var value = entries[i][1];
       app.mouse.on(window, key, value.handler, value.options);
     }
   };
 
   return {
-    getInstance: function() {
+    getInstance: function () {
       if (!instance) {
         instance = new ContextManager();
       }
