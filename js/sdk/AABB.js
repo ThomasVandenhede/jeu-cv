@@ -1,8 +1,8 @@
 function AABB(x, y, width, height) {
   this.x = x;
   this.y = y;
-  this.width = width;
-  this.height = height;
+  this.width = width !== undefined ? width : 0;
+  this.height = height !== undefined ? height : 0;
 }
 
 Object.defineProperties(AABB.prototype, {
@@ -44,6 +44,15 @@ Object.defineProperties(AABB.prototype, {
       } else {
         this.y = bottom - this.height;
       }
+    }
+  },
+  center: {
+    get: function() {
+      return new Vector(this.x + this.width / 2, this.y + this.height / 2);
+    },
+    set: function(x, y) {
+      this.x = x - this.width / 2;
+      this.y = y - this.height / 2;
     }
   }
 });
@@ -90,11 +99,9 @@ AABB.prototype.overlaps = function(r) {
 };
 
 AABB.prototype.contains = function(x, y) {
-  return (
-    x >= this.left && this <= this.right && y >= this.top && y <= this.bottom
-  );
+  return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
 };
 
 AABB.prototype.containsStrict = function(x, y) {
-  return x > this.left && this < this.right && y > this.top && y < this.bottom;
+  return x > this.left && x < this.right && y > this.top && y < this.bottom;
 };
