@@ -5,6 +5,8 @@ var Platform = (function() {
     AABB.call(this, x, y, width, height);
 
     this.v = new Vector();
+    this.solid = true; // can collide with other solid objects
+    this.passthrough = false; // can it be traversed upwards
     this.touched = false; // is the player touching the platform
     this.color = "#ddd";
   }

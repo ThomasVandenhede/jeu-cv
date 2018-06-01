@@ -13,6 +13,7 @@ var Player = (function() {
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
     this.COEFFICIENT_OF_RESTITUTION = 0.4;
+    this.solid = true; // can collide with other solid objects
     this.color = "#22dd00";
     this.color = "#37e018";
 
