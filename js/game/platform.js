@@ -6,7 +6,7 @@ var Platform = (function() {
 
     this.v = new Vector();
     this.solid = true; // can collide with other solid objects
-    this.passthrough = false; // can it be traversed upwards
+    this.passthrough = true; // can it be traversed upwards
     this.touched = false; // is the player touching the platform
     this.color = "#ddd";
   }
@@ -20,7 +20,7 @@ var Platform = (function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
     ctx.save();
-    if (this.touched) {
+    if (this.touched || !this.passthrough) {
       ctx.strokeStyle = this.color;
       ctx.fillStyle = this.color;
       ctx.beginPath();
@@ -31,14 +31,8 @@ var Platform = (function() {
           this.height * camera.zoomLevel
         ])
       );
+      ctx.fill();
       ctx.stroke();
-      ctx.fillRect.apply(
-        ctx,
-        applyCamToArr(this.x, this.y).concat([
-          this.width * camera.zoomLevel,
-          this.height * camera.zoomLevel
-        ])
-      );
     } else {
       ctx.strokeStyle = this.color;
       ctx.lineWidth = 2;

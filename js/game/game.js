@@ -276,11 +276,12 @@ var Game = (function() {
     var player = this.player;
     var collidableWith = this.getCollidableObjectsInViewport();
     var collisions = []; // contains objects describing collisions
+    var boxH = null,
+      boxV = null;
 
     // apply gravity acceleration and reset collisions
     player.applyGravity();
     player.isColliding = [0, 0];
-    var boxH, boxV;
 
     // loop over each collidable object and store collision data
     for (var i = 0; i < collidableWith.length; i++) {
@@ -324,8 +325,17 @@ var Game = (function() {
       var box = collision.box;
 
       // set player collisions [0, 1] + [-1, 0] -> [-1, 1]
-      player.isColliding[0] = side[0] ? side[0] : player.isColliding[0];
-      player.isColliding[1] = side[1] ? side[1] : player.isColliding[1];
+      if (box.solid) {
+        player.isColliding[0] = side[0] ? side[0] : player.isColliding[0];
+        if (box.passthrough) {
+          player.isColliding[1] =
+            side[1] * player.GRAVITY_ACCELERATION > 0
+              ? side[1]
+              : player.isColliding[1];
+        } else {
+          player.isColliding[1] = side[1] ? side[1] : player.isColliding[1];
+        }
+      }
 
       // if new value of d is greater than the old one then the new box is the one in contact with the player
       if (side[0]) {
@@ -333,7 +343,7 @@ var Game = (function() {
           dH = d;
           boxH = box;
         }
-      } else {
+      } else if (side[1]) {
         if (d > dV) {
           dV = d;
           boxV = box;
@@ -341,14 +351,14 @@ var Game = (function() {
       }
     }
 
-    // horizontal collision
+    // resolve horizontal collision
     if (player.isColliding[0]) {
       player.x =
         player.isColliding[0] > 0
           ? toFixedPrecision(boxH.left + boxH.v.x * dt - player.width, 2) // snap
           : toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
     }
-    // vertical collision
+    // resolve vertical collision
     if (player.isColliding[1]) {
       player.y =
         player.isColliding[1] > 0
@@ -356,7 +366,7 @@ var Game = (function() {
           : toFixedPrecision(boxV.bottom + boxV.v.y * dt, 2);
     }
 
-    // tell the player which objects it's colliding with
+    // inform the player about which objects it's colliding with
     player.collidingWith = [boxH, boxV];
     if (boxH) {
       boxH.touched = true;
