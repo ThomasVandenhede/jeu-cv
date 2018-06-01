@@ -7,6 +7,7 @@ var toolbarFactory = (function() {
     this.createButton = document.getElementById("button-create");
     this.moveButton = document.getElementById("button-move");
     this.downloadButton = document.getElementById("button-download");
+    this.objectTypeDropDown = document.getElementById("object-type");
 
     this.selectButton.addEventListener(
       "click",
@@ -40,10 +41,28 @@ var toolbarFactory = (function() {
         app.getDownLink();
       }.bind(this)
     );
+
+    this.objectTypeDropDown.addEventListener(
+      "change",
+      this.getGameObjectType.bind(this)
+    );
   }
 
   Toolbar.prototype.init = function(app) {
     this.app = app;
+    this.getGameObjectType();
+  };
+
+  Toolbar.prototype.getGameObjectType = function() {
+    var app = this.app;
+    var type = this.objectTypeDropDown.value;
+    var objectTypeMap = {
+      player: Player,
+      platform: Platform,
+      movingPlatform: MovingPlatform
+    };
+    app.gameObjectConstructor = objectTypeMap[type];
+    console.log(app.gameObjectConstructor);
   };
 
   return {
