@@ -96,10 +96,12 @@ var Player = (function() {
         }
       },
       draw: function(ctx, camera) {
+        ctx.save();
         for (var id in this.particles) {
           var particle = this.particles[id];
           particle.draw(ctx, camera);
         }
+        ctx.restore();
       }
     };
 
@@ -234,35 +236,51 @@ var Player = (function() {
   };
 
   Player.prototype.draw = function(ctx, camera) {
-    var r = 2.5;
-    var left = this.x - camera.x;
-    var top = this.y - camera.y;
+    var applyCamToArr = function() {
+      return Object.values(camera.applyCamera.apply(camera, arguments));
+    };
+    var r = 5;
+    var left = this.x;
+    var top = this.y;
     var right = left + this.width;
     var bottom = top + this.height;
     var color = this.color;
 
     ctx.save();
+    ctx.strokeStyle = color;
     ctx.fillStyle = color;
-    // ctx.shadowColor = color;
-    // ctx.shadowBlur = 15;
     ctx.beginPath();
-    ctx.moveTo(left, top + r);
-    ctx.arcTo(left, top, left + r, top, r);
-    ctx.lineTo(right - r, top);
-    ctx.arcTo(right, top, right, top + r, r);
-    ctx.lineTo(right, bottom - r);
-    ctx.arcTo(right, bottom, right - r, bottom, r);
-    ctx.lineTo(left + r, bottom);
-    ctx.arcTo(left, bottom, left, bottom - r, r);
+    ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
+    ctx.arcTo.apply(
+      ctx,
+      applyCamToArr(left, top)
+        .concat(applyCamToArr(left + r, top))
+        .concat([r * camera.zoomLevel])
+    );
+    ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
+    ctx.arcTo.apply(
+      ctx,
+      applyCamToArr(right, top)
+        .concat(applyCamToArr(right, top + r))
+        .concat([r * camera.zoomLevel])
+    );
+    ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
+    ctx.arcTo.apply(
+      ctx,
+      applyCamToArr(right, bottom)
+        .concat(applyCamToArr(right - r, bottom))
+        .concat([r * camera.zoomLevel])
+    );
+    ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
+    ctx.arcTo.apply(
+      ctx,
+      applyCamToArr(left, bottom)
+        .concat(applyCamToArr(left, bottom - r))
+        .concat([r * camera.zoomLevel])
+    );
     ctx.closePath();
+    ctx.stroke();
     ctx.fill();
-    // ctx.fill();
-    // ctx.fill();
-    // ctx.fill();
-    // ctx.shadowBlur = 40;
-    // ctx.fill();
-    // ctx.fill();
-    // ctx.fill();
     ctx.restore();
 
     // draw player shield

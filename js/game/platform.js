@@ -14,34 +14,39 @@ var Platform = (function() {
   Platform.prototype.update = function() {};
 
   Platform.prototype.draw = function(ctx, camera) {
+    var applyCamToArr = function() {
+      return Object.values(camera.applyCamera.apply(camera, arguments));
+    };
     ctx.save();
     if (this.touched) {
-      // // inset shadow
-      // ctx.shadowBlur = 3;
-      // ctx.lineWidth = 1;
       ctx.strokeStyle = this.color;
       ctx.fillStyle = this.color;
       ctx.beginPath();
-      ctx.rect(this.x - camera.x, this.y - camera.y, this.width, this.height);
+      ctx.rect.apply(
+        ctx,
+        applyCamToArr(this.x, this.y).concat([
+          this.width * camera.zoomLevel,
+          this.height * camera.zoomLevel
+        ])
+      );
       ctx.stroke();
-
-      // ctx.shadowColor = this.color;
-      // ctx.shadowBlur = 20;
-      ctx.fillRect(
-        this.x - camera.x,
-        this.y - camera.y,
-        this.width,
-        this.height
+      ctx.fillRect.apply(
+        ctx,
+        applyCamToArr(this.x, this.y).concat([
+          this.width * camera.zoomLevel,
+          this.height * camera.zoomLevel
+        ])
       );
     } else {
       ctx.strokeStyle = this.color;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.strokeRect(
-        this.x - camera.x,
-        this.y - camera.y,
-        this.width,
-        this.height
+      ctx.strokeRect.apply(
+        ctx,
+        applyCamToArr(this.x, this.y).concat([
+          this.width * camera.zoomLevel,
+          this.height * camera.zoomLevel
+        ])
       );
     }
     ctx.restore();

@@ -1,27 +1,27 @@
-var GameTimer = (function () {
+var GameTimer = (function() {
   function GameTimer() {
     this.totalTime = 0;
     this.currentTime = Date.now();
     this.previousTime = this.currentTime;
     this.isPaused = false;
     this.isCountDown = false;
-    this.countDownStart = 0.1 * 60 * 1000; // ms
+    this.countDownStart = 1 * 60 * 1000; // ms
   }
 
-  GameTimer.prototype.getEllapsedTime = function () {
+  GameTimer.prototype.getEllapsedTime = function() {
     return this.currentTime - this.previousTime;
   };
 
-  GameTimer.prototype.pause = function () {
+  GameTimer.prototype.pause = function() {
     this.isPaused = true;
   };
 
-  GameTimer.prototype.play = function () {
+  GameTimer.prototype.play = function() {
     this.isPaused = false;
     this.currentTime = Date.now();
   };
 
-  GameTimer.prototype.update = function () {
+  GameTimer.prototype.update = function() {
     if (!this.isPaused) {
       this.previousTime = this.currentTime;
       this.currentTime = Date.now();
@@ -29,7 +29,7 @@ var GameTimer = (function () {
     }
   };
 
-  GameTimer.prototype.draw = function (ctx) {
+  GameTimer.prototype.draw = function(ctx) {
     var displayTime = new Date();
     this.isCountDown
       ? displayTime.setTime(Math.max(0, this.countDownStart - this.totalTime))

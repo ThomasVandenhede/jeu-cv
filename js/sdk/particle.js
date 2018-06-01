@@ -22,21 +22,17 @@ var Particle = (function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
     var color = this.color;
-    // var alpha = Math.max(0, 1 - (Date.now() - this.createdAt) / this.maxLife);
-    ctx.save();
     ctx.fillStyle = color;
-    // ctx.globalAlpha = alpha;
     ctx.beginPath();
     ctx.arc.apply(
       ctx,
       applyCamToArr(this.x, this.y).concat([
-        this.size / camera.zoomLevel,
+        this.size * camera.zoomLevel,
         0,
         Math.PI * 2
       ])
     );
     ctx.fill();
-    ctx.restore();
   };
 
   return Particle;
