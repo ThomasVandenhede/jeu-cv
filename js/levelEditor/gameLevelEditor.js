@@ -16,10 +16,6 @@ var LevelEditor = (function() {
     this.keyboard = keyboardManager.getInstance();
     this.mouse = mouse.getInstance();
     this.mouse.init(this); // pass the game object to the mouse as its context
-    // this.mouse.on("mousedown", handleMouseDown);
-    // this.mouse.on("mousemove", handleMouseMove);
-    // this.mouse.on("mouseup", handleMouseUp);
-    // this.mouse.on("wheel", handleWheel, { passive: true });
     this.contextManager = contextManager.getInstance();
     this.contextManager.init(this);
     this.toolbar = toolbarFactory.getInstance();
@@ -104,7 +100,7 @@ var LevelEditor = (function() {
     this.drawGrid(ctx);
     for (var i = 0; i < this.drawables.length; i++) {
       var drawable = this.drawables[i];
-      drawable.overlaps(camera.viewportRect) && drawable.draw(ctx, camera);
+      drawable.overlaps(camera) && drawable.draw(ctx, camera);
     }
 
     // draw worldRect

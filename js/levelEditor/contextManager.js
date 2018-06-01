@@ -1,4 +1,4 @@
-var contextManager = (function () {
+var contextManager = (function() {
   var instance = null;
 
   var contextID = 0; // context
@@ -130,7 +130,15 @@ var contextManager = (function () {
   }
 
   function handleMouseDown1(e) {
-    console.log("DOWN");
+    this.x = e.clientX + this.canvas.offsetLeft;
+    this.y = e.clientY + this.canvas.offsetTop;
+    var Constructor = this.app.gameObjectConstructor;
+
+    var mousePos = this.app.grid._getMousePosSnappedToGrid();
+    var gamePos = this.app.camera.unapplyCamera(mousePos.x, mousePos.y);
+
+    var gameObject = new Constructor(gamePos.x, gamePos.y);
+    this.app.drawables.push(gameObject);
   }
 
   function handleMouseUp1(e) {
@@ -138,7 +146,8 @@ var contextManager = (function () {
   }
 
   function handleMouseMove1(e) {
-    console.log("MOVE");
+    this.x = e.clientX + this.canvas.offsetLeft;
+    this.y = e.clientY + this.canvas.offsetTop;
   }
 
   function handleMouseDown2(e) {
@@ -246,7 +255,7 @@ var contextManager = (function () {
           options: undefined
         },
         mousemove: {
-          handler: function () {
+          handler: function() {
             console.log("YOU ARE (NOT YET) MOVING OBJECTS!");
           },
           options: undefined
@@ -260,11 +269,11 @@ var contextManager = (function () {
     }
   };
 
-  function ContextManager() { }
+  function ContextManager() {}
 
   Object.defineProperties(ContextManager.prototype, {
     context: {
-      set: function (id) {
+      set: function(id) {
         console.log(id);
         if (id !== contextID) {
           this.setEventHandlersForContext(id);
@@ -274,27 +283,23 @@ var contextManager = (function () {
     }
   });
 
-  ContextManager.prototype.init = function (app) {
+  ContextManager.prototype.init = function(app) {
     this.app = app;
     this.setEventHandlersForContext(contextID);
   };
 
-  ContextManager.prototype.setEventHandlersForContext = function (id) {
+  ContextManager.prototype.setEventHandlersForContext = function(id) {
     var app = this.app;
     var entries;
     // unset previous event handlers
-    entries = Object.entries(
-      contextEventHandlers[contextID].mouse
-    )
+    entries = Object.entries(contextEventHandlers[contextID].mouse);
     for (var i = 0; i < entries.length; i++) {
       var key = entries[i][0];
       var value = entries[i][1];
       app.mouse.off(window, key, value.handler, value.options);
     }
     // set new event handlers
-    entries = Object.entries(
-      contextEventHandlers[id].mouse
-    )
+    entries = Object.entries(contextEventHandlers[id].mouse);
     for (var i = 0; i < entries.length; i++) {
       var key = entries[i][0];
       var value = entries[i][1];
@@ -303,7 +308,7 @@ var contextManager = (function () {
   };
 
   return {
-    getInstance: function () {
+    getInstance: function() {
       if (!instance) {
         instance = new ContextManager();
       }
