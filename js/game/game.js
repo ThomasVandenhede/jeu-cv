@@ -39,21 +39,25 @@ var Game = (function() {
     this.platforms = [
       new Platform(-20, -350, 220, 5),
       new Platform(350, -250, 50, 5),
-      new Platform(0, -130, 180, 5),
-      new Platform(0, -150, 180, 5),
-      new Platform(330, -390, 150, 5),
+      new Platform(0, -130, 180, 5, { passthrough: true }),
+      new Platform(0, -150, 180, 5, { passthrough: true }),
+      new Platform(330, -390, 150, 5, { passthrough: true }),
       new Platform(150, 200, 50, 5),
       new Platform(500, -270, 80, 80),
       new Platform(500, -170, 80, 160),
-      new Platform(500, 10, 80, 120),
-      new Platform(500, 150, 80, 120),
+      new Platform(500, 10, 80, 120, { passthrough: true }),
+      new Platform(500, 150, 80, 120, { passthrough: true }),
       new Platform(700, -80, 30, 20),
-      new Platform(350, 70, 30, 20),
-      new Platform(700, 210, 30, 20),
+      new Platform(350, 70, 30, 20, { passthrough: true }),
+      new Platform(700, 210, 30, 20, { passthrough: true }),
       new Platform(200, -470, 5, 170),
       new Platform(0, -10000, 0, 20000),
-      new MovingPlatform(200, -430, 100, 5, 400, -430, 100),
-      new MovingPlatform(700, -400, 80, 30, 700, -100, 100),
+      new MovingPlatform(200, -430, 100, 5, 400, -430, 100, {
+        passthrough: true
+      }),
+      new MovingPlatform(700, -400, 80, 30, 700, -100, 100, {
+        passthrough: true
+      }),
       new MovingPlatform(0, -200, 200, 50, 30, 400, 100)
     ];
 
@@ -93,6 +97,11 @@ var Game = (function() {
   Game.prototype.handleKeyboard = function() {
     var keyboard = this.keyboard;
     var player = this.player;
+
+    // do not handle keyboard if player is dead
+    if (player.isDead) {
+      return;
+    }
 
     player.v.y =
       player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
@@ -287,7 +296,7 @@ var Game = (function() {
     for (var i = 0; i < collidableWith.length; i++) {
       var box = collidableWith[i];
       var md = AABB.minkowskiDifference(box, player);
-      // window.md = md; // remove this when everything's working
+      window.md = md; // remove this when everything's working
       var relMotion = Vector.subtract(player.v, box.v).multiplyByScalar(dt);
       var colInfo = physics.collision.segmentAABB(new Vector(), relMotion, md);
       var t = colInfo.t;
@@ -310,7 +319,7 @@ var Game = (function() {
     /**
      * COLLISION RESOLUTION
      **/
-    // no collision detected, return
+    // no collision detected, do nothing
     if (!collisions.length) {
       return;
     }
@@ -323,6 +332,15 @@ var Game = (function() {
       var side = collision.side;
       var d = collision.d;
       var box = collision.box;
+
+      // die if player has double sided collision
+      if (
+        side[0] * player.isColliding[0] < 0 ||
+        side[1] * player.isColliding[1] < 0
+      ) {
+        player.die();
+        return;
+      }
 
       // set player collisions [0, 1] + [-1, 0] -> [-1, 1]
       if (box.solid) {
@@ -407,13 +425,22 @@ var Game = (function() {
       typeof drawable.updateVelocity === "function" &&
         drawable.updateVelocity();
     }
-    this.detectCollisions();
+    !this.player.isDead && this.detectCollisions();
     this.updateScene();
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
     this.renderScene(this.ctx, this.camera);
 
-    !this.isPaused && requestAnimationFrame(this.main.bind(this));
+    !this.isPaused
+      ? requestAnimationFrame(this.main.bind(this))
+      : requestAnimationFrame(this.pauseMenuLoop.bind(this));
+  };
+
+  Game.prototype.pauseMenuLoop = function() {
+    // this.renderScene(this.ctx, this.camera);
+    this.isPaused
+      ? requestAnimationFrame(this.pauseMenuLoop.bind(this))
+      : requestAnimationFrame(this.main.bind(this));
   };
 
   Game.prototype.updateDebugInfo = function() {
