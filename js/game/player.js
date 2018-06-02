@@ -17,94 +17,7 @@ var Player = (function() {
     this.color = "#22dd00";
     this.color = "#37e018";
 
-    this.particlesManager = {
-      particleIndex: 0,
-      maxCount: 50,
-      particles: {},
-      color: that.color,
-      minSpeed: 5,
-      maxSpeed: 20,
-      size: 2,
-      maxLife: 500,
-      addNewParticle: function() {
-        if (Object.keys(this.particles).length < this.maxCount) {
-          this.particleIndex++;
-          var position;
-          switch (randInt(0, 3)) {
-            case 0:
-              position = {
-                x: randInt(that.left, that.right),
-                y: that.top,
-                vx: randInt(-this.maxSpeed, this.maxSpeed),
-                vy: randInt(-this.maxSpeed, -this.minSpeed)
-              };
-              break;
-            case 1:
-              position = {
-                x: randInt(that.left, that.right),
-                y: that.bottom,
-                vx: randInt(-this.maxSpeed, this.maxSpeed),
-                vy: randInt(this.minSpeed, this.maxSpeed)
-              };
-              break;
-            case 2:
-              position = {
-                x: that.left,
-                y: randInt(that.top, that.bottom),
-                vx: randInt(-this.maxSpeed, -this.minSpeed),
-                vy: randInt(-this.maxSpeed, this.maxSpeed)
-              };
-              break;
-            case 3:
-              position = {
-                x: that.right,
-                y: randInt(that.top, that.bottom),
-                vx: randInt(this.minSpeed, this.maxSpeed),
-                vy: randInt(-this.maxSpeed, this.maxSpeed)
-              };
-              break;
-          }
-          var color = this.color;
-          // var color =
-          //   "rgb(" +
-          //   randInt(0, 255) +
-          //   ", " +
-          //   randInt(0, 255) +
-          //   ", " +
-          //   randInt(0, 255) +
-          //   ")";
-          var particle = new Particle(
-            position.x,
-            position.y,
-            this.size,
-            color,
-            position.vx,
-            position.vy,
-            this.maxLife
-          );
-          particle.id = this.particleIndex;
-          this.particles[this.particleIndex] = particle;
-        }
-      },
-      update: function() {
-        this.addNewParticle();
-        for (var id in this.particles) {
-          var particle = this.particles[id];
-          particle.update();
-          if (Date.now() - particle.createdAt >= this.maxLife) {
-            delete this.particles[id];
-          }
-        }
-      },
-      draw: function(ctx, camera) {
-        ctx.save();
-        for (var id in this.particles) {
-          var particle = this.particles[id];
-          particle.draw(ctx, camera);
-        }
-        ctx.restore();
-      }
-    };
+    this.sparks = sparksParticles(this);
 
     // crouching / standing state and animations
     this.isCrouching = false;
@@ -177,7 +90,10 @@ var Player = (function() {
     }
   };
 
-  Player.prototype.die = function() {};
+  Player.prototype.die = function() {
+    this.isDead = true;
+    this.explosion = explosionParticles(this);
+  };
 
   Player.prototype.getDeltaWidth = function() {
     var deltaWidth;
@@ -220,6 +136,9 @@ var Player = (function() {
   };
 
   Player.prototype.update = function() {
+    !this.isDead ? this.sparks.update() : this.explosion.update();
+    if (this.isDead) return;
+
     var dx = this.v.x * dt,
       dy = this.v.y * dt;
 
@@ -232,63 +151,66 @@ var Player = (function() {
     if (!this.isColliding[0]) {
       this.x = toFixedPrecision(this.x + dx, 2);
     }
-
-    this.particlesManager.update();
   };
 
   Player.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
-    var r = 5;
-    var left = this.x;
-    var top = this.y;
-    var right = left + this.width;
-    var bottom = top + this.height;
-    var color = this.color;
 
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(left, top)
-        .concat(applyCamToArr(left + r, top))
-        .concat([r * camera.zoomLevel])
-    );
-    ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(right, top)
-        .concat(applyCamToArr(right, top + r))
-        .concat([r * camera.zoomLevel])
-    );
-    ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(right, bottom)
-        .concat(applyCamToArr(right - r, bottom))
-        .concat([r * camera.zoomLevel])
-    );
-    ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(left, bottom)
-        .concat(applyCamToArr(left, bottom - r))
-        .concat([r * camera.zoomLevel])
-    );
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
-    ctx.restore();
+    if (!this.isDead) {
+      var r = 5;
+      var left = this.x;
+      var top = this.y;
+      var right = left + this.width;
+      var bottom = top + this.height;
+      var color = this.color;
 
-    // draw player shield
-    (this.shield.isOpen || this.shield.isAnimating) &&
-      this.shield.draw(ctx, camera);
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
+      ctx.arcTo.apply(
+        ctx,
+        applyCamToArr(left, top)
+          .concat(applyCamToArr(left + r, top))
+          .concat([r * camera.zoomLevel])
+      );
+      ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
+      ctx.arcTo.apply(
+        ctx,
+        applyCamToArr(right, top)
+          .concat(applyCamToArr(right, top + r))
+          .concat([r * camera.zoomLevel])
+      );
+      ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
+      ctx.arcTo.apply(
+        ctx,
+        applyCamToArr(right, bottom)
+          .concat(applyCamToArr(right - r, bottom))
+          .concat([r * camera.zoomLevel])
+      );
+      ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
+      ctx.arcTo.apply(
+        ctx,
+        applyCamToArr(left, bottom)
+          .concat(applyCamToArr(left, bottom - r))
+          .concat([r * camera.zoomLevel])
+      );
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
 
-    this.particlesManager.draw(ctx, camera);
+      // draw player shield
+      (this.shield.isOpen || this.shield.isAnimating) &&
+        this.shield.draw(ctx, camera);
+    }
+
+    !this.isDead
+      ? this.sparks.draw(ctx, camera)
+      : this.explosion.draw(ctx, camera);
   };
 
   return Player;
