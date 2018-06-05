@@ -49,12 +49,12 @@ var keyboardManager = (function() {
               ? this.app.pause.call(this.app)
               : this.app.unpause.call(this.app);
             break;
-          case 71:
-            this.app.player.reverseGravity();
-            break;
-          case 72:
-            this.app.player.zeroGravity();
-            break;
+          // case 71:
+          //   this.app.player.reverseGravity();
+          //   break;
+          // case 72:
+          //   this.app.player.zeroGravity();
+          //   break;
           default:
         }
       }.bind(this)
