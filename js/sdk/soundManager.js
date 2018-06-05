@@ -5,7 +5,7 @@ var soundManager = (function() {
     this.masterVolume = 1;
     this.sounds = {};
     this.musics = {};
-    this.pausedSounds = {};
+    this.pausedSounds = [];
   }
 
   SoundManager.prototype.init = function(gameData) {
@@ -16,28 +16,30 @@ var soundManager = (function() {
     location = soundData.location;
     files = soundData.files;
     // load sounds
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      var filename = file.filename;
+    files.forEach(
+      function(file) {
+        var filename = file.filename;
 
-      var sound = new Sound(location + filename);
-      sound.volume = file.volume * this.masterVolume;
+        var sound = new Sound(location + filename);
+        sound.volume = file.volume * this.masterVolume;
 
-      this.sounds[filename] = sound;
-    }
+        this.sounds[filename] = sound;
+      }.bind(this)
+    );
 
     location = musicData.location;
     files = musicData.files;
     // load musics
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-      var filename = file.filename;
+    files.forEach(
+      function(file) {
+        var filename = file.filename;
 
-      var sound = new Sound(location + filename);
-      sound.volume = file.volume * this.masterVolume;
+        var sound = new Sound(location + filename);
+        sound.volume = file.volume * this.masterVolume;
 
-      this.sounds[filename] = sound;
-    }
+        this.sounds[filename] = sound;
+      }.bind(this)
+    );
   };
 
   SoundManager.prototype.stopAll = function() {
@@ -56,10 +58,9 @@ var soundManager = (function() {
   };
 
   SoundManager.prototype.playPaused = function() {
-    for (var i = 0; i < this.pausedSounds.length; i++) {
-      var pausedSound = this.pausedSounds[i];
+    this.pausedSounds.forEach(function(pausedSound) {
       pausedSound.play();
-    }
+    });
   };
 
   return {

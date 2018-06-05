@@ -18,6 +18,9 @@
     </div>
 
     <div class="toolbar" id="toolbar">
+      <p>
+        <a href="./index.html" class="btn btn-primary">Retour à l'accueil</a>
+      </p>
       <h2>Toolbar</h2>
       <form action="" id="toolbar-form">
         <p>
@@ -48,7 +51,6 @@
         <div>
           <button id="button-select" class="btn">select</button>
           <button id="button-create" class="btn">create</button>
-          <button id="button-move" class="btn">move</button>
         </div>
         <select name="object-type" id="object-type">
           <option value="player">player</option>
@@ -58,7 +60,7 @@
           <option value="skill">skill</option>
         </select>
 
-        <button id="button-download" class="btn btn-primary">GET DOWNLOAD LINK</button>
+        <button id="save-button" class="btn btn-primary">SAVE</button>
       </form>
     </div>
   </div>
@@ -70,16 +72,16 @@
   <script src="./js/sdk/vector.js"></script>
   <script src="./js/sdk/AABB.js"></script>
   <script src="./js/sdk/particle.js"></script>
+  <script src="./js/sdk/particles.js"></script>
   <script src="./js/sdk/segment.js"></script>
   <!-- user input -->
-  <script src="./js/sdk/keyboardManager.js"></script>
   <script src="./js/sdk/mouseManager.js"></script>
   <!-- sound -->
   <script src="./js/sdk/sound.js"></script>
   <script src="./js/sdk/soundManager.js"></script>
   <!-- levels -->
   <!-- <script src="./js/sdk/level.js"></script>
-  <script src="./js/sdk/levelManager.js"></script> -->
+    <script src="./js/sdk/levelManager.js"></script> -->
   <!-- camera -->
   <script src="./js/sdk/camera.js"></script>
   <!-- game specific -->
@@ -88,15 +90,18 @@
   <script src="./js/game/shield.js"></script>
   <script src="./js/game/laser.js"></script>
   <script src="./js/game/ennemy.js"></script>
-  <script src="./js/game/player.js"></script>
-  <script src="./js/game/gameData.js"></script>
+  <script src="./js/game/skill.js"></script>
+  <script src=" ./js/game/player.js "></script>
+  <script src="./js/game/grid.js "></script>
+  <script src="./js/game/gameData.js "></script>
   <!-- level editor -->
-  <script src="./js/levelEditor/contextManager.js"></script>
-  <script src="./js/levelEditor/toolbar.js"></script>
-  <script src="./js/levelEditor/grid.js"></script>
-  <script src="./js/levelEditor/gameLevelEditor.js"></script>
+  <script src="./js/levelEditor/selectionContext.js "></script>
+  <script src="./js/levelEditor/contextManager.js "></script>
+  <script src="./js/levelEditor/keyboardManager.js"></script>
+  <script src="./js/levelEditor/toolbar.js "></script>
+  <script src="./js/levelEditor/gameLevelEditor.js "></script>
   <!-- entry point -->
-  <script src="./js/levelEditor.js"></script>
+  <script src="./js/levelEditor.js "></script>
 </body>
 
 </html>

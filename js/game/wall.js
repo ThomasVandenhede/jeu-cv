@@ -8,6 +8,7 @@ var Wall = (function() {
   }
 
   Wall.prototype = Object.create(Segment.prototype);
+  Wall.prototype.constructor = Wall;
 
   Wall.prototype.overlaps = function() {
     return true;
@@ -15,7 +16,7 @@ var Wall = (function() {
 
   Wall.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
-      return Object.values(camera.applyCamera.apply(camera, arguments));
+      return Object.values(camera.apply.apply(camera, arguments));
     };
     ctx.save();
     ctx.strokeStyle = this.color;

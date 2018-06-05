@@ -45,6 +45,13 @@ var Vector = (function() {
     return new Vector(-this.y, this.x);
   };
 
+  Vector.prototype.rotateRadians = function(angle) {
+    return new Vector(
+      Math.cos(angle) * this.x - Math.sin(angle) * this.y,
+      Math.sin(angle) * this.x + Math.cos(angle) * this.y
+    );
+  };
+
   Object.defineProperties(Vector.prototype, {
     direction: {
       get: function() {

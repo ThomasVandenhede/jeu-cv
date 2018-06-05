@@ -1,47 +1,54 @@
 var Platform = (function() {
   var MAX_SPEED = 100;
 
-  function Platform(x, y, width, height) {
-    AABB.call(this, x, y, width, height);
+  function Platform(options) {
+    AABB.call(this, options.x, options.y, options.width, options.height);
 
     this.v = new Vector();
-    this.solid = true; // can collide with other solid objects
-    this.passthrough = true; // can it be traversed upwards
+    this.solid = options && options.solid !== undefined ? options.solid : true; // can collide with other solid objects
+    this.passthrough =
+      options && options.passthrough !== undefined
+        ? options.passthrough
+        : false; // can it be traversed upwards
     this.touched = false; // is the player touching the platform
-    this.color = "#ddd";
+    this.color = "#5e4c4c";
   }
 
   Platform.prototype = Object.create(AABB.prototype);
+  Platform.prototype.constructor = Platform;
 
   Platform.prototype.update = function() {};
 
   Platform.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
-      return Object.values(camera.applyCamera.apply(camera, arguments));
+      return Object.values(camera.apply.apply(camera, arguments));
     };
+    var lineWidth = 3;
     ctx.save();
+    ctx.lineWidth = lineWidth * camera.zoomLevel;
     if (this.touched || !this.passthrough) {
-      ctx.strokeStyle = this.color;
+      ctx.strokeStyle = "#db0000";
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.rect.apply(
         ctx,
-        applyCamToArr(this.x, this.y).concat([
-          this.width * camera.zoomLevel,
-          this.height * camera.zoomLevel
+        applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
+          (this.width - lineWidth) * camera.zoomLevel,
+          (this.height - lineWidth) * camera.zoomLevel
         ])
       );
       ctx.fill();
       ctx.stroke();
     } else {
+      lineWidth = 3;
       ctx.strokeStyle = this.color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = lineWidth * camera.zoomLevel;
       ctx.beginPath();
       ctx.strokeRect.apply(
         ctx,
-        applyCamToArr(this.x, this.y).concat([
-          this.width * camera.zoomLevel,
-          this.height * camera.zoomLevel
+        applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
+          (this.width - lineWidth) * camera.zoomLevel,
+          (this.height - lineWidth) * camera.zoomLevel
         ])
       );
     }

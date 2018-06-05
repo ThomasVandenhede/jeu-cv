@@ -37,15 +37,11 @@ var mouse = (function() {
   Mouse.prototype.on = function(el, type, callback) {
     var eventHandler = callback.bind(this);
     this.eventListeners[callback.name] = eventHandler;
-
-    console.log("ON", callback);
     el.addEventListener(type, eventHandler, arguments[3]);
   };
 
   Mouse.prototype.off = function(el, type, callback) {
     var eventHandler = this.eventListeners[callback.name];
-
-    console.log("OFF", callback);
     el.removeEventListener(type, eventHandler, arguments[3]);
   };
 

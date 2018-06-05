@@ -1,6 +1,6 @@
 var gameData = {
   constants: {
-    GRAVITY_ACCELERATION: 1200
+    GRAVITY_ACCELERATION: 1600
   },
   colors: {
     STAR_WARS_YELLOW: "#ffd700"
@@ -35,6 +35,10 @@ var gameData = {
       {
         filename: "Close.mp3",
         volume: 0.6
+      },
+      {
+        filename: "impactsplat03.mp3.flac",
+        volume: 0.8
       }
     ]
   },
@@ -47,8 +51,8 @@ var gameData = {
       }
     ]
   },
-  levels: [
-    {
+  levels: {
+    "test level": {
       name: "test level",
       cssBackground: {
         src: "./assets/images/background_1000_stars.png",
@@ -118,7 +122,7 @@ var gameData = {
       ],
       ennemies: []
     },
-    {
+    "level 1": {
       name: "level 1",
       cssBackground: {
         src: "./assets/images/background_1000_stars.png",
@@ -166,5 +170,5 @@ var gameData = {
       ],
       ennemies: []
     }
-  ]
+  }
 };

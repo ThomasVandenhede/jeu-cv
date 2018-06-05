@@ -1,5 +1,22 @@
 var physics = {
   collision: {
+    AABBWithAABB: function(r1, r2) {
+      return (
+        r1.left <= r2.right &&
+        r1.right >= r2.left &&
+        r1.top <= r2.bottom &&
+        r1.bottom >= r2.top
+      );
+    },
+    circleWithSegment: function(c, s) {
+      var C = new Vector(c.x, c.y);
+      var H = s.getPointOfIntersectionWithCircle(c);
+
+      if (H) {
+        return H;
+      }
+      return false;
+    },
     lineSegmentCollision: function(A, B, O, P) {
       var AB = Vector.subtract(B, A);
       var AP = Vector.subtract(P, A);
@@ -14,7 +31,7 @@ var physics = {
       var OP = Vector.subtract(P, O);
       var numerator = -(A.x * OP.y - O.x * OP.y - OP.x * A.y + OP.x * O.y);
       var denominator = Vector.determinant(AB, OP);
-      k = toFixedPrecision(numerator / denominator);
+      k = toFixedPrecision(numerator / denominator, 2);
 
       if (k < 0 || k > 1) {
         return Number.POSITIVE_INFINITY;

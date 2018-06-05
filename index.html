@@ -6,24 +6,117 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Page Title</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
   <div class="page">
-    <div id="canvas-container" class="container">
+    <h1 class="main-title">Thomas Vandenhede</h1>
+    <div id="game-intro" class="game-intro">
+      <h2>Description</h2>
+      <p>
+        Je suis (ou je croyais être) un développeur web full stack JavaScript, sauf que...
+        j'ai malencontreusement égaré certaines de mes compétences les plus précieuses
+        ! Aidez-moi à retrouver toutes mes compétences afin que je puisse continuer
+        à créer des jeux tels que celui-ci.
+      </p>
+      <h2>Instructions</h2>
+      <p>Le but du jeu est de retrouver chacune de mes compétences</p>
+      <ul>
+        <li>Ne restez pas bloqué entre deux plateformes sous peine de finir en charpie.</li>
+        <li>Le temps à votre disposition est compté, n'attendez pas qu'il soit écoulé
+          (à moins que vous vous n'ayez envie d'assister à une mort particulièrement
+          gore).
+        </li>
+        <li>Des ennemis tenteront de vous barrer la route, esquivez leurs tirs ou bien
+          protégez-vous en activant votre bouclier.</li>
+      </ul>
+      <div class="game-thumbnail__wrapper">
+        <img src="./assets/images/thumbnail.png" class="game-thumbnail__img" />
+      </div>
+      <div class="buttons">
+        <p>
+          <a href="" id="start-game" class="btn btn-success">JOUER À MON JEU CV</a>
+        </p>
+        <p>
+          <a href="./assets/files/CV Thomas Vandenhede.pdf" id="download-resume" target="blank"
+            class="btn btn-primary">Consulter mon CV</a>
+        </p>
+      </div>
+    </div>
+
+    <div id="canvas-container" class="canvas-container hidden">
       <canvas id="background" height=480 width=640></canvas>
       <canvas id="canvas" height=480 width=640></canvas>
 
       <div class="game-menu hidden">
-        GAME PAUSED
+        <h2>JEU EN PAUSE</h2>
+        <div class="controls-container">
+          <table class="controls">
+            <tr>
+              <th>
+                <span class="kbd">&#8592;</span> /
+                <span class="kbd">&#8594;</span> ou
+                <span class="kbd">Q</span> /
+                <span class="kbd">D</span>
+              </th>
+              <td>Se déplacer horizontalement</td>
+            </tr>
+            <tr>
+              <th>
+                <span class="kbd">&#8593;</span> ou
+                <span class="kbd">Z</span>
+              </th>
+              <td>Sauter</td>
+            </tr>
+            <tr>
+              <th>
+                <span class="kbd">&#8626;</span>
+              </th>
+              <td>Ouvrir le bouclier</td>
+            </tr>
+            <tr>
+              <th>
+                <span class="kbd">Échap</span>
+              </th>
+              <td>Afficher cet écran</td>
+            </tr>
+          </table>
+        </div>
+        <ul class="game-menu__list">
+          <li class="game-menu__item">
+            <a href="" id="resume" class="game-menu__link">REPRENDRE</a>
+          </li>
+          <li class="game-menu__item">
+            <a href="" id="load-level" class="game-menu__link">CHARGER UN NIVEAU</a>
+          </li>
+          <li class="game-menu__item">
+            <a href="./level-editor.html" class="game-menu__link">ALLER À L'ÉDITEUR</a>
+          </li>
+          <li class="game-menu__item">
+            <a href="" id="about" class="game-menu__link">À PROPOS</a>
+          </li>
+          <li class="game-menu__item">
+            <a href="" id="exit" class="game-menu__link">QUITER LE JEU</a>
+          </li>
+        </ul>
       </div>
 
-      <div class="game-menu hidden">
-        GAME PAUSED
+      <div id="game-over" class="game-menu hidden">
+        <h2 id="game-over-message"></h2>
+        <p id="game-over-submessage"></p>
+        <ul class="game-menu__list">
+          <li class="game-menu__item">
+            <a href="" id="restart" class="game-menu__link">RECOMMENCER</a>
+          </li>
+          <li class="game-menu__item">
+            <a href="" id="exit2" class="game-menu__link">QUITER LE JEU</a>
+          </li>
+        </ul>
       </div>
 
-      <div class="debug">
+      <div class="debug hidden">
         <h2>debug info</h2>
         <section class="player">
           <p class="player__position"></p>
@@ -48,8 +141,10 @@
   <!-- basic shapes -->
   <script src="./js/sdk/vector.js"></script>
   <script src="./js/sdk/AABB.js"></script>
+  <script src="./js/sdk/circle.js"></script>
   <script src="./js/sdk/particle.js"></script>
   <script src="./js/sdk/particles.js"></script>
+  <script src="./js/sdk/smokeParticle.js"></script>
   <script src="./js/sdk/segment.js"></script>
   <!-- collisions -->
   <script src="./js/sdk/collision.js"></script>
@@ -66,6 +161,7 @@
   <!-- camera -->
   <script src="./js/sdk/camera.js"></script>
   <!-- game specific -->
+  <script src="./js/game/skill.js"></script>
   <script src="./js/game/wall.js"></script>
   <script src="./js/game/platform.js"></script>
   <script src="./js/game/movingPlatform.js"></script>
@@ -73,6 +169,7 @@
   <script src="./js/game/laser.js"></script>
   <script src="./js/game/ennemy.js"></script>
   <script src="./js/game/player.js"></script>
+  <script src="./js/game/lifebar.js"></script>
   <script src="./js/game/game.js"></script>
   <script src="./js/game/gameData.js"></script>
   <!-- entry point -->

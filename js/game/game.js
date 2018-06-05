@@ -1,6 +1,15 @@
 var Game = (function() {
   function Game(options) {}
 
+  var states = {
+    PAUSED: "paused",
+    RUNNING: "running",
+    INTRO: "intro",
+    GAME_OVER: "",
+    VICTORY: "",
+    EXIT: 0
+  };
+
   Game.prototype.init = function(config) {
     // config
     if (config) {
@@ -11,21 +20,19 @@ var Game = (function() {
           : true;
     }
 
-    // time management
-    this.timer = new GameTimer();
+    // game state
+    this.state = states.RUNNING;
 
-    // // game state
-    // this.state = {
-    //   inPauseMenu: false,
-    //   inMainMenu: false,
-    //   inGame: true
-    // };
-
-    // initalize canvas(es)
+    // initalize canvas(es) and html elements
     this.canvas = document.getElementById("canvas");
     this.ctx = this.canvas.getContext("2d");
-    // this.backgroundCanvas = document.getElementById("background");
-    // this.bgCtx = this.backgroundCanvas.getContext("2d");
+    this.gameMenuEl = document.querySelector(".game-menu");
+    hide(this.gameMenuEl);
+    this.canvasContainerEl = document.getElementById("canvas-container");
+    this.gameIntroEl = document.getElementById("game-intro");
+    this.gameOverEl = document.getElementById("game-over");
+    this.gameOverMessageEl = document.getElementById("game-over-message");
+    this.gameOverSubmessageEl = document.getElementById("game-over-submessage");
 
     // keyboard & sound
     this.keyboard = keyboardManager.getInstance();
@@ -33,65 +40,221 @@ var Game = (function() {
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
 
+    // attach event handlers for game menu
+    this.attachEventHandlers();
+
+    // load local storage data
+    this.loadGameDataFromLocalStorage();
+
     // create level
-    worldRect = new AABB(0, -10000, 3000, 2000);
-    this.player = new Player(100, -600);
+    worldRect = new AABB(0, -2000, 3000, 4000);
+    this.player = new Player({ x: 10, y: -500 });
     this.platforms = [
-      new Platform(-20, -350, 220, 5),
-      new Platform(350, -250, 50, 5),
-      new Platform(0, -130, 180, 5, { passthrough: true }),
-      new Platform(0, -150, 180, 5, { passthrough: true }),
-      new Platform(330, -390, 150, 5, { passthrough: true }),
-      new Platform(150, 200, 50, 5),
-      new Platform(500, -270, 80, 80),
-      new Platform(500, -170, 80, 160),
-      new Platform(500, 10, 80, 120, { passthrough: true }),
-      new Platform(500, 150, 80, 120, { passthrough: true }),
-      new Platform(700, -80, 30, 20),
-      new Platform(350, 70, 30, 20, { passthrough: true }),
-      new Platform(700, 210, 30, 20, { passthrough: true }),
-      new Platform(200, -470, 5, 170),
-      new Platform(0, -10000, 0, 20000),
-      new MovingPlatform(200, -430, 100, 5, 400, -430, 100, {
+      new Platform({ x: -20, y: -400, width: 220, height: 10 }),
+      new Platform({ x: 350, y: -250, width: 50, height: 10 }),
+      new Platform({
+        x: 0,
+        y: -130,
+        width: 180,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({
+        x: 0,
+        y: -150,
+        width: 180,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({
+        x: 330,
+        y: -390,
+        width: 150,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({ x: 150, y: 200, width: 50, height: 10 }),
+      new Platform({ x: 500, y: -270, width: 80, height: 80 }),
+      new Platform({ x: 480, y: -170, width: 120, height: 160 }),
+      new Platform({
+        x: 500,
+        y: 10,
+        width: 80,
+        height: 120,
+        passthrough: true
+      }),
+      new Platform({
+        x: 480,
+        y: 180,
+        width: 120,
+        height: 120,
+        passtarough: true
+      }),
+      new Platform({ x: 700, y: -80, width: 30, height: 20 }),
+      new Platform({ x: 350, y: 70, width: 30, height: 20, passthrough: true }),
+      new Platform({
+        x: 700,
+        y: 210,
+        width: 30,
+        height: 20,
+        passthrough: true
+      }),
+      new Platform({ x: 200, y: -470, width: 10, height: 170 }),
+      new Platform({ x: 0, y: -10000, width: 0, height: 20000 }),
+      new Platform({
+        x: 0,
+        y: -500,
+        width: 400,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({ x: 0, y: -600, width: 100, height: 100 }),
+      new Platform({ x: 400, y: -600, width: 100, height: 100 }),
+      new Platform({
+        x: 100,
+        y: -600,
+        width: 400,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({ x: 0, y: -700, width: 200, height: 100 }),
+      new Platform({ x: 500, y: -700, width: 100, height: 100 }),
+      new Platform({
+        x: 200,
+        y: -700,
+        width: 400,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({ x: 0, y: -800, width: 100, height: 100 }),
+      new Platform({ x: 400, y: -800, width: 100, height: 100 }),
+      new Platform({
+        x: 100,
+        y: -800,
+        width: 400,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({
+        x: 0,
+        y: -900,
+        width: 300,
+        height: 10,
+        passthrough: true
+      }),
+      new Platform({ x: 300, y: -900, width: 100, height: 100 }),
+      new MovingPlatform(200, -430, 100, 10, 400, -430, 100, {
         passthrough: true
       }),
       new MovingPlatform(700, -400, 80, 30, 700, -100, 100, {
         passthrough: true
       }),
-      new MovingPlatform(0, -200, 200, 50, 30, 400, 100)
+      new MovingPlatform(0, -200, 200, 50, 30, 400, 100),
+      new Platform({ x: 800, y: -500, width: 500, height: 10 }),
+      new MovingPlatform(950, -800, 50, 200, 950, -700, 200),
+      new MovingPlatform(1050, -800, 50, 200, 1050, -700, 200),
+      new MovingPlatform(1150, -800, 50, 200, 1150, -700, 200),
+      new MovingPlatform(100, -600, 100, 100, 300, -600, 100),
+      new MovingPlatform(850, -400, 150, 10, 1250, -400, 200)
+    ];
+    this.skills = [
+      new Skill(350, -570, 50, 50, "./assets/images/html-5-icon.png"),
+      new Skill(500, -600, 50, 50, "./assets/images/css-3-icon.png"),
+      new Skill(1000, -600, 50, 50, "./assets/images/jquery-logo.png"),
+      new Skill(200, 0, 50, 50, "./assets/images/mongodb-logo.png"),
+      new Skill(500, -200, 50, 50, "./assets/images/react-logo.png"),
+      new Skill(1300, -600, 50, 50, "./assets/images/angular-logo.svg"),
+      new Skill(10, -880, 50, 50, "./assets/images/meteor-logo.png"),
+      new Skill(830, 50, 50, 50, "./assets/images/sass-logo.png"),
+      new Skill(20, -350, 50, 50, "./assets/images/bootstrap-logo.png"),
+      new Skill(1000, -450, 50, 50, "./assets/images/nodejs-logo.png")
+    ];
+    this.ennemies = [
+      new Ennemy(450, -650),
+      new Ennemy(120, -750),
+      new Ennemy(900, -700),
+      new Ennemy(1250, -700),
+      new Ennemy(320, -970),
+      new Ennemy(900, -300),
+      new Ennemy(850, -300),
+      new Ennemy(950, -300),
+      new Ennemy(300, -250),
+      new Ennemy(300, 250),
+      new Ennemy(20, -100),
+      new Ennemy(650, -500)
     ];
 
-    // initialize background
+    // temporary objects
+    this.lasers = [];
+    this.particles = [];
+
+    // game objects
+    this.gameObjects = []
+      .concat(this.platforms)
+      .concat(this.skills)
+      .concat(this.ennemies)
+      .concat(this.lasers)
+      .concat([this.player]);
+
+    // background
     this.canvas.style.backgroundImage =
       "url(./assets/images/background_2000_stars.png";
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
-    // this.starCount = 500;
-    // this.stars = [];
-    // for (var i = 0; i < this.starCount; i++) {
-    //   this.stars.push({
-    //     x: Math.floor(Math.random() * (this.canvas.width + 1)),
-    //     y: Math.floor(Math.random() * (this.canvas.height + 1)),
-    //     r: Math.random() * 1 + 0.5,
-    //     opacity: Math.random() * 0.5 + 0.4
-    //   });
-    // }
 
-    this.drawables = [];
-    this.drawables.push(this.player);
-    this.drawables = this.drawables.concat(this.platforms);
-    // this.drawables = this.drawables.concat(this.walls);
-
-    var that = this;
-    this.player.collidableWith = this.drawables.filter(function(el) {
-      return el !== that.player;
-    });
-
+    // camera
     this.camera = new Camera(this);
     this.camera.follow(
       this.player,
       (this.canvas.width - this.player.width) / 2 - 10,
       (this.canvas.height - this.player.height) / 2 - 10
     );
+
+    // UI
+    this.timer = new GameTimer(canvas.width - 170, 35, 80, 30);
+    this.lifeBar = new LifeBar(this.player, 60, 40, 200, 15);
+  };
+
+  Game.prototype.attachEventHandlers = function() {
+    this.MenuResumeButton = document.getElementById("resume");
+    this.MenuLevelButton = document.getElementById("load-level");
+    this.MenuAboutButton = document.getElementById("about");
+    this.MenuExitButton = document.getElementById("exit");
+    this.MenuExitButton2 = document.getElementById("exit2");
+    this.MenuRestartButton = document.getElementById("restart");
+    this.handleMenuResumeClick = function(e) {
+      e.preventDefault();
+      this.unpause();
+    };
+    this.handleMenuLevelClick = function(e) {
+      e.preventDefault();
+    };
+    this.handleMenuAboutClick = function(e) {
+      e.preventDefault();
+    };
+    this.handleMenuExitClick = function(e) {
+      e.preventDefault();
+      this.exit();
+    };
+    this.handleRestartClick = function(e) {
+      e.preventDefault();
+      hide(this.gameOverEl);
+      cancelAnimationFrame(this.rAF);
+      this.init();
+      this.startGame();
+    };
+    this.MenuResumeButton.onclick = this.handleMenuResumeClick.bind(this);
+    this.MenuLevelButton.onclick = this.handleMenuLevelClick.bind(this);
+    this.MenuAboutButton.onclick = this.handleMenuAboutClick.bind(this);
+    this.MenuExitButton.onclick = this.handleMenuExitClick.bind(this);
+    this.MenuExitButton2.onclick = this.handleMenuExitClick.bind(this);
+    this.MenuRestartButton.onclick = this.handleRestartClick.bind(this);
+  };
+
+  Game.prototype.loadGameDataFromLocalStorage = function() {
+    var savedData = localStorage.getItem("gameData");
+    if (savedData) {
+      gameData = JSON.parse(savedData);
+    }
   };
 
   Game.prototype.handleKeyboard = function() {
@@ -115,6 +278,9 @@ var Game = (function() {
         player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
           ? player.collidingWith[1].v.x
           : 0;
+      player.v.x = player.isColliding[0]
+        ? player.collidingWith[0].v.x
+        : player.v.x;
     }
 
     if (keyboard.DOWN) {
@@ -138,67 +304,111 @@ var Game = (function() {
     }
   };
 
+  Game.prototype.displaySkills = function(ctx, camera) {
+    var acquiredSkillsCount = this.player.skills.length;
+    var totalSkillsCount = acquiredSkillsCount + this.skills.length;
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(
+      60,
+      100,
+      100,
+      100 + (acquiredSkillsCount + acquiredSkillsCount % 2) / 2 * 45
+    );
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.font = "16px arial";
+    ctx.fillText("Skills", 110, 130);
+    ctx.fillText(acquiredSkillsCount + " / " + totalSkillsCount, 110, 160);
+    this.player.skills.forEach(
+      function(skill, index) {
+        ctx.drawImage(
+          skill.image,
+          70 + (index % 2) * 45,
+          200 + (index - index % 2) / 2 * 45,
+          30,
+          30
+        );
+      }.bind(this)
+    );
+    ctx.restore();
+  };
+
   Game.prototype.updateScene = function() {
+    var player = this.player;
+
     // update objects to be rendered
-    this.player.shield.update();
-    for (var i = 0; i < this.platforms.length; i++) {
-      var platform = this.platforms[i];
+    !player.isDead &&
+      this.ennemies.forEach(
+        function(ennemy) {
+          var distanceVector = Vector.subtract(player.center, ennemy.center);
+          if (
+            distanceVector.normSquared < Math.pow(ennemy.visionRange, 2) &&
+            Date.now() - ennemy.lastFiredAt > ennemy.fireDelay
+          ) {
+            var direction = distanceVector.getUnitVector();
+            this.lasers.push(ennemy.attack(direction));
+          }
+        }.bind(this)
+      );
+    this.lasers.forEach(
+      function(laser, index) {
+        if (laser.hasReachedMaxRange()) {
+          this.destroyLaser(index);
+        } else {
+          laser.update();
+        }
+      }.bind(this)
+    );
+    player.shield.update();
+    this.platforms.forEach(function(platform) {
       platform.update();
+    });
+    player.update();
+
+    // update particles
+    this.particles.forEach(
+      function(particle, index) {
+        if (Date.now() - particle.createdAt > particle.maxLife) {
+          this.particles.splice(index, 1);
+        }
+        particle.update();
+      }.bind(this)
+    );
+
+    // kill player if they move outside of the world boundaries
+    if (!player.isDead && !player.within(worldRect)) {
+      player.die();
     }
-    this.player.update();
     this.camera.update();
   };
 
   Game.prototype.renderBackground = function(ctx, camera) {
-    // this.fillCanvas(ctx, "#111");
-    // ctx.save();
-    // for (var i = 0; i < this.starCount; i++) {
-    //   var star = this.stars[i];
-    //   ctx.fillStyle = "rgba(255, 255, 255, " + star.opacity + ")";
-    //   ctx.beginPath();
-    //   ctx.arc(
-    //     (star.x - this.camera.x * 0.7 + this.canvas.width) % this.canvas.width,
-    //     (star.y - this.camera.y * 0.7 + this.canvas.height) %
-    //       this.canvas.height,
-    //     star.r,
-    //     0,
-    //     Math.PI * 2
-    //   );
-    //   ctx.fill();
-    // }
-    // ctx.restore();
-
     this.canvas.style.backgroundPosition =
       -camera.x * 0.502 + "px " + -camera.y * 0.502 + "px";
-    // death star
-    var deathStar = new Image();
-    deathStar.src = "./assets/images/death_star.png";
-    ctx.drawImage(
-      deathStar,
-      1000 - camera.x * 0.5,
-      -100 - camera.y * 0.5,
-      500,
-      500
-    );
   };
 
   Game.prototype.renderScene = function(ctx, camera) {
-    this.shouldDisplayRulers && this.drawRulers(ctx, camera);
+    this.gameObjects = []
+      .concat(this.platforms)
+      .concat(this.skills)
+      .concat(this.ennemies)
+      .concat(this.lasers)
+      .concat([this.player]);
 
-    // only drawing objects that are in the viewport
-    for (var i = 0; i < this.drawables.length; i++) {
-      var drawable = this.drawables[i];
-      drawable.overlaps(this.camera) && drawable.draw(ctx, camera);
-    }
-
-    if (window.md) {
-      ctx.save();
-      ctx.fillStyle = "yellow";
-      ctx.fillRect(md.x - camera.x, md.y - camera.y, md.width, md.height);
-      ctx.restore();
-    }
-
+    // only draw objects in the viewport
+    this.gameObjects.forEach(
+      function(obj) {
+        obj.getBoundingRect().overlaps(this.camera) && obj.draw(ctx, camera);
+      }.bind(this)
+    );
+    this.particles.forEach(function(particle) {
+      particle.draw(ctx, camera);
+    });
+    this.lifeBar.draw(ctx);
     this.timer.draw(ctx);
+    this.shouldDisplayRulers && this.drawRulers(ctx, camera);
+    this.displaySkills(ctx, camera);
   };
 
   Game.prototype.clearCanvas = function(ctx) {
@@ -248,29 +458,91 @@ var Game = (function() {
   };
 
   Game.prototype.pause = function() {
-    this.isPaused = true;
+    this.state = states.PAUSED;
     this.timer.pause();
     this.soundManager.pauseAll();
-
-    var gameMenuEl = document.querySelector(".game-menu");
-    gameMenuEl.classList.remove("hidden");
+    show(this.gameMenuEl);
   };
 
   Game.prototype.unpause = function() {
-    this.isPaused = false;
+    this.state = states.RUNNING;
     this.timer.play();
     this.soundManager.playPaused();
-
-    var gameMenuEl = document.querySelector(".game-menu");
-    gameMenuEl.classList.add("hidden");
-
-    // finally resume game loop
-    this.main();
+    hide(this.gameMenuEl);
   };
 
-  Game.prototype.getCollidableObjectsInViewport = function() {
-    return this.drawables.filter(
-      function(box) {
+  Game.prototype.destroyLaser = function(index) {
+    this.lasers.splice(index, 1);
+  };
+
+  Game.prototype.destroyParticleSet = function(index) {
+    this.particleSet;
+  };
+
+  Game.prototype.detectCollisions = function() {
+    this.detectCollisionsWithPlatforms();
+    this.handleCollisionsWithSkills();
+    this.handleCollisionsWithLasers();
+  };
+
+  Game.prototype.handleCollisionsWithLasers = function() {
+    var playerBox = this.player.getBoundingRect();
+    var shieldBox = this.player.shield.getBoundingRect();
+    !this.player.shield.isOpen
+      ? this.lasers.forEach(
+          function(laser, index) {
+            var laserBox = laser.getBoundingRect();
+            if (physics.collision.AABBWithAABB(playerBox, laserBox)) {
+              if (
+                playerBox.contains(laser.A.x, laser.A.y) ||
+                playerBox.contains(laser.B.x, laser.B.y) ||
+                physics.collision.segmentAABB(laser.A, laser.B, playerBox) <
+                  Math.POSITIVE_INFINITY
+              ) {
+                this.player.applyDamage(laser.damage);
+                this.player.hitPoints <= 0 && this.player.die();
+                this.particles.push(
+                  hitParticles(
+                    laser.B.x,
+                    laser.B.y,
+                    Vector.subtract(laser.A, laser.B),
+                    "red"
+                  )
+                );
+                this.player.hitParticles = hitParticles;
+                this.destroyLaser(index);
+              }
+            }
+          }.bind(this)
+        )
+      : this.lasers.forEach(
+          function(laser, index) {
+            var laserBox = laser.getBoundingRect();
+            if (this.player.shield.hasCollisionWithLaser(laser)) {
+              this.destroyLaser(index);
+            }
+          }.bind(this)
+        );
+  };
+
+  Game.prototype.handleCollisionsWithSkills = function() {
+    var playerBox = this.player.getBoundingRect();
+    this.skills.forEach(
+      function(skill, index) {
+        var skillBox = skill.getBoundingRect();
+        if (physics.collision.AABBWithAABB(playerBox, skillBox)) {
+          this.player.skills.push(skill);
+          this.timer.countDownStart += 5 * 1000; // add 5s to timer
+          this.skills.splice(index, 1);
+        }
+      }.bind(this)
+    );
+  };
+
+  Game.prototype.getCollidablePlatformsInViewport = function() {
+    return this.gameObjects.filter(
+      function(gameObject) {
+        var box = gameObject.getBoundingRect();
         if (box !== this.player) {
           box.touched = false;
           box.overlaps(this.camera);
@@ -281,22 +553,14 @@ var Game = (function() {
     );
   };
 
-  Game.prototype.detectCollisions = function() {
+  Game.prototype.getCollisions = function(collidableGameObjects) {
     var player = this.player;
-    var collidableWith = this.getCollidableObjectsInViewport();
-    var collisions = []; // contains objects describing collisions
-    var boxH = null,
-      boxV = null;
-
-    // apply gravity acceleration and reset collisions
-    player.applyGravity();
-    player.isColliding = [0, 0];
+    var collisions = [];
 
     // loop over each collidable object and store collision data
-    for (var i = 0; i < collidableWith.length; i++) {
-      var box = collidableWith[i];
+    collidableGameObjects.forEach(function(box) {
       var md = AABB.minkowskiDifference(box, player);
-      window.md = md; // remove this when everything's working
+      // window.md = md; // remove this when everything's working
       var relMotion = Vector.subtract(player.v, box.v).multiplyByScalar(dt);
       var colInfo = physics.collision.segmentAABB(new Vector(), relMotion, md);
       var t = colInfo.t;
@@ -305,8 +569,8 @@ var Game = (function() {
       // create array of all collisions for that frame
       if (t < Number.POSITIVE_INFINITY) {
         var d = side[0] ? relMotion.x * side[0] : relMotion.y * side[1];
-        // there is a collision along one of the axes
-        // Add collision to the array of collision characteristics
+        // If there is a collision along one of the axes,
+        // add collision to the array of collision characteristics
         d > 0 &&
           collisions.push({
             side: side,
@@ -314,21 +578,34 @@ var Game = (function() {
             d: d
           });
       }
-    }
+    });
+    return collisions;
+  };
+
+  Game.prototype.detectCollisionsWithPlatforms = function() {
+    var player = this.player;
+    var collidableWith = this.getCollidablePlatformsInViewport();
+    var collisions;
+    var boxH = null,
+      boxV = null;
+
+    // apply gravity acceleration and reset collisions
+    player.applyGravity();
+    player.isColliding = [0, 0];
+    collisions = this.getCollisions(collidableWith);
 
     /**
      * COLLISION RESOLUTION
      **/
-    // no collision detected, do nothing
-    if (!collisions.length) {
-      return;
-    }
+    // // no collision detected, do nothing
+    // if (!collisions.length) {
+    //   return;
+    // }
 
     // determine FINAL COLLISION characteristics
     var dH = 0,
       dV = 0;
-    for (var i = 0; i < collisions.length; i++) {
-      var collision = collisions[i];
+    collisions.forEach(function(collision) {
       var side = collision.side;
       var d = collision.d;
       var box = collision.box;
@@ -367,7 +644,7 @@ var Game = (function() {
           boxV = box;
         }
       }
-    }
+    });
 
     // resolve horizontal collision
     if (player.isColliding[0]) {
@@ -395,52 +672,178 @@ var Game = (function() {
   };
 
   Game.prototype.startGame = function() {
-    var music = new Sound(
-      "./assets/music/Star Wars - John Williams - Duel Of The Fates.mp3",
-      1
-    );
-    setTimeout(function() {
-      music.play();
-    }, 2000);
-    this.main();
+    switch (this.state) {
+      case states.INTRO:
+        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
+        break;
+      case states.RUNNING:
+        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
+        break;
+      case states.GAME_OVER:
+      case states.PAUSED:
+        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
+        break;
+      default:
+        break;
+    }
   };
 
-  /*
-    GAME LOOPS
-  */
+  Game.prototype.exit = function() {
+    show(this.gameIntroEl);
+    hide(this.gameOverEl);
+    hide(this.canvasContainerEl);
+    this.state = states.EXIT;
+    delete game;
+  };
 
-  // intro loop
+  Game.prototype.checkVictory = function() {
+    if (this.skills.length <= 0 && !(this.state === states.GAME_OVER)) {
+      this.state = states.VICTORY;
+      setTimeout(
+        function() {
+          this.gameOverMessageEl.innerHTML = "GAGNÉ !";
+          this.gameOverSubmessageEl.innerHTML =
+            "Vous avez retrouvé toutes mes principales compétences, vous pouvez avoir plus d'infos en consultant mon cv détaillé <a href='./assets/files/CV Thomas Vandenhede.pdf'>ici</a>. Ou bien essayez de battre votre score.";
+          show(this.gameOverEl);
+        }.bind(this),
+        1000
+      );
+    }
+  };
+
+  Game.prototype.checkDefeat = function() {
+    if (this.player.isDead && !(this.state === states.GAME_OVER)) {
+      this.state = states.GAME_OVER;
+      setTimeout(
+        function() {
+          this.gameOverMessageEl.innerHTML = "PERDU";
+          this.gameOverSubmessageEl.innerHTML = "";
+          show(this.gameOverEl);
+        }.bind(this),
+        1000
+      );
+    }
+  };
+
+  /**
+   * Intro loop
+   */
   Game.prototype.introLoop = function() {
-    requestAnimationFrame(this.intro.bind(this));
+    switch (this.state) {
+      case states.INTRO:
+        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
+        break;
+      case states.RUNNING:
+        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
+        break;
+      case states.PAUSED:
+        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
+        break;
+      case states.GAME_OVER:
+      case states.VICTORY:
+        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
+      default:
+        break;
+    }
   };
 
-  // main game loop
-  Game.prototype.main = function() {
+  /**
+   * Main game loop
+   */
+  Game.prototype.mainLoop = function() {
     // time management
     this.timer.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
+
+    // kill player if countdown is finished
+    !this.player.isDead &&
+      this.timer.countDownStart - this.timer.totalTime < 1000 &&
+      this.player.die();
+
+    // keyboard
     this.handleKeyboard();
-    for (var i = 0; i < this.drawables.length; i++) {
-      var drawable = this.drawables[i];
+
+    //
+    for (var i = 0; i < this.gameObjects.length; i++) {
+      var drawable = this.gameObjects[i];
       typeof drawable.updateVelocity === "function" &&
         drawable.updateVelocity();
     }
+
     !this.player.isDead && this.detectCollisions();
+    this.updateScene();
+    this.checkVictory();
+    this.checkDefeat();
+    this.clearCanvas(this.ctx);
+    this.renderBackground(this.ctx, this.camera);
+    this.renderScene(this.ctx, this.camera);
+
+    switch (this.state) {
+      case states.INTRO:
+        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
+        break;
+      case states.RUNNING:
+        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
+        break;
+      case states.PAUSED:
+        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
+        break;
+      case states.GAME_OVER:
+      case states.VICTORY:
+        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
+      default:
+        break;
+    }
+  };
+
+  /**
+   * Pause menu loop
+   */
+  Game.prototype.pauseMenuLoop = function() {
+    this.clearCanvas(this.ctx);
+    this.renderBackground(this.ctx, this.camera);
+    this.renderScene(this.ctx, this.camera);
+
+    switch (this.state) {
+      case states.INTRO:
+        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
+        break;
+      case states.RUNNING:
+        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
+        break;
+      case states.PAUSED:
+        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
+        break;
+      case states.GAME_OVER:
+      case states.VICTORY:
+        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
+      default:
+        break;
+    }
+  };
+
+  Game.prototype.gameOverLoop = function() {
     this.updateScene();
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
     this.renderScene(this.ctx, this.camera);
 
-    !this.isPaused
-      ? requestAnimationFrame(this.main.bind(this))
-      : requestAnimationFrame(this.pauseMenuLoop.bind(this));
-  };
-
-  Game.prototype.pauseMenuLoop = function() {
-    // this.renderScene(this.ctx, this.camera);
-    this.isPaused
-      ? requestAnimationFrame(this.pauseMenuLoop.bind(this))
-      : requestAnimationFrame(this.main.bind(this));
+    switch (this.state) {
+      case states.INTRO:
+        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
+        break;
+      case states.RUNNING:
+        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
+        break;
+      case states.PAUSED:
+        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
+        break;
+      case states.GAME_OVER:
+      case states.VICTORY:
+        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
+      default:
+        break;
+    }
   };
 
   Game.prototype.updateDebugInfo = function() {

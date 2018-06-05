@@ -1,12 +1,16 @@
 var GameTimer = (function() {
-  function GameTimer() {
+  function GameTimer(x, y, width, height) {
+    AABB.call(this, x, y, width, height);
     this.totalTime = 0;
     this.currentTime = Date.now();
     this.previousTime = this.currentTime;
     this.isPaused = false;
-    this.isCountDown = false;
-    this.countDownStart = 1 * 60 * 1000; // ms
+    this.isCountDown = true;
+    this.countDownStart = 0.5 * 60 * 1000; // ms
   }
+
+  GameTimer.prototype = Object.create(AABB.prototype);
+  GameTimer.prototype.constructor = GameTimer;
 
   GameTimer.prototype.getEllapsedTime = function() {
     return this.currentTime - this.previousTime;
@@ -40,11 +44,32 @@ var GameTimer = (function() {
     seconds = seconds < 10 ? "0" + seconds : seconds;
     minutes = minutes < 10 ? "0" + minutes : minutes;
 
+    var left = this.left;
+    var right = this.right;
+    var top = this.top;
+    var bottom = this.bottom;
+    var width = this.width;
+    var height = this.height;
+    var center = this.center;
+    var r = height / 2;
+    var color =
+      this.isCountDown && this.countDownStart - this.totalTime < 16000
+        ? "red"
+        : "white";
+
     ctx.save();
-    ctx.fillStyle = "rgb(27, 229, 0)";
-    ctx.font = "32px Arial";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.rect(left, top, width, height);
+    ctx.stroke();
+    ctx.fill();
+
+    ctx.font = "bold 24px Arial";
     ctx.textAlign = "center";
-    ctx.fillText(minutes + ":" + seconds, canvas.width / 2, 80);
+    ctx.fillStyle = color;
+    ctx.fillText(minutes + ":" + seconds, center.x, bottom - 7);
     ctx.restore();
   };
 

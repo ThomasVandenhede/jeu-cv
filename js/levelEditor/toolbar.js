@@ -3,10 +3,10 @@ var toolbarFactory = (function() {
 
   function Toolbar() {
     this.el = document.getElementById("toolbar");
+    this.levelNameInput = document.getElementById("level-name");
     this.selectButton = document.getElementById("button-select");
     this.createButton = document.getElementById("button-create");
-    this.moveButton = document.getElementById("button-move");
-    this.downloadButton = document.getElementById("button-download");
+    this.saveButton = document.getElementById("save-button");
     this.objectTypeDropDown = document.getElementById("object-type");
 
     this.selectButton.addEventListener(
@@ -25,26 +25,35 @@ var toolbarFactory = (function() {
         app.contextManager.context = 1;
       }.bind(this)
     );
-    this.moveButton.addEventListener(
+    this.saveButton.addEventListener(
       "click",
       function(e) {
         var app = this.app;
         e.preventDefault();
-        app.contextManager.context = 2;
-      }.bind(this)
-    );
-    this.downloadButton.addEventListener(
-      "click",
-      function(e) {
-        var app = this.app;
-        e.preventDefault();
-        app.getDownLink();
+        app.saveToLocalStorage();
       }.bind(this)
     );
 
     this.objectTypeDropDown.addEventListener(
       "change",
-      this.getGameObjectType.bind(this)
+      function(e) {
+        var app = this.app;
+        e.preventDefault();
+        var objectType = this.getGameObjectType();
+        switch (objectType) {
+          case "Player":
+          case "Ennemy":
+          case "Skill":
+            app.contextManager.context = 1;
+            break;
+          case "Platform":
+          case "MovingPlatform":
+            app.contextManager.context = 2;
+            break;
+          default:
+            break;
+        }
+      }.bind(this)
     );
   }
 
@@ -59,10 +68,11 @@ var toolbarFactory = (function() {
     var objectTypeMap = {
       player: Player,
       platform: Platform,
-      movingPlatform: MovingPlatform
+      movingPlatform: MovingPlatform,
+      ennemy: Ennemy,
+      skill: Skill
     };
     app.gameObjectConstructor = objectTypeMap[type];
-    console.log(app.gameObjectConstructor);
   };
 
   return {

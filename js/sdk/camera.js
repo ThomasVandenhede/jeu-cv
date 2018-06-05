@@ -29,33 +29,46 @@ var Camera = (function() {
   }
 
   Camera.prototype = Object.create(AABB.prototype);
+  Camera.prototype.constructor = Camera;
 
   Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
     this.xDeadZone = xDeadZone;
     this.yDeadZone = yDeadZone;
+    // this.xClearZone = xClearZone;
+    // this.yClearZone = yClearZone;
   };
 
   Camera.prototype.update = function() {
     this.height = canvas.height / this.zoomLevel;
     this.width = canvas.width / this.zoomLevel;
+    if (this.followed) {
+      var xDeadZone = Math.min(
+        (this.width - this.followed.width) / 2,
+        this.yDeadZone
+      );
+      var yDeadZone = Math.min(
+        (this.height - this.followed.height) / 2,
+        this.xDeadZone
+      );
+    }
 
     // keep following the player (or other desired object)
     if (this.followed != null) {
       if (this.axis == AXIS.HORIZONTAL || this.axis == AXIS.BOTH) {
         // moves camera on horizontal axis based on followed object position
-        if (this.followed.x - this.x + this.xDeadZone > this.width) {
-          this.x = this.followed.x - (this.width - this.xDeadZone);
-        } else if (this.followed.x - this.xDeadZone < this.x) {
-          this.x = this.followed.x - this.xDeadZone;
+        if (this.followed.right + xDeadZone > this.right) {
+          this.x = this.followed.right + xDeadZone - this.width;
+        } else if (this.followed.left - xDeadZone < this.left) {
+          this.x = this.followed.left - xDeadZone;
         }
       }
       if (this.axis == AXIS.VERTICAL || this.axis == AXIS.BOTH) {
         // moves camera on vertical axis based on followed object position
-        if (this.followed.y - this.y + this.yDeadZone > this.height) {
-          this.y = this.followed.y - (this.height - this.yDeadZone);
-        } else if (this.followed.y - this.yDeadZone < this.y) {
-          this.y = this.followed.y - this.yDeadZone;
+        if (this.followed.bottom + yDeadZone > this.bottom) {
+          this.y = this.followed.bottom + yDeadZone - this.height;
+        } else if (this.followed.top - yDeadZone < this.top) {
+          this.y = this.followed.top - yDeadZone;
         }
       }
     }
@@ -80,14 +93,14 @@ var Camera = (function() {
     }
   };
 
-  Camera.prototype.applyCamera = function(x, y) {
+  Camera.prototype.apply = function(x, y) {
     var screenX, screenY;
-    screenX = toFixedPrecision((x - this.x) * this.zoomLevel, 2);
-    screenY = toFixedPrecision((y - this.y) * this.zoomLevel, 2);
+    screenX = toFixedPrecision((x - this.x) * this.zoomLevel, 4);
+    screenY = toFixedPrecision((y - this.y) * this.zoomLevel, 4);
     return new Vector(screenX, screenY);
   };
 
-  Camera.prototype.unapplyCamera = function(x, y) {
+  Camera.prototype.unapply = function(x, y) {
     var gameX, gameY;
     gameX = toFixedPrecision(x / this.zoomLevel + this.x, 2);
     gameY = toFixedPrecision(y / this.zoomLevel + this.y, 2);

@@ -33,7 +33,6 @@ var keyboardManager = (function() {
     window.addEventListener(
       "keydown",
       function(event) {
-        event.preventDefault();
         var code = event.code || event.keyCode;
         var mappings = event.code ? codeMappings : keyCodeMappings;
         if (mappings[code] && !this[mappings[code]]) {
@@ -44,10 +43,24 @@ var keyboardManager = (function() {
         }
 
         switch (event.keyCode) {
+          case 46:
+            var selectedObjects = this.app.mouse.selectedObjects;
+            if (selectedObjects && selectedObjects.length) {
+              selectedObjects.forEach(
+                function(selectedObject, index) {
+                  var gameObjectIndex = this.app.gameObjects.indexOf(
+                    selectedObject
+                  );
+                  if (gameObjectIndex >= 0) {
+                    this.app.gameObjects.splice(gameObjectIndex, 1);
+                  }
+                }.bind(this)
+              );
+              this.app.mouse.selectedObjects = [];
+            }
+            break;
           case 27:
-            this.app.state === "running"
-              ? this.app.pause.call(this.app)
-              : this.app.unpause.call(this.app);
+            this.app.mouse.selectedObjects = [];
             break;
           case 71:
             this.app.player.reverseGravity();

@@ -1,21 +1,25 @@
 var Player = (function() {
-  var ABS_JUMP_SPEED = 600;
+  var ABS_JUMP_SPEED = 700;
   var MAX_FALL_SPEED = 1000;
   var animationID;
-  var INITIAL_WIDTH = 40;
-  var INITIAL_HEIGHT = 40;
+  var INITIAL_WIDTH = 30;
+  var INITIAL_HEIGHT = 30;
   var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
-  function Player(x, y) {
-    AABB.call(this, x, y, INITIAL_WIDTH, INITIAL_HEIGHT);
+  function Player(options) {
+    AABB.call(this, options.x, options.y, INITIAL_WIDTH, INITIAL_HEIGHT);
 
     var that = this;
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
     this.COEFFICIENT_OF_RESTITUTION = 0.4;
     this.solid = true; // can collide with other solid objects
-    this.color = "#22dd00";
-    this.color = "#37e018";
+    this.maxHitPoints = 100;
+    this.hitPoints = this.maxHitPoints;
+    this.skills = []; // the player must harvest these
+    // this.color = "#22dd00";
+    // this.color = "#37e018";
+    this.color = this.getColorFromHP();
 
     this.sparks = sparksParticles(this);
 
@@ -32,14 +36,17 @@ var Player = (function() {
     // sounds
     this.sounds = {
       jump: [
-        new Sound("./assets/sounds/Light swing 1.mp4", 1),
-        new Sound("./assets/sounds/Light swing 2.mp4", 1)
+        // new Sound("./assets/sounds/Swoosh1.mp3", 0.25),
+        new Sound("./assets/sounds/Swoosh2.mp3", 0.1),
+        new Sound("./assets/sounds/Swoosh3.mp3", 0.3)
       ],
       hit: [
         new Sound("./assets/sounds/Hit 1.mp4", 0.2),
         new Sound("./assets/sounds/Hit 2.mp4", 0.2)
       ],
-      still: new Sound("./assets/sounds/Medium hum.mp4", 0.15)
+      still: new Sound("./assets/sounds/Medium hum.mp4", 0.15),
+      die: new Sound("./assets/sounds/impactsplat03.mp3", 0.8),
+      hurt: new Sound("./assets/sounds/Knife Stab.mp3", 0.2)
     };
 
     // should the player get stuck to the ceiling when jumping?
@@ -50,13 +57,14 @@ var Player = (function() {
   }
 
   Player.prototype = Object.create(AABB.prototype);
+  Player.prototype.constructor = Player;
 
   Player.prototype.moveLeft = function() {
-    this.v.x = -200;
+    this.v.x = -250;
   };
 
   Player.prototype.moveRight = function() {
-    this.v.x = 200;
+    this.v.x = 250;
   };
 
   Player.prototype.crouch = function() {
@@ -69,13 +77,10 @@ var Player = (function() {
 
   Player.prototype.jump = function() {
     if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
-      this.isCrouching
-        ? this.sounds.jump[1].replay()
-        : this.sounds.jump[0].replay();
+      this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
       this.isColliding[1] = 0;
       this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
     }
-    this.sounds.still.play();
   };
 
   Player.prototype.reverseGravity = function() {
@@ -90,8 +95,17 @@ var Player = (function() {
     }
   };
 
+  Player.prototype.applyDamage = function(damage) {
+    this.sounds.hurt.replay();
+    this.hitPoints = toFixedPrecision(this.hitPoints - damage);
+  };
+
   Player.prototype.die = function() {
     this.isDead = true;
+    this.hitPoints = 0;
+    this.color = this.getColorFromHP();
+    this.sounds.still.stop();
+    this.sounds.die.play();
     this.explosion = explosionParticles(this);
   };
 
@@ -136,8 +150,12 @@ var Player = (function() {
   };
 
   Player.prototype.update = function() {
-    !this.isDead ? this.sparks.update() : this.explosion.update();
-    if (this.isDead) return;
+    if (this.isDead) {
+      this.explosion.update();
+      return;
+    } else {
+      this.sparks.update();
+    }
 
     var dx = this.v.x * dt,
       dy = this.v.y * dt;
@@ -153,64 +171,100 @@ var Player = (function() {
     }
   };
 
+  Player.prototype.getHitPointsRatio = function() {
+    return this.hitPoints / this.maxHitPoints;
+  };
+
+  Player.prototype.getColorFromHP = function() {
+    var hitPointsRatio = this.getHitPointsRatio();
+    var color = "hsl(" + hitPointsRatio * 120 + ", 100%, 50%)";
+    return color;
+  };
+
   Player.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
-      return Object.values(camera.applyCamera.apply(camera, arguments));
+      return Object.values(camera.apply.apply(camera, arguments));
     };
 
+    // draw particles
+    this.color = this.getColorFromHP();
+    !this.isDead
+      ? this.sparks.draw(ctx, camera)
+      : this.explosion.draw(ctx, camera);
+
+    // draw player
     if (!this.isDead) {
       var r = 5;
       var left = this.x;
       var top = this.y;
       var right = left + this.width;
       var bottom = top + this.height;
-      var color = this.color;
+      var center = this.center;
+      var lineWidth = 5;
 
       ctx.save();
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
+      ctx.strokeStyle = this.color;
+      ctx.fillStyle = this.color;
+      ctx.lineWidth = lineWidth * camera.zoomLevel;
+      ctx.fillRect.apply(
+        ctx,
+        applyCamToArr(this.x, this.y).concat(
+          this.width * camera.zoomLevel,
+          this.height * camera.zoomLevel
+        )
+      );
+
+      // draw mask
+      ctx.fillStyle = "black";
+      ctx.fillRect.apply(
+        ctx,
+        applyCamToArr(this.left, this.top + 10).concat([
+          this.width * camera.zoomLevel,
+          10 * camera.zoomLevel
+        ])
+      );
+
+      // draw eyes
+      ctx.fillStyle = this.color;
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
-      ctx.arcTo.apply(
+      ctx.moveTo.apply(ctx, applyCamToArr(center.x - 10, this.top + 12));
+      ctx.quadraticCurveTo.apply(
         ctx,
-        applyCamToArr(left, top)
-          .concat(applyCamToArr(left + r, top))
-          .concat([r * camera.zoomLevel])
+        applyCamToArr(center.x - 4, this.top + 14).concat(
+          applyCamToArr(center.x - 4, this.top + 16)
+        )
       );
-      ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
-      ctx.arcTo.apply(
+      ctx.quadraticCurveTo.apply(
         ctx,
-        applyCamToArr(right, top)
-          .concat(applyCamToArr(right, top + r))
-          .concat([r * camera.zoomLevel])
-      );
-      ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
-      ctx.arcTo.apply(
-        ctx,
-        applyCamToArr(right, bottom)
-          .concat(applyCamToArr(right - r, bottom))
-          .concat([r * camera.zoomLevel])
-      );
-      ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
-      ctx.arcTo.apply(
-        ctx,
-        applyCamToArr(left, bottom)
-          .concat(applyCamToArr(left, bottom - r))
-          .concat([r * camera.zoomLevel])
+        applyCamToArr(center.x - 10, this.top + 16).concat(
+          applyCamToArr(center.x - 10, this.top + 14)
+        )
       );
       ctx.closePath();
-      ctx.stroke();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(center.x + 10, this.top + 12));
+      ctx.quadraticCurveTo.apply(
+        ctx,
+        applyCamToArr(center.x + 4, this.top + 14).concat(
+          applyCamToArr(center.x + 4, this.top + 16)
+        )
+      );
+      ctx.quadraticCurveTo.apply(
+        ctx,
+        applyCamToArr(center.x + 10, this.top + 16).concat(
+          applyCamToArr(center.x + 10, this.top + 14)
+        )
+      );
+      ctx.closePath();
       ctx.fill();
       ctx.restore();
 
-      // draw player shield
-      (this.shield.isOpen || this.shield.isAnimating) &&
+      // draw shield
+      if (this.shield.isOpen || this.shield.isAnimating) {
         this.shield.draw(ctx, camera);
+      }
     }
-
-    !this.isDead
-      ? this.sparks.draw(ctx, camera)
-      : this.explosion.draw(ctx, camera);
   };
 
   return Player;

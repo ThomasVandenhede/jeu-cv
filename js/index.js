@@ -1,46 +1,50 @@
 window.addEventListener("DOMContentLoaded", function() {
+  var canvasContainer = document.getElementById("canvas-container");
+  var canvases = document.getElementsByTagName("canvas");
+  var startGameButton = document.getElementById("start-game");
+  var gameIntroEl = document.getElementById("game-intro");
+
   function fitCanvasToContainer() {
-    var canvasContainer = document.getElementById("canvas-container");
-    var canvases = document.getElementsByTagName("canvas");
     for (var i = 0; i < canvases.length; i++) {
       var canvas = canvases[i];
-      var canvasWidth = parseFloat(window.getComputedStyle(canvas).width);
-      var canvasHeight = Math.min(
-        canvasWidth / 21 * 9,
-        parseFloat(window.getComputedStyle(canvasContainer).height)
-      );
+      var canvasWidth = parseFloat(getComputedStyle(canvas).width);
+      var canvasHeight = parseFloat(getComputedStyle(canvas).height);
       // change resolution
       canvas.setAttribute("width", canvasWidth);
       canvas.setAttribute("height", canvasHeight);
-
-      // change size to preserve aspect ratio
-      canvas.style.height = canvasHeight + "px";
     }
   }
 
-  var canvas = document.getElementById("canvas");
+  startGameButton.addEventListener("click", function(e) {
+    e.preventDefault();
+    // instantiate game
+    show(canvasContainer);
+    hide(gameIntroEl);
+    window.game = new Game();
+    game.init({
+      shouldDisplayDebug: false,
+      shouldDisplayRulers: true
+    });
+    game.startGame();
+  });
   window.addEventListener("blur", function(e) {
-    if (game) {
+    if (window.hasOwnProperty("game")) {
       game.pause();
     }
   });
   window.addEventListener("resize", fitCanvasToContainer);
   fitCanvasToContainer();
 
-  var game = new Game();
-  game.init({
-    shouldDisplayDebug: true,
-    shouldDisplayRulers: true
-  });
-  game.startGame();
-
-  var debug = document.querySelector(".debug");
-  if (game.shouldDisplayDebug) {
-    debug.classList.remove("hidden");
-    setInterval(function() {
-      game.updateDebugInfo();
-    }, 50);
-  } else {
-    debug.classList.add("hidden");
+  // update debug info
+  var debugEl = document.querySelector(".debug");
+  if (window.hasOwnProperty("game")) {
+    if (game.shouldDisplayDebug) {
+      show(debugEl);
+      setInterval(function() {
+        game.updateDebugInfo();
+      }, 50);
+    } else {
+      hide(debugEl);
+    }
   }
 });

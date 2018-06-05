@@ -8,7 +8,7 @@ function AABB(x, y, width, height) {
 Object.defineProperties(AABB.prototype, {
   left: {
     get: function() {
-      return this.x;
+      return this.width >= 0 ? this.x : this.x + this.width;
     },
     set: function(left) {
       this.x = left;
@@ -16,7 +16,7 @@ Object.defineProperties(AABB.prototype, {
   },
   top: {
     get: function() {
-      return this.y;
+      return this.height >= 0 ? this.y : this.y + this.height;
     },
     set: function(left) {
       this.y = bottom;
@@ -24,7 +24,7 @@ Object.defineProperties(AABB.prototype, {
   },
   right: {
     get: function() {
-      return this.x + this.width;
+      return this.width >= 0 ? this.x + this.width : this.x;
     },
     set: function(right) {
       if (this.width === Number.POSITIVE_INFINITY) {
@@ -36,7 +36,7 @@ Object.defineProperties(AABB.prototype, {
   },
   bottom: {
     get: function() {
-      return this.y + this.height;
+      return this.height >= 0 ? this.y + this.height : this.y;
     },
     set: function(bottom) {
       if (this.height === Number.POSITIVE_INFINITY) {
@@ -68,16 +68,8 @@ AABB.minkowskiDifference = function(r1, r2) {
 };
 
 // public methods
-AABB.prototype.set = function(x, y, width, height) {
-  this.x = x;
-  this.y = y;
-  this.width = width || this.width;
-  this.height = height || this.height;
-};
-
-AABB.prototype.move = function(dx, dy) {
-  this.x += dx;
-  this.y += dy;
+AABB.prototype.getBoundingRect = function() {
+  return this;
 };
 
 AABB.prototype.within = function(r) {

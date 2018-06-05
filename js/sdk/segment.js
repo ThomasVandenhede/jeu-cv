@@ -5,6 +5,15 @@ var Segment = (function() {
     this.color = color;
   }
 
+  Segment.prototype.getBoundingRect = function() {
+    return new AABB(
+      Math.min(this.A.x, this.B.x),
+      Math.min(this.A.y, this.B.y),
+      Math.abs(this.B.x - this.A.x),
+      Math.abs(this.B.y - this.A.y)
+    );
+  };
+
   Segment.prototype.isOrthogonalProjectedPointOnSegment = function(P) {
     var AB = Vector.subtract(this.B, this.A);
     var AP = Vector.subtract(P, this.A);
