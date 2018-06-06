@@ -33,10 +33,10 @@ var keyboardManager = (function() {
     window.addEventListener(
       "keydown",
       function(event) {
-        event.preventDefault();
         var code = event.code || event.keyCode;
         var mappings = event.code ? codeMappings : keyCodeMappings;
         if (mappings[code] && !this[mappings[code]]) {
+          event.preventDefault();
           if (this[mappings[code]]) {
             this.keyRepeat[code] = true;
           }
