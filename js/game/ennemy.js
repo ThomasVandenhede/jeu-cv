@@ -1,6 +1,6 @@
 var Ennemy = (function() {
-  function Ennemy(x, y) {
-    AABB.call(this, x, y, 20, 20);
+  function Ennemy(options) {
+    AABB.call(this, options.x, options.y, 20, 20);
 
     this.v = new Vector();
     this.solid = false;

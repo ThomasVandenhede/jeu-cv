@@ -1,13 +1,18 @@
 var MovingPlatform = (function() {
-  function MovingPlatform(xStart, yStart, width, height, xEnd, yEnd, speed) {
-    Platform.call(this, { x: xStart, y: yStart, width: width, height: height });
+  function MovingPlatform(options) {
+    Platform.call(this, {
+      x: options.x,
+      y: options.y,
+      width: options.width,
+      height: options.height
+    });
 
-    this.xStart = xStart !== undefined ? xStart : 0;
-    this.yStart = yStart !== undefined ? yStart : 0;
-    this.xEnd = xEnd !== undefined ? xEnd : xStart;
-    this.yEnd = yEnd !== undefined ? yEnd : yStart;
+    this.xStart = options.x !== undefined ? options.x : 0;
+    this.yStart = options.x !== undefined ? options.y : 0;
+    this.xEnd = options.xEnd !== undefined ? options.xEnd : options.xStart;
+    this.yEnd = options.yEnd !== undefined ? options.yEnd : options.yStart;
 
-    this.speed = speed || 50;
+    this.speed = options.speed || 50;
     this.v = new Vector(this.xEnd - this.x, this.yEnd - this.y);
     var vNorm = this.v.norm;
     this.v = this.v.multiplyByScalar(this.speed / vNorm);
