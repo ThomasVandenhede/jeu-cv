@@ -49,6 +49,12 @@ var keyboardManager = (function() {
               ? this.app.pause.call(this.app)
               : this.app.unpause.call(this.app);
             break;
+          case 219:
+            this.app.camera.zoomLevel /= 1.1;
+            break;
+          case 187:
+            this.app.camera.zoomLevel *= 1.1;
+            break;
           // case 71:
           //   this.app.player.reverseGravity();
           //   break;
