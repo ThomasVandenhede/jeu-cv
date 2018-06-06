@@ -33,6 +33,8 @@ var Camera = (function() {
 
   Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
+    this.x = this.followed.center.x - this.width / 2;
+    this.y = this.followed.center.y - this.height / 2;
     this.xDeadZone = xDeadZone;
     this.yDeadZone = yDeadZone;
     // this.xClearZone = xClearZone;
