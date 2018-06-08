@@ -59,6 +59,14 @@ var Game = (function() {
       this.skills = this.level1.skills;
     }
 
+    // player ghost
+    this.ghostIndex = 0;
+    this.ghostPositions =
+      Array.isArray(this.ghostPositionsTemp) &&
+      this.ghostPositionsTemp.length !== 0
+        ? this.ghostPositionsTemp.slice(0)
+        : [];
+    this.ghostPositionsTemp = [];
 
     // temporary objects
     this.lasers = [];
@@ -289,6 +297,7 @@ var Game = (function() {
         obj.getBoundingRect().overlaps(this.camera) && obj.draw(ctx, camera);
       }.bind(this)
     );
+    this.ghostPositions.length && this.displayGhost(ctx, camera);
     this.particles.forEach(function(particle) {
       particle.draw(ctx, camera);
     });
@@ -296,6 +305,45 @@ var Game = (function() {
     this.timer.draw(ctx);
     this.shouldDisplayRulers && this.drawRulers(ctx, camera);
     this.displaySkills(ctx, camera);
+  };
+
+  Game.prototype.displayGhost = function(ctx, camera) {
+    if (this.ghost) {
+      var applyCamToArr = function() {
+        return Object.values(camera.apply.apply(camera, arguments));
+      };
+      ctx.save();
+      ctx.fillStyle = "rgba(180, 180, 180, 0.7)";
+      ctx.fillRect.apply(
+        ctx,
+        applyCamToArr(this.ghost.x, this.ghost.y).concat([
+          this.player.width * camera.zoomLevel,
+          this.player.height * camera.zoomLevel
+        ])
+      );
+      if (!this.ghostPositions[this.ghostIndex + 1]) {
+        ctx.strokeStyle = "black";
+        ctx.beginPath();
+        ctx.moveTo.apply(ctx, applyCamToArr(this.ghost.x, this.ghost.y));
+        ctx.lineTo.apply(
+          ctx,
+          applyCamToArr(
+            this.ghost.x + this.player.width,
+            this.ghost.y + this.player.height
+          )
+        );
+        ctx.moveTo.apply(
+          ctx,
+          applyCamToArr(this.ghost.x + this.player.width, this.ghost.y)
+        );
+        ctx.lineTo.apply(
+          ctx,
+          applyCamToArr(this.ghost.x, this.ghost.y + this.player.height)
+        );
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   };
 
   Game.prototype.clearCanvas = function(ctx) {
@@ -634,6 +682,21 @@ var Game = (function() {
     }
   };
 
+  Game.prototype.updateGhost = function() {
+    // display current ghost
+    this.ghost = this.ghostPositions.length
+      ? this.ghostPositions[this.ghostIndex]
+      : null;
+
+    // store position for next ghost
+    this.ghostPositions[this.ghostIndex + 1] && this.ghostIndex++;
+    this.ghostPositionsTemp.push({
+      time: this.timer.totalTime,
+      x: this.player.x,
+      y: this.player.y
+    });
+  };
+
   /**
    * Main game loop
    */
@@ -641,6 +704,9 @@ var Game = (function() {
     // time management
     this.timer.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
+
+    // ghost
+    this.updateGhost();
 
     // kill player if countdown is finished
     !this.player.isDead &&
