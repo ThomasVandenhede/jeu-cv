@@ -59,8 +59,7 @@ var gameData = {
         size: "800px 600px"
       },
       worldRect: {
-        type: AABB,
-        options: {
+        props: {
           x: -1000,
           y: -2000,
           width: 5000,
@@ -68,56 +67,29 @@ var gameData = {
         }
       },
       player: {
-        type: Player,
-        options: {
+        type: "Player",
+        props: {
           x: 10,
           y: -200,
           color: "red"
         }
       },
       platforms: [
-        { type: Platform, options: { x: 0, y: -350, width: 200, height: 5 } },
-        { type: Platform, options: { x: 350, y: -250, width: 50, height: 5 } },
-        { type: Platform, options: { x: 0, y: -130, width: 180, height: 5 } },
-        { type: Platform, options: { x: 0, y: -150, width: 180, height: 5 } },
-        { type: Platform, options: { x: 330, y: -400, width: 150, height: 5 } },
-        { type: Platform, options: { x: 150, y: 200, width: 50, height: 5 } },
-        { type: Platform, options: { x: 500, y: -270, width: 80, height: 80 } },
+        { type: "Platform", props: { x: 0, y: -350, width: 200, height: 5 } },
         {
-          type: Platform,
-          options: { x: 500, y: -170, width: 80, height: 160 }
+          type: "Platform",
+          props: { x: 350, y: -250, width: 50, height: 5 }
         },
-        { type: Platform, options: { x: 500, y: 10, width: 80, height: 120 } },
-        { type: Platform, options: { x: 500, y: 150, width: 80, height: 120 } },
-        { type: Platform, options: { x: 700, y: -80, width: 30, height: 20 } },
-        { type: Platform, options: { x: 350, y: 70, width: 30, height: 20 } },
-        { type: Platform, options: { x: 700, y: 210, width: 30, height: 20 } },
-        { type: Platform, options: { x: 200, y: -400, width: 5, height: 100 } },
+        { type: "Platform", props: { x: 0, y: -130, width: 180, height: 5 } },
+        { type: "Platform", props: { x: 0, y: -150, width: 180, height: 5 } },
         {
-          type: Platform,
-          options: { x: 0, y: -100000, width: 1, height: 200000 }
+          type: "Platform",
+          props: { x: 330, y: -400, width: 150, height: 5 }
         },
+        { type: "Platform", props: { x: 150, y: 200, width: 50, height: 5 } },
         {
-          type: MovingPlatform,
-          options: {
-            xStart: 200,
-            yStart: -500,
-            width: 100,
-            height: 5,
-            xEnd: 400,
-            yEnd: -500
-          }
-        },
-        {
-          type: MovingPlatform,
-          options: {
-            xStart: 700,
-            yStart: -400,
-            width: 80,
-            height: 30,
-            xEnd: 700,
-            yEnd: -100
-          }
+          type: "Platform",
+          props: { x: 500, y: -270, width: 80, height: 80 }
         }
       ],
       ennemies: []
@@ -129,46 +101,419 @@ var gameData = {
         size: "800px 600px"
       },
       worldRect: {
-        type: AABB,
-        options: {
-          x: -1000,
+        props: {
+          x: 0,
           y: -2000,
-          width: 5000,
-          height: 8000
+          width: 3000,
+          height: 3000
         }
       },
       player: {
-        type: Player,
-        options: {
-          x: 100,
-          y: -400,
-          color: "green"
+        type: "Player",
+        props: {
+          x: 10,
+          y: -500
         }
       },
       platforms: [
-        { type: Platform, options: { x: 0, y: -350, width: 200, height: 5 } },
-        { type: Platform, options: { x: 350, y: -250, width: 50, height: 5 } },
-        { type: Platform, options: { x: 0, y: -130, width: 180, height: 5 } },
-        { type: Platform, options: { x: 0, y: -150, width: 180, height: 5 } },
-        { type: Platform, options: { x: 330, y: -400, width: 150, height: 5 } },
-        { type: Platform, options: { x: 150, y: 200, width: 50, height: 5 } },
-        { type: Platform, options: { x: 500, y: -270, width: 80, height: 80 } },
         {
-          type: Platform,
-          options: { x: 500, y: -170, width: 80, height: 160 }
+          type: "Platform",
+          props: { x: -20, y: -400, width: 220, height: 10 }
         },
-        { type: Platform, options: { x: 500, y: 10, width: 80, height: 120 } },
-        { type: Platform, options: { x: 500, y: 150, width: 80, height: 120 } },
-        { type: Platform, options: { x: 700, y: -80, width: 30, height: 20 } },
-        { type: Platform, options: { x: 350, y: 70, width: 30, height: 20 } },
-        { type: Platform, options: { x: 700, y: 210, width: 30, height: 20 } },
-        { type: Platform, options: { x: 200, y: -400, width: 5, height: 100 } },
         {
-          type: Platform,
-          options: { x: 0, y: -100000, width: 1, height: 200000 }
+          type: "Platform",
+          props: { x: 350, y: -250, width: 50, height: 10 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 0,
+            y: -130,
+            width: 180,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 0,
+            y: -150,
+            width: 180,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 330,
+            y: -390,
+            width: 150,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 150, y: 200, width: 50, height: 10 }
+        },
+        {
+          type: "Platform",
+          props: { x: 500, y: -270, width: 80, height: 80 }
+        },
+        {
+          type: "Platform",
+          props: { x: 480, y: -170, width: 120, height: 160 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 500,
+            y: 10,
+            width: 80,
+            height: 120,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 480,
+            y: 180,
+            width: 120,
+            height: 120,
+            passtarough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 700, y: -80, width: 30, height: 20 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 350,
+            y: 70,
+            width: 30,
+            height: 20,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 700,
+            y: 210,
+            width: 30,
+            height: 20,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 200, y: -470, width: 10, height: 170 }
+        },
+        {
+          type: "Platform",
+          props: { x: 0, y: -10000, width: 0, height: 20000 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 0,
+            y: -500,
+            width: 400,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 0, y: -600, width: 100, height: 100 }
+        },
+        {
+          type: "Platform",
+          props: { x: 400, y: -600, width: 100, height: 100 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 100,
+            y: -600,
+            width: 400,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 0, y: -700, width: 200, height: 100 }
+        },
+        {
+          type: "Platform",
+          props: { x: 500, y: -700, width: 100, height: 100 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 200,
+            y: -700,
+            width: 400,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 0, y: -800, width: 100, height: 100 }
+        },
+        {
+          type: "Platform",
+          props: { x: 400, y: -800, width: 100, height: 100 }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 100,
+            y: -800,
+            width: 400,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: {
+            x: 0,
+            y: -900,
+            width: 300,
+            height: 10,
+            passthrough: true
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 300, y: -900, width: 100, height: 100 }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 200,
+            y: -430,
+            width: 100,
+            height: 10,
+            xEnd: 400,
+            yEnd: -430,
+            speed: 100
+          }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 700,
+            y: -400,
+            width: 80,
+            height: 30,
+            xEnd: 700,
+            yEnd: -100,
+            speed: 100,
+            passthrough: true
+          }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 0,
+            y: -200,
+            width: 200,
+            height: 50,
+            xEnd: 30,
+            yEnd: 400,
+            speed: 100
+          }
+        },
+        {
+          type: "Platform",
+          props: { x: 800, y: -500, width: 500, height: 10 }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 950,
+            y: -800,
+            width: 50,
+            height: 200,
+            xEnd: 950,
+            yEnd: -700,
+            speed: 200
+          }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 1050,
+            y: -800,
+            width: 50,
+            height: 200,
+            xEnd: 1050,
+            yEnd: -700,
+            speed: 200
+          }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 1150,
+            y: -800,
+            width: 50,
+            height: 200,
+            xEnd: 1150,
+            yEnd: -700,
+            speed: 200
+          }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 100,
+            y: -600,
+            width: 100,
+            height: 100,
+            xEnd: 300,
+            yEnd: -600,
+            speed: 100
+          }
+        },
+        {
+          type: "MovingPlatform",
+          props: {
+            x: 850,
+            y: -400,
+            width: 150,
+            height: 10,
+            xEnd: 1250,
+            yEnd: -400,
+            speed: 200
+          }
         }
       ],
-      ennemies: []
+      ennemies: [
+        { type: "Ennemy", props: { x: 450, y: -650 } },
+        { type: "Ennemy", props: { x: 120, y: -750 } },
+        { type: "Ennemy", props: { x: 900, y: -700 } },
+        { type: "Ennemy", props: { x: 1250, y: -700 } },
+        { type: "Ennemy", props: { x: 320, y: -970 } },
+        { type: "Ennemy", props: { x: 900, y: -300 } },
+        { type: "Ennemy", props: { x: 850, y: -300 } },
+        { type: "Ennemy", props: { x: 950, y: -300 } },
+        { type: "Ennemy", props: { x: 300, y: -250 } },
+        { type: "Ennemy", props: { x: 300, y: 250 } },
+        { type: "Ennemy", props: { x: 20, y: -100 } },
+        { type: "Ennemy", props: { x: 650, y: -500 } }
+      ],
+      skills: [
+        {
+          type: "Skill",
+          props: {
+            x: 350,
+            y: -570,
+            width: 50,
+            height: 50,
+            src: "./assets/images/html-5-icon.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 500,
+            y: -600,
+            width: 50,
+            height: 50,
+            src: "./assets/images/css-3-icon.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 1000,
+            y: -600,
+            width: 50,
+            height: 50,
+            src: "./assets/images/jquery-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 200,
+            y: 0,
+            width: 50,
+            height: 50,
+            src: "./assets/images/mongodb-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 500,
+            y: -200,
+            width: 50,
+            height: 50,
+            src: "./assets/images/react-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 1300,
+            y: -600,
+            width: 50,
+            height: 50,
+            src: "./assets/images/angular-logo.svg"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 10,
+            y: -880,
+            width: 50,
+            height: 50,
+            src: "./assets/images/meteor-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 830,
+            y: 50,
+            width: 50,
+            height: 50,
+            src: "./assets/images/sass-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 20,
+            y: -350,
+            width: 50,
+            height: 50,
+            src: "./assets/images/bootstrap-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 1000,
+            y: -450,
+            width: 50,
+            height: 50,
+            src: "./assets/images/nodejs-logo.png"
+          }
+        }
+      ]
     }
   }
 };

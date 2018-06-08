@@ -40,149 +40,25 @@ var Game = (function() {
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
 
+    // initialize level manager
+    this.levelManager = levelManager.getInstance();
+    this.levelManager.init(this);
+
     // attach event handlers for game menu
     this.attachEventHandlers();
 
     // load local storage data
     this.loadGameDataFromLocalStorage();
 
-    // create level
-    worldRect = new AABB({ x: 0, y: -2000, width: 3000, height: 4000 });
-    this.player = new Player({ x: 10, y: -500 });
-    this.platforms = [
-      new Platform({ x: -20, y: -400, width: 220, height: 10 }),
-      new Platform({ x: 350, y: -250, width: 50, height: 10 }),
-      new Platform({
-        x: 0,
-        y: -130,
-        width: 180,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({
-        x: 0,
-        y: -150,
-        width: 180,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({
-        x: 330,
-        y: -390,
-        width: 150,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({ x: 150, y: 200, width: 50, height: 10 }),
-      new Platform({ x: 500, y: -270, width: 80, height: 80 }),
-      new Platform({ x: 480, y: -170, width: 120, height: 160 }),
-      new Platform({
-        x: 500,
-        y: 10,
-        width: 80,
-        height: 120,
-        passthrough: true
-      }),
-      new Platform({
-        x: 480,
-        y: 180,
-        width: 120,
-        height: 120,
-        passtarough: true
-      }),
-      new Platform({ x: 700, y: -80, width: 30, height: 20 }),
-      new Platform({ x: 350, y: 70, width: 30, height: 20, passthrough: true }),
-      new Platform({
-        x: 700,
-        y: 210,
-        width: 30,
-        height: 20,
-        passthrough: true
-      }),
-      new Platform({ x: 200, y: -470, width: 10, height: 170 }),
-      new Platform({ x: 0, y: -10000, width: 0, height: 20000 }),
-      new Platform({
-        x: 0,
-        y: -500,
-        width: 400,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({ x: 0, y: -600, width: 100, height: 100 }),
-      new Platform({ x: 400, y: -600, width: 100, height: 100 }),
-      new Platform({
-        x: 100,
-        y: -600,
-        width: 400,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({ x: 0, y: -700, width: 200, height: 100 }),
-      new Platform({ x: 500, y: -700, width: 100, height: 100 }),
-      new Platform({
-        x: 200,
-        y: -700,
-        width: 400,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({ x: 0, y: -800, width: 100, height: 100 }),
-      new Platform({ x: 400, y: -800, width: 100, height: 100 }),
-      new Platform({
-        x: 100,
-        y: -800,
-        width: 400,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({
-        x: 0,
-        y: -900,
-        width: 300,
-        height: 10,
-        passthrough: true
-      }),
-      new Platform({ x: 300, y: -900, width: 100, height: 100 }),
-      new MovingPlatform(200, -430, 100, 10, 400, -430, 100, {
-        passthrough: true
-      }),
-      new MovingPlatform(700, -400, 80, 30, 700, -100, 100, {
-        passthrough: true
-      }),
-      new MovingPlatform(0, -200, 200, 50, 30, 400, 100),
-      new Platform({ x: 800, y: -500, width: 500, height: 10 }),
-      new MovingPlatform(950, -800, 50, 200, 950, -700, 200),
-      new MovingPlatform(1050, -800, 50, 200, 1050, -700, 200),
-      new MovingPlatform(1150, -800, 50, 200, 1150, -700, 200),
-      new MovingPlatform(100, -600, 100, 100, 300, -600, 100),
-      new MovingPlatform(850, -400, 150, 10, 1250, -400, 200)
-    ];
-    this.skills = [
-      new Skill(350, -570, 50, 50, "./assets/images/html-5-icon.png"),
-      new Skill(500, -600, 50, 50, "./assets/images/css-3-icon.png"),
-      new Skill(1000, -600, 50, 50, "./assets/images/jquery-logo.png"),
-      new Skill(200, 0, 50, 50, "./assets/images/mongodb-logo.png"),
-      new Skill(500, -200, 50, 50, "./assets/images/react-logo.png"),
-      new Skill(1300, -600, 50, 50, "./assets/images/angular-logo.svg"),
-      new Skill(10, -880, 50, 50, "./assets/images/meteor-logo.png"),
-      new Skill(830, 50, 50, 50, "./assets/images/sass-logo.png"),
-      new Skill(20, -350, 50, 50, "./assets/images/bootstrap-logo.png"),
-      new Skill(1000, -450, 50, 50, "./assets/images/nodejs-logo.png")
-    ];
-    this.ennemies = [
-      new Ennemy(450, -650),
-      new Ennemy(120, -750),
-      new Ennemy(900, -700),
-      new Ennemy(1250, -700),
-      new Ennemy(320, -970),
-      new Ennemy(900, -300),
-      new Ennemy(850, -300),
-      new Ennemy(950, -300),
-      new Ennemy(300, -250),
-      new Ennemy(300, 250),
-      new Ennemy(20, -100),
-      new Ennemy(650, -500)
-    ];
+    this.level1 = this.levelManager.buildLevel("level 1");
+    if (this.level1 !== null) {
+      worldRect = this.level1.worldRect;
+      this.player = this.level1.player;
+      this.platforms = this.level1.platforms;
+      this.ennemies = this.level1.ennemies;
+      this.skills = this.level1.skills;
+    }
+
 
     // temporary objects
     this.lasers = [];

@@ -6,12 +6,12 @@ var Segment = (function() {
   }
 
   Segment.prototype.getBoundingRect = function() {
-    return new AABB(
-      Math.min(this.A.x, this.B.x),
-      Math.min(this.A.y, this.B.y),
-      Math.abs(this.B.x - this.A.x),
-      Math.abs(this.B.y - this.A.y)
-    );
+    return new AABB({
+      x: Math.min(this.A.x, this.B.x),
+      y: Math.min(this.A.y, this.B.y),
+      width: Math.abs(this.B.x - this.A.x),
+      height: Math.abs(this.B.y - this.A.y)
+    });
   };
 
   Segment.prototype.isOrthogonalProjectedPointOnSegment = function(P) {
