@@ -14,7 +14,7 @@ var Grid = (function() {
     this.isPrecisionAreaRound = false; // otherwise square
   }
 
-  Grid.prototype._getMousePosSnappedToGrid = function() {
+  Grid.prototype.getMousePosSnappedToGrid = function(mouseX, mouseY) {
     var camera = this.camera;
     var applyCam = camera.applyCamera.bind(camera);
     var unapplyCam = camera.unapplyCamera.bind(camera);
@@ -27,6 +27,13 @@ var Grid = (function() {
       Math.round(mouseGamePos.y / precisionGridSize) * precisionGridSize
     );
     return applyCam(snappedMouseGamePos.x, snappedMouseGamePos.y);
+  };
+
+  Grid.prototype.getGameMousePosSnappedToGrid = function(mouseX, mouseY) {
+    var camera = this.camera;
+    var unapplyCam = camera.unapplyCamera.bind(camera);
+    var mousePosSnappedToGrid = this.getMousePosSnappedToGrid(mouseX, mouseY);
+    return unapplyCam(mousePosSnappedToGrid.x, mousePosSnappedToGrid.y);
   };
 
   Grid.prototype._drawRulers = function(ctx, camera) {
@@ -127,7 +134,7 @@ var Grid = (function() {
       return Object.values(camera.applyCamera.apply(camera, arguments));
     };
     var unapplyCam = camera.unapplyCamera.bind(camera);
-    var mousePos = this._getMousePosSnappedToGrid();
+    var mousePos = this.getMousePosSnappedToGrid();
     var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
     var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
     var minX = mousePos.x - precisionAreaGameSize / 2;
@@ -150,7 +157,7 @@ var Grid = (function() {
   };
 
   Grid.prototype._drawCursor = function(ctx, camera) {
-    var mousePos = this._getMousePosSnappedToGrid();
+    var mousePos = this.getMousePosSnappedToGrid();
     var cursorSize = this.cursorSize;
     ctx.strokeStyle = this.cursorColor;
     ctx.lineWidth = 2;
@@ -165,7 +172,7 @@ var Grid = (function() {
 
   Grid.prototype._displayCoordinates = function(ctx, camera) {
     var unapplyCam = camera.unapplyCamera.bind(camera);
-    var mousePos = this._getMousePosSnappedToGrid();
+    var mousePos = this.getMousePosSnappedToGrid();
     ctx.font = "bold 14px Arial";
     ctx.fillStyle = "#ccc";
     var mouseGamePos = unapplyCam(mousePos.x, mousePos.y);

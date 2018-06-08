@@ -55,10 +55,10 @@ var contextManager = (function() {
     if (this.buttons[1]) {
       this.grabbed.x =
         this.grabbedStartingX -
-        scrollDirection * (this.x - this.clickX) / camera.zoomLevel;
+        (scrollDirection * (this.x - this.clickX)) / camera.zoomLevel;
       this.grabbed.y =
         this.grabbedStartingY -
-        scrollDirection * (this.y - this.clickY) / camera.zoomLevel;
+        (scrollDirection * (this.y - this.clickY)) / camera.zoomLevel;
     }
   }
 
@@ -105,7 +105,7 @@ var contextManager = (function() {
     var clickX = e.clientX + this.canvas.offsetLeft;
     var clickY = e.clientY + this.canvas.offsetTop;
     this.buttons[e.button] = true;
-    var mousePos = this.app.grid._getMousePosSnappedToGrid.call(
+    var mousePos = this.app.grid.getMousePosSnappedToGrid.call(
       this.app.grid,
       this.clickX,
       this.clickY
@@ -203,13 +203,13 @@ var contextManager = (function() {
   function handleMouseMove(e) {
     var camera = this.app.camera;
     var unapplyCam = camera.unapply.bind(camera);
-    var clickPos = this.app.grid._getMousePosSnappedToGrid.call(
+    var clickPos = this.app.grid.getMousePosSnappedToGrid.call(
       this.app.grid,
       this.clickX,
       this.clickY
     );
     var clickGamePos = unapplyCam(clickPos.x, clickPos.y);
-    var mousePos = this.app.grid._getMousePosSnappedToGrid.call(
+    var mousePos = this.app.grid.getMousePosSnappedToGrid.call(
       this.app.grid,
       this.x,
       this.y
@@ -266,7 +266,7 @@ var contextManager = (function() {
     var clickX = e.clientX + this.canvas.offsetLeft;
     var clickY = e.clientY + this.canvas.offsetTop;
     this.buttons[e.button] = true;
-    var mousePos = this.app.grid._getMousePosSnappedToGrid.call(
+    var mousePos = this.app.grid.getMousePosSnappedToGrid.call(
       this.app.grid,
       this.clickX,
       this.clickY
@@ -290,6 +290,10 @@ var contextManager = (function() {
           case "Platform":
           case "MovingPlatform":
             this.currentObject = gameObject;
+            console.log(
+              "​contextManager -> this.currentObject",
+              this.currentObject
+            );
             break;
           default:
             this.currentObject = null;
@@ -345,13 +349,13 @@ var contextManager = (function() {
   function handleMouseMove1(e) {
     var camera = this.app.camera;
     var unapplyCam = camera.unapply.bind(camera);
-    var clickPos = this.app.grid._getMousePosSnappedToGrid.call(
+    var clickPos = this.app.grid.getMousePosSnappedToGrid.call(
       this.app.grid,
       this.clickX,
       this.clickY
     );
     var clickGamePos = unapplyCam(clickPos.x, clickPos.y);
-    var mousePos = this.app.grid._getMousePosSnappedToGrid.call(
+    var mousePos = this.app.grid.getMousePosSnappedToGrid.call(
       this.app.grid,
       this.x,
       this.y
@@ -361,6 +365,7 @@ var contextManager = (function() {
 
     // move camera when mouse wheel is held down
     if (this.buttons[0]) {
+      console.log(this.currentObject);
       if (this.currentObject) {
         this.currentObject.width = Math.max(0, mouseGameDisplacement.x);
         this.currentObject.height = Math.max(0, mouseGameDisplacement.y);
@@ -374,19 +379,19 @@ var contextManager = (function() {
       mouse: {
         mousedown: {
           handler: handleMouseDownGeneric,
-          options: undefined
+          props: undefined
         },
         mouseup: {
           handler: handleMouseUpGeneric,
-          options: undefined
+          props: undefined
         },
         mousemove: {
           handler: handleMouseMoveGeneric,
-          options: undefined
+          props: undefined
         },
         wheel: {
           handler: handleWheelGeneric,
-          options: { passive: true }
+          props: { passive: true }
         }
       },
       keyboard: {}
@@ -395,19 +400,19 @@ var contextManager = (function() {
       mouse: {
         mousedown: {
           handler: handleMouseDown,
-          options: undefined
+          props: undefined
         },
         mouseup: {
           handler: handleMouseUp,
-          options: undefined
+          props: undefined
         },
         mousemove: {
           handler: handleMouseMove,
-          options: undefined
+          props: undefined
         },
         wheel: {
           handler: function() {},
-          options: { passive: true }
+          props: { passive: true }
         }
       },
       keyboard: {}
@@ -416,19 +421,19 @@ var contextManager = (function() {
       mouse: {
         mousedown: {
           handler: handleMouseDown1,
-          options: undefined
+          props: undefined
         },
         mouseup: {
           handler: handleMouseUp1,
-          options: undefined
+          props: undefined
         },
         mousemove: {
           handler: handleMouseMove1,
-          options: undefined
+          props: undefined
         },
         wheel: {
           handler: function() {},
-          options: { passive: true }
+          props: { passive: true }
         }
       },
       keyboard: {}
@@ -466,7 +471,7 @@ var contextManager = (function() {
     for (var i = 0; i < entries.length; i++) {
       var key = entries[i][0];
       var value = entries[i][1];
-      app.mouse.off(app.canvas, key, value.handler, value.options);
+      app.mouse.off(app.canvas, key, value.handler, value.props);
     }
   };
 
@@ -476,7 +481,7 @@ var contextManager = (function() {
     for (var i = 0; i < entries.length; i++) {
       var key = entries[i][0];
       var value = entries[i][1];
-      app.mouse.on(app.canvas, key, value.handler, value.options);
+      app.mouse.on(app.canvas, key, value.handler, value.props);
     }
   };
 
