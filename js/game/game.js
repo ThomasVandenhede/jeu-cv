@@ -73,12 +73,7 @@ var Game = (function() {
     this.particles = [];
 
     // game objects
-    this.gameObjects = []
-      .concat(this.platforms)
-      .concat(this.skills)
-      .concat(this.ennemies)
-      .concat(this.lasers)
-      .concat([this.player]);
+    this.buildGameObjects();
 
     // background
     this.canvas.style.backgroundImage =
@@ -150,6 +145,15 @@ var Game = (function() {
     if (savedData) {
       gameData = JSON.parse(savedData);
     }
+  };
+
+  Game.prototype.buildGameObjects = function() {
+    this.gameObjects = []
+      .concat(this.platforms)
+      .concat(this.skills)
+      .concat(this.ennemies)
+      .concat(this.lasers)
+      .concat([this.player]);
   };
 
   Game.prototype.handleKeyboard = function() {
@@ -284,12 +288,7 @@ var Game = (function() {
   };
 
   Game.prototype.renderScene = function(ctx, camera) {
-    this.gameObjects = []
-      .concat(this.platforms)
-      .concat(this.skills)
-      .concat(this.ennemies)
-      .concat(this.lasers)
-      .concat([this.player]);
+    this.buildGameObjects();
 
     // only draw objects in the viewport
     this.gameObjects.forEach(
