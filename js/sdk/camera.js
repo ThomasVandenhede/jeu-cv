@@ -7,13 +7,13 @@ var Camera = (function() {
   };
 
   function Camera(context, x, y, zoomLevel) {
-    AABB.call(this, x, y, canvas.width, canvas.height);
-
     this.context = context;
 
     this.zoomLevel = zoomLevel || 1;
     this.height = canvas.height / this.zoomLevel;
     this.width = canvas.width / this.zoomLevel;
+
+    AABB.call(this, { x: x, y: y, width: canvas.width, height: canvas.height });
 
     this.x = x || 0;
     this.y = y || 0;
@@ -78,7 +78,12 @@ var Camera = (function() {
     // don't let camera leave the world's boundaries
     if (
       this.shouldStayWithinWorldBounds &&
-      !new AABB(this.x, this.y, this.width, this.height).within(worldRect)
+      !new AABB({
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height
+      }).within(worldRect)
     ) {
       if (this.x < worldRect.left) {
         this.x = worldRect.left;

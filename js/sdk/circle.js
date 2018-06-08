@@ -1,8 +1,8 @@
-function Circle(x, y, r, color) {
-  this.x = x;
-  this.y = y;
-  this.r = r;
-  this.color = color || "grey";
+function Circle(props) {
+  this.x = props.x;
+  this.y = props.y;
+  this.r = props.r;
+  this.color = props.color || "grey";
   this.fill = false;
 }
 
@@ -17,7 +17,12 @@ Circle.prototype.containsPoint = function(P) {
 };
 
 Circle.prototype.getBoundingRect = function() {
-  return new AABB(this.x - this.r, this.y - this.r, this.r * 2, this.r * 2);
+  return new AABB({
+    x: this.x - this.r,
+    y: this.y - this.r,
+    width: this.r * 2,
+    height: this.r * 2
+  });
 };
 
 Circle.prototype.draw = function(ctx) {

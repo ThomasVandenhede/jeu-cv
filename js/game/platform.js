@@ -1,15 +1,13 @@
 var Platform = (function() {
   var MAX_SPEED = 100;
 
-  function Platform(options) {
-    AABB.call(this, options.x, options.y, options.width, options.height);
+  function Platform(props) {
+    AABB.call(this, props);
 
     this.v = new Vector();
-    this.solid = options && options.solid !== undefined ? options.solid : true; // can collide with other solid objects
+    this.solid = props && props.solid !== undefined ? props.solid : true; // can collide with other solid objects
     this.passthrough =
-      options && options.passthrough !== undefined
-        ? options.passthrough
-        : false; // can it be traversed upwards
+      props && props.passthrough !== undefined ? props.passthrough : false; // can it be traversed upwards
     this.touched = false; // is the player touching the platform
     this.color = "#5e4c4c";
   }

@@ -1,24 +1,24 @@
 var Laser = (function() {
-  function Laser(x, y, direction, damage, range, color) {
+  function Laser(props) {
     this.length = 20;
-    var A = new Vector(x, y);
-    var B = Vector.sum(A, direction.multiplyByScalar(this.length));
+    var A = new Vector(props.x, props.y);
+    var B = Vector.sum(A, props.direction.multiplyByScalar(this.length));
     Segment.call(this, A, B);
 
-    this.origin = new Vector(x, y);
+    this.origin = new Vector(props.x, props.y);
     this.speed = 250;
     this.v = Vector.subtract(B, A)
       .getUnitVector()
       .multiplyByScalar(this.speed);
 
     // stats
-    this.damage = damage;
+    this.damage = props.damage;
 
     // timings
     this.createdAt = Date.now();
-    this.range = range;
+    this.range = props.range;
 
-    this.color = color;
+    this.color = props.color;
   }
 
   Laser.prototype = Object.create(Segment.prototype);

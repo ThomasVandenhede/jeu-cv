@@ -119,15 +119,15 @@ var explosionParticles = function(gameObj) {
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
       );
-      var particle = new Particle(
-        i,
-        j,
-        size,
-        gameObj.color,
-        v.x,
-        v.y,
-        randInt(minLife, maxLife)
-      );
+      var particle = new Particle({
+        x: i,
+        y: j,
+        size: size,
+        color: gameObj.color,
+        vx: v.x,
+        vy: v.y,
+        maxLife: randInt(minLife, maxLife)
+      });
       particles[particleIndex] = particle;
       particleIndex++;
       var v = new Vector(
@@ -137,15 +137,15 @@ var explosionParticles = function(gameObj) {
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
       );
-      var particle = new Particle(
-        i,
-        j,
-        size,
-        gameObj.color,
-        v.x,
-        v.y,
-        randInt(minLife, maxLife)
-      );
+      var particle = new Particle({
+        x: i,
+        y: j,
+        size: size,
+        color: gameObj.color,
+        vx: v.x,
+        vy: v.y,
+        maxLife: randInt(minLife, maxLife)
+      });
       particles[particleIndex] = particle;
       particleIndex++;
     }
@@ -154,7 +154,7 @@ var explosionParticles = function(gameObj) {
     update: function() {
       for (var id in particles) {
         var particle = particles[id];
-        particle.v.y += gameObj.GRAVITY_ACCELERATION / 4 * dt;
+        particle.v.y += (gameObj.GRAVITY_ACCELERATION / 4) * dt;
         particle.update();
         if (Date.now() - particle.createdAt >= particle.maxLife) {
           delete particles[id];
@@ -186,16 +186,16 @@ var hitParticles = function(x, y, direction, color) {
     var v = direction
       .getUnitVector()
       .multiplyByScalar(randInt(minSpeed, maxSpeed))
-      .rotateRadians(Math.random() * Math.PI / 3 - Math.PI / 6);
-    var particle = new Particle(
-      x,
-      y,
-      size,
-      color,
-      v.x,
-      v.y,
-      randInt(minLife, maxLife)
-    );
+      .rotateRadians((Math.random() * Math.PI) / 3 - Math.PI / 6);
+    var particle = new Particle({
+      x: x,
+      y: y,
+      size: size,
+      color: color,
+      vx: v.x,
+      vy: v.y,
+      maxLife: randInt(minLife, maxLife)
+    });
     particleIndex++;
     particles[particleIndex] = particle;
   }

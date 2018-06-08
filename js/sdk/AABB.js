@@ -1,8 +1,8 @@
-function AABB(x, y, width, height) {
-  this.x = x;
-  this.y = y;
-  this.width = width !== undefined ? width : 0;
-  this.height = height !== undefined ? height : 0;
+function AABB(props) {
+  this.x = props.x;
+  this.y = props.y;
+  this.width = props.width !== undefined ? props.width : 0;
+  this.height = props.height !== undefined ? props.height : 0;
 }
 
 Object.defineProperties(AABB.prototype, {
@@ -59,12 +59,12 @@ Object.defineProperties(AABB.prototype, {
 
 // static methods
 AABB.minkowskiDifference = function(r1, r2) {
-  return new AABB(
-    r1.left - r2.right,
-    r1.top - r2.bottom,
-    r1.width + r2.width,
-    r1.height + r2.height
-  );
+  return new AABB({
+    x: r1.left - r2.right,
+    y: r1.top - r2.bottom,
+    width: r1.width + r2.width,
+    height: r1.height + r2.height
+  });
 };
 
 // public methods

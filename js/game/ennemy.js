@@ -1,6 +1,6 @@
 var Ennemy = (function() {
-  function Ennemy(options) {
-    AABB.call(this, options.x, options.y, 20, 20);
+  function Ennemy(props) {
+    AABB.call(this, { x: props.x, y: props.y, width: 20, height: 20 });
 
     this.v = new Vector();
     this.solid = false;
@@ -18,14 +18,14 @@ var Ennemy = (function() {
   Ennemy.prototype.attack = function(direction) {
     var center = this.center;
     this.lastFiredAt = Date.now();
-    return new Laser(
-      center.x,
-      center.y,
-      direction,
-      this.damage,
-      this.attackRange,
-      "red"
-    );
+    return new Laser({
+      x: center.x,
+      y: center.y,
+      direction: direction,
+      damage: this.damage,
+      range: this.attackRange,
+      color: "red"
+    });
   };
 
   Ennemy.prototype.update = function() {};

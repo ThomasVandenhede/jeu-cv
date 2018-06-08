@@ -1,7 +1,7 @@
 var LifeBar = (function() {
-  function LifeBar(gameObject, x, y, width, height) {
-    AABB.call(this, x, y, width, height);
-    this.gameObject = gameObject;
+  function LifeBar(props) {
+    AABB.call(this, props);
+    this.gameObject = props.gameObject;
   }
 
   LifeBar.prototype = Object.create(AABB.prototype);

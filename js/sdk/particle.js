@@ -1,13 +1,13 @@
 var Particle = (function() {
-  function Particle(x, y, size, color, vx, vy, maxLife) {
-    Vector.call(this, x, y);
+  function Particle(props) {
+    Vector.call(this, props.x, props.y);
 
-    this.size = size;
-    this.color = color;
+    this.size = props.size;
+    this.color = props.color;
 
-    this.v = new Vector(vx, vy);
+    this.v = new Vector(props.vx, props.vy);
     this.createdAt = Date.now();
-    this.maxLife = maxLife;
+    this.maxLife = props.maxLife;
     // this.hasTransparency =
     //   hasTransparency !== undefined ? hasTransparency : false;
   }

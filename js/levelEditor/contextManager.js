@@ -142,7 +142,10 @@ var contextManager = (function() {
         this.selectedObjectsStart = selectedObjectsStart;
         // console.log(this.selectedObjects);
         if (!selectedObjects.length) {
-          this.selectionArea = new AABB(mouseGamePos.x, mouseGamePos.y);
+          this.selectionArea = new AABB({
+            x: mouseGamePos.x,
+            y: mouseGamePos.y
+          });
         }
         break;
       default:

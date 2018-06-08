@@ -2,8 +2,8 @@ var Shield = (function() {
   var MIN_SIZE = 0;
   var MAX_SIZE = 40;
 
-  function Shield(shielded) {
-    this.shielded = shielded || null; // object benefitting from the shield
+  function Shield(props) {
+    this.shielded = props.shielded || null; // object benefitting from the shield
     this.r = MIN_SIZE;
     this.isOpen = false;
     this.isAnimating = false;
@@ -24,12 +24,12 @@ var Shield = (function() {
 
   Shield.prototype.getBoundingRect = function() {
     var shielded = this.shielded;
-    return new AABB(
-      shielded.left - this.r,
-      shielded.top - this.r,
-      shielded.width + this.r * 2,
-      shielded.height + this.r * 2
-    );
+    return new AABB({
+      x: shielded.left - this.r,
+      y: shielded.top - this.r,
+      width: shielded.width + this.r * 2,
+      height: shielded.height + this.r * 2
+    });
   };
 
   Shield.prototype.open = function() {
@@ -49,7 +49,7 @@ var Shield = (function() {
   Shield.prototype.update = function() {
     var dr;
     if (this.isOpen) {
-      dr = (MAX_SIZE - MIN_SIZE) / this.openingDuration * dt;
+      dr = ((MAX_SIZE - MIN_SIZE) / this.openingDuration) * dt;
       // shield opening
       if (this.r + dr < MAX_SIZE) {
         this.r += dr;
@@ -58,7 +58,7 @@ var Shield = (function() {
         this.isAnimating = false;
       }
     } else {
-      dr = (MAX_SIZE - MIN_SIZE) / this.closingDuration * dt;
+      dr = ((MAX_SIZE - MIN_SIZE) / this.closingDuration) * dt;
       // shield closing
       if (this.r - dr > MIN_SIZE) {
         this.r -= dr;
@@ -81,22 +81,22 @@ var Shield = (function() {
     }
 
     // the shield can be decomposed in 6 shapes
-    c1 = new Circle(shielded.left, shielded.top, r);
-    c2 = new Circle(shielded.right, shielded.top, r);
-    c3 = new Circle(shielded.right, shielded.bottom, r);
-    c4 = new Circle(shielded.left, shielded.bottom, r);
-    r1 = new AABB(
-      shielded.left - r,
-      shielded.top,
-      shielded.width + 2 * r,
-      shielded.height
-    );
-    r2 = new AABB(
-      shielded.left,
-      shielded.top - r,
-      shielded.width,
-      shielded.height + 2 * r
-    );
+    c1 = new Circle({ x: shielded.left, y: shielded.top, r: r });
+    c2 = new Circle({ x: shielded.right, y: shielded.top, r: r });
+    c3 = new Circle({ x: shielded.right, y: shielded.bottom, r: r });
+    c4 = new Circle({ x: shielded.left, y: shielded.bottom, r: r });
+    r1 = new AABB({
+      x: shielded.left - r,
+      y: shielded.top,
+      width: shielded.width + 2 * r,
+      height: shielded.height
+    });
+    r2 = new AABB({
+      x: shielded.left,
+      y: shielded.top - r,
+      width: shielded.width,
+      height: shielded.height + 2 * r
+    });
 
     return (
       c1.containsPoint(laser.A) ||

@@ -6,8 +6,13 @@ var Player = (function() {
   var INITIAL_HEIGHT = 30;
   var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
-  function Player(options) {
-    AABB.call(this, options.x, options.y, INITIAL_WIDTH, INITIAL_HEIGHT);
+  function Player(props) {
+    AABB.call(this, {
+      x: props.x,
+      y: props.y,
+      width: INITIAL_WIDTH,
+      height: INITIAL_HEIGHT
+    });
 
     var that = this;
     this.v = new Vector(0, 0);
@@ -31,7 +36,7 @@ var Player = (function() {
     this.isColliding = [0, 0]; // [horizontal, vertical]
     this.collidableWith = []; // potential object collisions
     this.collidingWith = [null, null]; // actual object collisions
-    this.shield = new Shield(this);
+    this.shield = new Shield({ shielded: this });
 
     // sounds
     this.sounds = {
@@ -112,7 +117,7 @@ var Player = (function() {
   Player.prototype.getDeltaWidth = function() {
     var deltaWidth;
     var computedDelta =
-      dt / CROUCH_STAND_ANIMATION_DURATION * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
+      (dt / CROUCH_STAND_ANIMATION_DURATION) * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
     if (this.isCrouching) {
       deltaWidth =
         this.height - computedDelta < INITIAL_WIDTH

@@ -1,11 +1,11 @@
 var Skill = (function() {
-  function Skill(x, y, width, height, src) {
-    AABB.call(this, x, y, width, height);
+  function Skill(props) {
+    AABB.call(this, props);
 
     this.v = new Vector();
     this.solid = false;
     this.image = new Image();
-    this.image.src = src;
+    this.image.src = props.src;
   }
 
   Skill.prototype = Object.create(AABB.prototype);

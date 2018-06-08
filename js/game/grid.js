@@ -1,6 +1,6 @@
 var Grid = (function() {
-  function Grid(app) {
-    this.app = app;
+  function Grid(props) {
+    this.app = props.app;
     this.mouse = this.app.mouse;
 
     // grid config

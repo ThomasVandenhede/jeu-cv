@@ -1,6 +1,6 @@
 var GameTimer = (function() {
-  function GameTimer(x, y, width, height) {
-    AABB.call(this, x, y, width, height);
+  function GameTimer(props) {
+    AABB.call(this, props);
     this.totalTime = 0;
     this.currentTime = Date.now();
     this.previousTime = this.currentTime;

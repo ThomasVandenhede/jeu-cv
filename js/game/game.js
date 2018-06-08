@@ -1,5 +1,5 @@
 var Game = (function() {
-  function Game(options) {}
+  function Game(props) {}
 
   var states = {
     PAUSED: "paused",
@@ -47,7 +47,7 @@ var Game = (function() {
     this.loadGameDataFromLocalStorage();
 
     // create level
-    worldRect = new AABB(0, -2000, 3000, 4000);
+    worldRect = new AABB({ x: 0, y: -2000, width: 3000, height: 4000 });
     this.player = new Player({ x: 10, y: -500 });
     this.platforms = [
       new Platform({ x: -20, y: -400, width: 220, height: 10 }),
@@ -210,8 +210,19 @@ var Game = (function() {
     );
 
     // UI
-    this.timer = new GameTimer(canvas.width - 170, 35, 80, 30);
-    this.lifeBar = new LifeBar(this.player, 60, 40, 200, 15);
+    this.timer = new GameTimer({
+      x: canvas.width - 170,
+      y: 35,
+      width: 80,
+      height: 30
+    });
+    this.lifeBar = new LifeBar({
+      x: 60,
+      y: 40,
+      width: 200,
+      height: 15,
+      gameObject: this.player
+    });
   };
 
   Game.prototype.attachEventHandlers = function() {
@@ -313,7 +324,7 @@ var Game = (function() {
       60,
       100,
       100,
-      100 + (acquiredSkillsCount + acquiredSkillsCount % 2) / 2 * 45
+      100 + ((acquiredSkillsCount + (acquiredSkillsCount % 2)) / 2) * 45
     );
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
@@ -325,7 +336,7 @@ var Game = (function() {
         ctx.drawImage(
           skill.image,
           70 + (index % 2) * 45,
-          200 + (index - index % 2) / 2 * 45,
+          200 + ((index - (index % 2)) / 2) * 45,
           30,
           30
         );
