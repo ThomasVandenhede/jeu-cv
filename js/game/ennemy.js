@@ -24,7 +24,7 @@ var Ennemy = (function() {
       direction: direction,
       damage: this.damage,
       range: this.attackRange,
-      color: "red"
+      color: "lightgrey"
     });
   };
 
