@@ -373,10 +373,6 @@ var Game = (function() {
       this.player = this.level.player;
       this.platforms = this.level.platforms;
       this.ennemies = this.level.ennemies;
-      console.log(
-        "​Game.prototype.buildGameLevel -> this.ennemies",
-        this.ennemies
-      );
       this.skills = this.level.skills;
     }
   };

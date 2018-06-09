@@ -26,9 +26,6 @@ var incrementID = (function() {
 })();
 
 function e(type, props, children) {
-  console.log("​e -> type", type);
-  console.log("​e -> props", props);
-  console.log("​e -> children", children);
   var el = document.createElement(type);
   for (var key in props) {
     el.setAttribute(key, props[key]);
