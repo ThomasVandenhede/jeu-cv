@@ -325,12 +325,7 @@ var Game = (function() {
     };
     this.handleRestartClick = function(e) {
       e.preventDefault();
-      this.ghostIndex = 0;
-      // this.closeGameMenu();
-      cancelAnimationFrame(this.rAF);
-      this.unpause();
-      this.init();
-      this.startGame();
+      this.restartGame();
     };
     this.handleControlsButtonClick = function(e) {
       e.preventDefault();
@@ -388,6 +383,7 @@ var Game = (function() {
 
   Game.prototype.closeGameMenu = function() {
     this.uiContainerEl.innerHTML = "";
+    this.gameMenuEl = null;
   };
 
   Game.prototype.handleKeyboard = function() {
@@ -627,17 +623,19 @@ var Game = (function() {
   };
 
   Game.prototype.pause = function() {
-    this.state = states.PAUSED;
+    !this.gameMenuEl && this.showPauseMenu();
     this.timer.pause();
     this.soundManager.pauseAll();
-    this.showPauseMenu();
+    this.state = states.PAUSED;
   };
 
   Game.prototype.unpause = function() {
-    this.state = states.RUNNING;
+    this.state !== states.GAME_OVER &&
+      this.state !== states.VICTORY &&
+      this.closeGameMenu();
     this.timer.play();
     this.soundManager.playPaused();
-    this.closeGameMenu();
+    this.state = states.RUNNING;
   };
 
   Game.prototype.destroyLaser = function(index) {
@@ -838,6 +836,15 @@ var Game = (function() {
     if (boxV) {
       boxV.touched = true;
     }
+  };
+
+  Game.prototype.restartGame = function() {
+    this.ghostIndex = 0;
+    this.closeGameMenu();
+    cancelAnimationFrame(this.rAF);
+    this.unpause();
+    this.init();
+    this.startGame();
   };
 
   Game.prototype.startGame = function() {
