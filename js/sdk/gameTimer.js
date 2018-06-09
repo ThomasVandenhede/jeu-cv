@@ -6,7 +6,7 @@ var GameTimer = (function() {
     this.previousTime = this.currentTime;
     this.isPaused = false;
     this.isCountDown = true;
-    this.countDownStart = 0.5 * 60 * 1000; // ms
+    this.countDownStart = props.countDownStart || 0.5 * 60 * 1000; // ms
   }
 
   GameTimer.prototype = Object.create(AABB.prototype);

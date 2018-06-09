@@ -25,6 +25,7 @@ var Game = (function() {
     this.ctx = this.canvas.getContext("2d");
 
     // initialize game menu elements
+    this.gameContainerEl = document.getElementById("game-container");
     this.uiContainerEl = document.getElementById("ui-container");
     this.gameIntroEl = document.getElementById("game-intro");
 
@@ -124,9 +125,9 @@ var Game = (function() {
       e("a", { href: "", class: "game-menu__link" }, "RETOUR")
     );
 
-    // display pause menu
-    this.buildPauseMenu();
-    this.uiContainerEl.append(this.gameMenuEl);
+    // // display pause menu
+    // this.showPauseMenu();
+    // this.uiContainerEl.append(this.gameMenuEl);
 
     // attach event handlers for game menu
     this.attachEventHandlers();
@@ -179,7 +180,8 @@ var Game = (function() {
       x: canvas.width - 170,
       y: 35,
       width: 80,
-      height: 30
+      height: 30,
+      countDownStart: 0.5 * 60 * 1000
     });
     this.lifeBar = new LifeBar({
       x: 60,
@@ -188,13 +190,18 @@ var Game = (function() {
       height: 15,
       gameObject: this.player
     });
+    this.grid = new Grid({
+      canvas: this.canvas,
+      camera: this.camera,
+      mouse: this.mouse
+    });
   };
 
   // Build different game menus
-  Game.prototype.buildGameOverMenu = function() {
+  Game.prototype.showGameOverMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "DÉFAITE !"),
+      e("h2", null, "PERDU !"),
       e("ul", { class: "game-menu__list" }, [
         this.restartButton,
         this.exitButton
@@ -203,7 +210,7 @@ var Game = (function() {
     this.uiContainerEl.append(this.gameMenuEl);
   };
 
-  Game.prototype.buildVictoryMenu = function() {
+  Game.prototype.showVictoryMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "VICTOIRE !"),
@@ -220,7 +227,7 @@ var Game = (function() {
     this.uiContainerEl.append(this.gameMenuEl);
   };
 
-  Game.prototype.buildPauseMenu = function() {
+  Game.prototype.showPauseMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "JEU EN PAUSE"),
@@ -237,7 +244,7 @@ var Game = (function() {
     this.uiContainerEl.append(this.gameMenuEl);
   };
 
-  Game.prototype.buildControlsMenu = function() {
+  Game.prototype.showControlsMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "CONTRÔLES"),
@@ -246,7 +253,7 @@ var Game = (function() {
     this.uiContainerEl.append(this.gameMenuEl);
   };
 
-  Game.prototype.buildAboutMenu = function() {
+  Game.prototype.showAboutMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "CONTRÔLES"),
@@ -267,7 +274,7 @@ var Game = (function() {
     this.uiContainerEl.append(this.gameMenuEl);
   };
 
-  Game.prototype.buildLoadMenu = function() {
+  Game.prototype.showLoadMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "CHARGER UN NIVEAU"),
@@ -288,7 +295,7 @@ var Game = (function() {
                     "game.buildGameLevel('" +
                     gameData.levels[key].name +
                     "');" +
-                    "game.camera.follow(game.player)"
+                    "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10,                     (game.canvas.height - game.player.height) / 2 - 10)"
                 },
                 gameData.levels[key].name
               )
@@ -318,38 +325,38 @@ var Game = (function() {
     };
     this.handleRestartClick = function(e) {
       e.preventDefault();
-      console.log("RESTART");
       this.ghostIndex = 0;
-      hide(this.gameOverMenuEl);
+      // this.closeGameMenu();
       cancelAnimationFrame(this.rAF);
+      this.unpause();
       this.init();
       this.startGame();
     };
-    this.displayControlsMenu = function(e) {
+    this.handleControlsButtonClick = function(e) {
       e.preventDefault();
-      this.buildControlsMenu();
+      this.showControlsMenu();
     };
-    this.displayPauseMenu = function(e) {
+    this.handleAboutButtonClick = function(e) {
       e.preventDefault();
-      this.buildPauseMenu();
+      this.showAboutMenu();
     };
-    this.displayAboutMenu = function(e) {
+    this.handleBackButtonClick = function(e) {
       e.preventDefault();
-      this.buildAboutMenu();
+      this.showPauseMenu();
     };
-    this.displayLoadMenu = function(e) {
+    this.handleLoadMenuClick = function(e) {
       e.preventDefault();
-      this.buildLoadMenu();
+      this.showLoadMenu();
     };
     this.resumeButton.onclick = this.handleMenuResumeClick.bind(this);
     this.restartButton.onclick = this.handleRestartClick.bind(this);
     this.loadButton.onclick = this.handleMenuLevelClick.bind(this);
     this.aboutButton.onclick = this.handleMenuAboutClick.bind(this);
     this.exitButton.onclick = this.handleMenuExitClick.bind(this);
-    this.controlsButton.onclick = this.displayControlsMenu.bind(this);
-    this.aboutButton.onclick = this.displayAboutMenu.bind(this);
-    this.backButton.onclick = this.displayPauseMenu.bind(this);
-    this.loadButton.onclick = this.displayLoadMenu.bind(this);
+    this.controlsButton.onclick = this.handleControlsButtonClick.bind(this);
+    this.aboutButton.onclick = this.handleAboutButtonClick.bind(this);
+    this.backButton.onclick = this.handleBackButtonClick.bind(this);
+    this.loadButton.onclick = this.handleLoadMenuClick.bind(this);
   };
 
   Game.prototype.loadGameDataFromLocalStorage = function() {
@@ -366,6 +373,10 @@ var Game = (function() {
       this.player = this.level.player;
       this.platforms = this.level.platforms;
       this.ennemies = this.level.ennemies;
+      console.log(
+        "​Game.prototype.buildGameLevel -> this.ennemies",
+        this.ennemies
+      );
       this.skills = this.level.skills;
     }
   };
@@ -377,6 +388,10 @@ var Game = (function() {
       .concat(this.ennemies)
       .concat(this.lasers)
       .concat([this.player]);
+  };
+
+  Game.prototype.closeGameMenu = function() {
+    this.uiContainerEl.innerHTML = "";
   };
 
   Game.prototype.handleKeyboard = function() {
@@ -525,7 +540,8 @@ var Game = (function() {
     });
     this.lifeBar.draw(ctx);
     this.timer.draw(ctx);
-    this.shouldDisplayRulers && this.drawRulers(ctx, camera);
+    this.shouldDisplayRulers &&
+      this.grid.draw(ctx, camera, { isGame: true, shouldDisplayRulers: true });
     this.displaySkills(ctx, camera);
   };
 
@@ -618,14 +634,14 @@ var Game = (function() {
     this.state = states.PAUSED;
     this.timer.pause();
     this.soundManager.pauseAll();
-    show(this.gameMenuEl);
+    this.showPauseMenu();
   };
 
   Game.prototype.unpause = function() {
     this.state = states.RUNNING;
     this.timer.play();
     this.soundManager.playPaused();
-    hide(this.gameMenuEl);
+    this.closeGameMenu();
   };
 
   Game.prototype.destroyLaser = function(index) {
@@ -830,14 +846,13 @@ var Game = (function() {
 
   Game.prototype.startGame = function() {
     // game state
-    this.pause();
     requestAnimationFrame(this.pauseMenuLoop.bind(this));
   };
 
   Game.prototype.exit = function() {
     show(this.gameIntroEl);
-    hide(this.gameMenuEl);
-    hide(this.uiContainerEl);
+    this.closeGameMenu();
+    hide(this.gameContainerEl);
     this.state = states.EXIT;
     delete game;
   };
@@ -847,7 +862,7 @@ var Game = (function() {
       this.state = states.VICTORY;
       setTimeout(
         function() {
-          show(this.gameOverMenuEl);
+          this.showVictoryMenu();
         }.bind(this),
         1000
       );
@@ -857,10 +872,9 @@ var Game = (function() {
   Game.prototype.checkDefeat = function() {
     if (this.player.isDead && !(this.state === states.GAME_OVER)) {
       this.state = states.GAME_OVER;
-      console.log("GAME OVER");
       setTimeout(
         function() {
-          show(this.gameOverMenuEl);
+          this.showGameOverMenu();
         }.bind(this),
         1000
       );

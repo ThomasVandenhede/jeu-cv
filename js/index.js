@@ -1,5 +1,5 @@
 window.addEventListener("DOMContentLoaded", function() {
-  var canvasContainer = document.getElementById("canvas-container");
+  var gameContainer = document.getElementById("game-container");
   var canvases = document.getElementsByTagName("canvas");
   var startGameButton = document.getElementById("start-game");
   var gameIntroEl = document.getElementById("game-intro");
@@ -18,7 +18,7 @@ window.addEventListener("DOMContentLoaded", function() {
   startGameButton.addEventListener("click", function(e) {
     e.preventDefault();
     // instantiate game
-    show(canvasContainer);
+    show(gameContainer);
     hide(gameIntroEl);
     window.game = new Game();
     game.init({
@@ -26,6 +26,7 @@ window.addEventListener("DOMContentLoaded", function() {
       shouldDisplayRulers: true
     });
     game.startGame();
+    game.pause();
   });
   window.addEventListener("blur", function(e) {
     if (window.hasOwnProperty("game")) {

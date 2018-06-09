@@ -1,7 +1,8 @@
 var Grid = (function() {
   function Grid(props) {
-    this.app = props.app;
-    this.mouse = this.app.mouse;
+    this.camera = props.camera;
+    this.canvas = props.canvas;
+    this.mouse = props.mouse;
 
     // grid config
     this.cursorSize = 10;
@@ -17,13 +18,21 @@ var Grid = (function() {
     var applyCam = camera.apply.bind(camera);
     var unapplyCam = camera.unapply.bind(camera);
     var precisionGridSize = this.precisionGridSize;
+    var mouse = this.mouse;
 
-    var mouseGamePos = unapplyCam(mouseX, mouseY);
+    var mouseGamePos = unapplyCam(mouse.x, mouse.y);
     var snappedMouseGamePos = new Vector(
       Math.round(mouseGamePos.x / precisionGridSize) * precisionGridSize,
       Math.round(mouseGamePos.y / precisionGridSize) * precisionGridSize
     );
     return applyCam(snappedMouseGamePos.x, snappedMouseGamePos.y);
+  };
+
+  Grid.prototype.getGameMousePosSnappedToGrid = function(mouseX, mouseY) {
+    var camera = this.camera;
+    var unapplyCam = camera.unapply.bind(camera);
+    var mousePosSnappedToGrid = this.getMousePosSnappedToGrid(mouseX, mouseY);
+    return unapplyCam(mousePosSnappedToGrid.x, mousePosSnappedToGrid.y);
   };
 
   Grid.prototype._drawRulers = function(ctx, camera) {
@@ -42,12 +51,28 @@ var Grid = (function() {
     ctx.fillStyle = gameData.colors.STAR_WARS_YELLOW; // Star Wars yellow
     ctx.strokeStyle = "white";
     for (var i = minX; i <= maxX; i += innerGridSize) {
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.top));
+      ctx.lineTo.apply(
+        ctx,
+        Object.values(Vector.sum(applyCam(i, camera.top), new Vector(0, 10)))
+      );
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.bottom));
+      ctx.lineTo.apply(
+        ctx,
+        Object.values(
+          Vector.sum(applyCam(i, camera.bottom), new Vector(0, -10))
+        )
+      );
+      ctx.stroke();
       if (i % (innerGridSize * 5) === 0) {
         ctx.fillText.apply(
           ctx,
           [i].concat(
             Object.values(
-              Vector.sum(applyCam(i, camera.top0), new Vector(10, 20))
+              Vector.sum(applyCam(i, camera.top), new Vector(10, 20))
             )
           )
         );
@@ -61,23 +86,36 @@ var Grid = (function() {
         );
       }
     }
-    for (var j = minY; j <= maxY; j += innerGridSize) {
-      if (j % (innerGridSize * 5) === 0) {
+    for (var i = minY; i <= maxY; i += innerGridSize) {
+      ctx.beginPath();
+      ctx.moveTo.apply(ctx, applyCamToArr(camera.left, i));
+      ctx.lineTo.apply(
+        ctx,
+        Object.values(Vector.sum(applyCam(camera.left, i), new Vector(10, 0)))
+      );
+      ctx.stroke();
+      ctx.moveTo.apply(ctx, applyCamToArr(camera.right, i));
+      ctx.lineTo.apply(
+        ctx,
+        Object.values(Vector.sum(applyCam(camera.right, i), new Vector(-10, 0)))
+      );
+      ctx.stroke();
+      if (i % (innerGridSize * 5) === 0) {
         ctx.textAlign = "left";
         ctx.fillText.apply(
           ctx,
-          [-j].concat(
+          [-i].concat(
             Object.values(
-              Vector.sum(applyCam(camera.left, j), new Vector(10, -10))
+              Vector.sum(applyCam(camera.left, i), new Vector(10, -10))
             )
           )
         );
         ctx.textAlign = "right";
         ctx.fillText.apply(
           ctx,
-          [-j].concat(
+          [-i].concat(
             Object.values(
-              Vector.sum(applyCam(camera.right, j), new Vector(-10, -10))
+              Vector.sum(applyCam(camera.right, i), new Vector(-10, -10))
             )
           )
         );
@@ -98,9 +136,9 @@ var Grid = (function() {
 
     for (var i = minX; i <= maxX; i += innerGridSize) {
       if (i % (innerGridSize * 5) === 0) {
-        ctx.strokeStyle = "rgba(255, 255, 255, 1)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
       } else {
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
       }
       ctx.beginPath();
       ctx.moveTo.apply(ctx, applyCamToArr(i, camera.top));
@@ -125,8 +163,7 @@ var Grid = (function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
     var unapplyCam = camera.unapply.bind(camera);
-    var mouse = this.app.mouse;
-    var mousePos = this.getMousePosSnappedToGrid(mouse.x, mouse.y);
+    var mousePos = this.getMousePosSnappedToGrid();
     var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
     var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
     var minX = mousePos.x - precisionAreaGameSize / 2;
@@ -149,8 +186,7 @@ var Grid = (function() {
   };
 
   Grid.prototype._drawCursor = function(ctx, camera) {
-    var mouse = this.app.mouse;
-    var mousePos = this.getMousePosSnappedToGrid(mouse.x, mouse.y);
+    var mousePos = this.getMousePosSnappedToGrid();
     var cursorSize = this.cursorSize;
     ctx.strokeStyle = this.cursorColor;
     ctx.lineWidth = 2;
@@ -165,22 +201,19 @@ var Grid = (function() {
 
   Grid.prototype._displayCoordinates = function(ctx, camera) {
     var unapplyCam = camera.unapply.bind(camera);
-    var mouse = this.app.mouse;
-    var mousePos = this.getMousePosSnappedToGrid(mouse.x, mouse.y);
+    var mousePos = this.getMousePosSnappedToGrid();
     ctx.font = "bold 14px Arial";
     ctx.fillStyle = "#ccc";
     var mouseGamePos = unapplyCam(mousePos.x, mousePos.y);
     ctx.fillText(
-      toFixedPrecision(mouseGamePos.x) +
-        ", " +
-        toFixedPrecision(mouseGamePos.y),
+      mouseGamePos.x + ", " + mouseGamePos.y,
       mousePos.x + 20,
       mousePos.y - 20
     );
   };
 
   Grid.prototype.draw = function(ctx, camera, options) {
-    this.camera = camera;
+    var camera = this.camera;
 
     // update mouse precision for performance
     if (camera.zoomLevel <= 0.3) {
@@ -200,6 +233,9 @@ var Grid = (function() {
     // this._drawPrecisionArea(ctx, camera);
     !options.isGame && this._drawCursor(ctx, camera);
     !options.isGame && this._displayCoordinates(ctx, camera);
+    !options.isGame &&
+      options.shouldDisplayRulers &&
+      this._drawRulers(ctx, camera);
   };
 
   return Grid;

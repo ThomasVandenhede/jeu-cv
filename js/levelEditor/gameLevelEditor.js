@@ -23,7 +23,11 @@ var LevelEditor = (function() {
     this.toolbar.init(this);
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
-    this.grid = new Grid(this);
+    this.grid = new Grid({
+      camera: this.camera,
+      canvas: this.canvas,
+      mouse: this.mouse
+    });
 
     // contexts
     this.contexts = {};
