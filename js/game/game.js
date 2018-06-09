@@ -256,7 +256,7 @@ var Game = (function() {
   Game.prototype.showAboutMenu = function() {
     this.uiContainerEl.innerHTML = "";
     this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "CONTRÔLES"),
+      e("h2", null, "À PROPOS"),
       e("p", null, [
         e(
           "p",
