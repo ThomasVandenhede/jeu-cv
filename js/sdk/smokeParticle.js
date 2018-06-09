@@ -1,6 +1,6 @@
 var SmokeParticle = (function() {
-  function SmokeParticle(x, y, size, color, vx, vy, maxLife) {
-    Particle.call(this, x, y, size, color, vx, vy, maxLife);
+  function SmokeParticle(props) {
+    Particle.call(this, props);
 
     this.image = new Image();
     this.image.src = "./assets/images/smoke2.png";
