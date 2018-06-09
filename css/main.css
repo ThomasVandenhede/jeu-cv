@@ -85,6 +85,10 @@ canvas {
   text-decoration: none;
 }
 
+.controls-container {
+  padding: 1rem;
+}
+
 .controls {
   font-size: 1rem;
   font-weight: bold;
@@ -102,7 +106,7 @@ td {
 .kbd {
   border-radius: 0.2em;
   padding: 0.2em 0.4em;
-  border: 2px solid white;
+  border: 3px inset white;
   background-color: lightgrey;
 }
 

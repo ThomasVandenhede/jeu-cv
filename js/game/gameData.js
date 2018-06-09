@@ -92,7 +92,49 @@ var gameData = {
           props: { x: 500, y: -270, width: 80, height: 80 }
         }
       ],
-      ennemies: []
+      ennemies: [],
+      skills: [
+        {
+          type: "Skill",
+          props: {
+            x: 350,
+            y: -570,
+            width: 50,
+            height: 50,
+            src: "./assets/images/html-5-icon.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 500,
+            y: -600,
+            width: 50,
+            height: 50,
+            src: "./assets/images/css-3-icon.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 1000,
+            y: -600,
+            width: 50,
+            height: 50,
+            src: "./assets/images/jquery-logo.png"
+          }
+        },
+        {
+          type: "Skill",
+          props: {
+            x: 200,
+            y: 0,
+            width: 50,
+            height: 50,
+            src: "./assets/images/mongodb-logo.png"
+          }
+        }
+      ]
     },
     "level 1": {
       name: "level 1",

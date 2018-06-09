@@ -100,6 +100,22 @@ var Camera = (function() {
     }
   };
 
+  Camera.prototype.zoomIn = function() {
+    this.zoomLevel *= 1.1;
+    this.height = canvas.height / this.zoomLevel;
+    this.width = canvas.width / this.zoomLevel;
+    this.x = this.followed.center.x - this.width / 2;
+    this.y = this.followed.center.y - this.height / 2;
+  };
+
+  Camera.prototype.zoomOut = function() {
+    this.zoomLevel /= 1.1;
+    this.height = canvas.height / this.zoomLevel;
+    this.width = canvas.width / this.zoomLevel;
+    this.x = this.followed.center.x - this.width / 2;
+    this.y = this.followed.center.y - this.height / 2;
+  };
+
   Camera.prototype.apply = function(x, y) {
     var screenX, screenY;
     screenX = toFixedPrecision((x - this.x) * this.zoomLevel, 4);
