@@ -10,7 +10,12 @@ var LevelEditor = (function() {
         : true;
     this.canvas = document.getElementById("canvas");
     this.backgroundCanvas = document.getElementById("background");
-    this.camera = new Camera(this, -1000, -1000, 0.05);
+    this.camera = new Camera({
+      x: -1000,
+      y: -1000,
+      zoomLevel: 0.05,
+      worldRect: this.worldRect
+    });
     this.ctx = this.canvas.getContext("2d");
     this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
@@ -33,7 +38,7 @@ var LevelEditor = (function() {
     this.contexts = {};
 
     // initialize world size
-    worldRect = new AABB({ x: 0, y: 0, width: 10000, height: 10000 });
+    this.worldRect = new AABB({ x: 0, y: 0, width: 10000, height: 10000 });
 
     // initialize world objects
     this.gameObjects = [];
@@ -215,7 +220,6 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.renderScene = function(ctx, camera) {
-    var worldRect = window.worldRect;
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -316,9 +320,9 @@ var LevelEditor = (function() {
     ctx.beginPath();
     ctx.strokeRect.apply(
       ctx,
-      applyCamToArr(worldRect.x, worldRect.y).concat([
-        worldRect.width * camera.zoomLevel,
-        worldRect.height * camera.zoomLevel
+      applyCamToArr(this.worldRect.x, this.worldRect.y).concat([
+        this.worldRect.width * camera.zoomLevel,
+        this.worldRect.height * camera.zoomLevel
       ])
     );
     ctx.stroke();
@@ -355,10 +359,10 @@ var LevelEditor = (function() {
     this.data.worldRect = {
       type: "AABB",
       options: {
-        x: worldRect.x,
-        y: worldRect.y,
-        width: worldRect.width,
-        height: worldRect.height
+        x: this.worldRect.x,
+        y: this.worldRect.y,
+        width: this.worldRect.width,
+        height: this.worldRect.height
       }
     };
 

@@ -6,17 +6,18 @@ var Camera = (function() {
     BOTH: "both"
   };
 
-  function Camera(context, x, y, zoomLevel) {
-    this.context = context;
-
-    this.zoomLevel = zoomLevel || 1;
+  function Camera(props) {
+    this.zoomLevel = props.zoomLevel || 1;
     this.height = canvas.height / this.zoomLevel;
     this.width = canvas.width / this.zoomLevel;
+    this.worldRect = props.worldRect;
 
-    AABB.call(this, { x: x, y: y, width: canvas.width, height: canvas.height });
-
-    this.x = x || 0;
-    this.y = y || 0;
+    AABB.call(this, {
+      x: props.x,
+      y: props.y,
+      width: canvas.width,
+      height: canvas.height
+    });
 
     this.xDeadZone = canvas.width / 3; // min distance to horizontal borders
     this.yDeadZone = canvas.height / 3; // min distance to vertical borders
@@ -83,19 +84,19 @@ var Camera = (function() {
         y: this.y,
         width: this.width,
         height: this.height
-      }).within(worldRect)
+      }).within(this.worldRect)
     ) {
-      if (this.x < worldRect.left) {
-        this.x = worldRect.left;
+      if (this.x < this.worldRect.left) {
+        this.x = this.worldRect.left;
       }
-      if (this.y < worldRect.top) {
-        this.y = worldRect.top;
+      if (this.y < this.worldRect.top) {
+        this.y = this.worldRect.top;
       }
-      if (this.x + this.width > worldRect.right) {
-        this.x = worldRect.right - this.width;
+      if (this.x + this.width > this.worldRect.right) {
+        this.x = this.worldRect.right - this.width;
       }
-      if (this.y + this.height > worldRect.bottom) {
-        this.y = worldRect.bottom - this.height;
+      if (this.y + this.height > this.worldRect.bottom) {
+        this.y = this.worldRect.bottom - this.height;
       }
     }
   };

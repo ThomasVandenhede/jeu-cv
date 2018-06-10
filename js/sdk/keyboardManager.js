@@ -36,7 +36,9 @@ var keyboardManager = (function() {
         var code = event.code || event.keyCode;
         var mappings = event.code ? codeMappings : keyCodeMappings;
         if (mappings[code] && !this[mappings[code]]) {
-          event.preventDefault ? event.preventDefault() : (event.returnValue = false);;
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
           if (this[mappings[code]]) {
             this.keyRepeat[code] = true;
           }

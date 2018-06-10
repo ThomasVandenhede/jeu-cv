@@ -144,7 +144,7 @@ var Game = (function() {
     this.currentLevelName = "level 1";
 
     // camera
-    this.camera = new Camera(this);
+    this.camera = new Camera({ worldRect: this.worldRect });
 
     // grid
     this.grid = new Grid({
@@ -329,7 +329,7 @@ var Game = (function() {
   Game.prototype.buildGameLevel = function(levelName) {
     this.level = this.levelManager.buildLevel(levelName);
     if (this.level !== null) {
-      worldRect = this.level.worldRect;
+      this.worldRect = this.level.worldRect;
       this.player = this.level.player;
       this.platforms = this.level.platforms;
       this.ennemies = this.level.ennemies;
@@ -479,7 +479,7 @@ var Game = (function() {
     );
 
     // kill player if they move outside of the world boundaries
-    if (!player.isDead && !player.within(worldRect)) {
+    if (!player.isDead && !player.within(this.worldRect)) {
       player.die();
     }
     this.camera.update();
