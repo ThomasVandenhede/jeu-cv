@@ -15,24 +15,20 @@ var Grid = (function() {
 
   Grid.prototype.getMousePosSnappedToGrid = function(mouseX, mouseY) {
     var camera = this.camera;
-    var applyCam = camera.apply.bind(camera);
-    var unapplyCam = camera.unapply.bind(camera);
     var precisionGridSize = this.precisionGridSize;
-    var mouse = this.mouse;
 
-    var mouseGamePos = unapplyCam(mouse.x, mouse.y);
+    var mouseGamePos = camera.unapply(mouseX, mouseY);
     var snappedMouseGamePos = new Vector(
       Math.round(mouseGamePos.x / precisionGridSize) * precisionGridSize,
       Math.round(mouseGamePos.y / precisionGridSize) * precisionGridSize
     );
-    return applyCam(snappedMouseGamePos.x, snappedMouseGamePos.y);
+    return camera.apply(snappedMouseGamePos.x, snappedMouseGamePos.y);
   };
 
   Grid.prototype.getGameMousePosSnappedToGrid = function(mouseX, mouseY) {
     var camera = this.camera;
-    var unapplyCam = camera.unapply.bind(camera);
     var mousePosSnappedToGrid = this.getMousePosSnappedToGrid(mouseX, mouseY);
-    return unapplyCam(mousePosSnappedToGrid.x, mousePosSnappedToGrid.y);
+    return camera.unapply(mousePosSnappedToGrid.x, mousePosSnappedToGrid.y);
   };
 
   Grid.prototype._drawRulers = function(ctx, camera) {
@@ -159,11 +155,7 @@ var Grid = (function() {
   };
 
   Grid.prototype._drawPrecisionArea = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-    var unapplyCam = camera.unapply.bind(camera);
-    var mousePos = this.getMousePosSnappedToGrid();
+    var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
     var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
     var minX = mousePos.x - precisionAreaGameSize / 2;
@@ -186,7 +178,7 @@ var Grid = (function() {
   };
 
   Grid.prototype._drawCursor = function(ctx, camera) {
-    var mousePos = this.getMousePosSnappedToGrid();
+    var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     var cursorSize = this.cursorSize;
     ctx.strokeStyle = this.cursorColor;
     ctx.lineWidth = 2;
@@ -201,7 +193,7 @@ var Grid = (function() {
 
   Grid.prototype._displayCoordinates = function(ctx, camera) {
     var unapplyCam = camera.unapply.bind(camera);
-    var mousePos = this.getMousePosSnappedToGrid();
+    var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     ctx.font = "bold 14px Arial";
     ctx.fillStyle = "#ccc";
     var mouseGamePos = unapplyCam(mousePos.x, mousePos.y);

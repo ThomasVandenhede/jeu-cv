@@ -101,6 +101,7 @@ var contextManager = (function() {
 
   // SELECTION EVENT HANDLERS
   function handleMouseDown(e) {
+    console.log("HANDLE MOUSE DOWN");
     var camera = this.app.camera;
     var clickX = e.clientX + this.canvas.offsetLeft;
     var clickY = e.clientY + this.canvas.offsetTop;
@@ -140,7 +141,6 @@ var contextManager = (function() {
         this.clickedObject = clickedObject;
         this.selectedObjects = selectedObjects;
         this.selectedObjectsStart = selectedObjectsStart;
-        // console.log(this.selectedObjects);
         if (!selectedObjects.length) {
           this.selectionArea = new AABB({
             x: mouseGamePos.x,
@@ -201,27 +201,45 @@ var contextManager = (function() {
   }
 
   function handleMouseMove(e) {
-    var camera = this.app.camera;
-    var unapplyCam = camera.unapply.bind(camera);
-    var clickPos = this.app.grid.getMousePosSnappedToGrid.call(
-      this.app.grid,
+    // console.log("mouse pos: ", this.x, this.y);
+    // console.log("mouse click: ", this.clickX, this.clickY);
+    // var camera = this.app.camera;
+    var clickGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
       this.clickX,
       this.clickY
     );
-    var clickGamePos = unapplyCam(clickPos.x, clickPos.y);
-    var mousePos = this.app.grid.getMousePosSnappedToGrid.call(
-      this.app.grid,
+    console.log(
+      "​handleMouseMove -> clickGamePosSnappedToGrid",
+      clickGamePosSnappedToGrid
+    );
+    // var clickGamePos = camera.unapply(clickPos.x, clickPos.y);
+    var mouseGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
       this.x,
       this.y
     );
-    var mouseGamePos = unapplyCam(mousePos.x, mousePos.y);
-    var mouseGameDisplacement = Vector.subtract(mouseGamePos, clickGamePos);
+    // console.log(
+    //   "​handleMouseMove -> mouseGamePosSnappedToGrid",
+    //   mouseGamePosSnappedToGrid
+    // );
+    // var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
+    var mouseGameDisplacement = Vector.subtract(
+      mouseGamePosSnappedToGrid,
+      clickGamePosSnappedToGrid
+    );
+    console.log(
+      "​handleMouseMove -> mouseGameDisplacement",
+      mouseGameDisplacement
+    );
 
     // move camera when mouse wheel is held down
     if (this.buttons[0]) {
       if (this.selectionArea) {
         this.selectionArea.width = mouseGameDisplacement.x;
         this.selectionArea.height = mouseGameDisplacement.y;
+        console.log(
+          "​handleMouseMove -> this.selectionArea",
+          this.selectionArea
+        );
       } else {
         var selectedObjects = this.selectedObjects;
         for (var i = 0; i < selectedObjects.length; i++) {
@@ -452,6 +470,9 @@ var contextManager = (function() {
 
   Object.defineProperties(ContextManager.prototype, {
     context: {
+      get: function() {
+        return contextID;
+      },
       set: function(id) {
         if (id !== contextID) {
           this.unsetEventHandlersForContext(contextID);
