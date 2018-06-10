@@ -30,7 +30,8 @@ var mouse = (function() {
     });
 
     // EXTRACT THIS INTO A SEPARATE 'CONTEXT' CLASS
-    this.selectedObjects = [];
+    this.selectedObjects = []; // rename to "selection"
+    this.selection = [];
     this.selectionArea = null;
   }
 

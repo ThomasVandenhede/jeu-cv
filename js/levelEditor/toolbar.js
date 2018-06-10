@@ -38,9 +38,10 @@ var toolbarFactory = (function() {
     this.objectTypeDropDown.addEventListener(
       "change",
       function(e) {
-        var app = this.app;
         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+        var app = this.app;
         var objectType = this.getGameObjectType();
+        app.contextManager.context = 1;
         switch (objectType) {
           case "Player":
           case "Ennemy":

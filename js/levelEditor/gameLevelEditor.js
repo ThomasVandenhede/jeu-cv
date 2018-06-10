@@ -124,30 +124,33 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.getSelectionBoundingRect = function() {
+    var selectedObjects = this.mouse.selection.map(function(item) {
+      return item.object;
+    });
     var left = Math.min.apply(
       null,
-      this.mouse.selectedObjects.map(function(selectedObject) {
-        return selectedObject.getBoundingRect().left;
+      selectedObjects.map(function(obj) {
+        return obj.getBoundingRect().left;
       })
     );
     var top = Math.min.apply(
       null,
-      this.mouse.selectedObjects.map(function(selectedObject) {
-        return selectedObject.getBoundingRect().top;
+      selectedObjects.map(function(obj) {
+        return obj.getBoundingRect().top;
       })
     );
     var width =
       Math.max.apply(
         null,
-        this.mouse.selectedObjects.map(function(selectedObject) {
-          return selectedObject.getBoundingRect().right;
+        selectedObjects.map(function(obj) {
+          return obj.getBoundingRect().right;
         })
       ) - left;
     var height =
       Math.max.apply(
         null,
-        this.mouse.selectedObjects.map(function(selectedObject) {
-          return selectedObject.getBoundingRect().bottom;
+        selectedObjects.map(function(obj) {
+          return obj.getBoundingRect().bottom;
         })
       ) - top;
     return new AABB({ x: left, y: top, width: width, height: height });
@@ -158,7 +161,9 @@ var LevelEditor = (function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
     var applyCam = camera.apply.bind(camera);
-    var selectedObjects = this.mouse.selectedObjects;
+    var selectedObjects = this.mouse.selection.map(function(item) {
+      return item.object;
+    });
 
     if (!selectedObjects || selectedObjects.length === 0) return;
 
@@ -201,9 +206,10 @@ var LevelEditor = (function() {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
-    var selectedObjects = this.mouse.selectedObjects;
 
-    if (!selectedObjects || selectedObjects.length === 0) return;
+    if (!this.mouse.selection.length) {
+      return;
+    }
 
     var selectionRectangle = this.getSelectionBoundingRect();
 

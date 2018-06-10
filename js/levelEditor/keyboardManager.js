@@ -44,27 +44,38 @@ var keyboardManager = (function() {
 
         switch (event.keyCode) {
           case 46: // Delete
-            var selectedObjects = this.app.mouse.selectedObjects;
-            console.log(selectedObjects);
-            if (selectedObjects && selectedObjects.length) {
-              while (selectedObjects[0]) {
-                var selectedObject = selectedObjects[0];
+            if (this.app.mouse.selection.length) {
+              while (this.app.mouse.selection[0]) {
+                var selectedObject = this.app.mouse.selection[0].object;
                 var gameObjectIndex = this.app.gameObjects.indexOf(
                   selectedObject
                 );
                 gameObjectIndex >= 0 &&
                   this.app.gameObjects.splice(gameObjectIndex, 1);
-                this.app.mouse.selectedObjects.shift();
+                this.app.mouse.selection.shift();
               }
             }
             break;
           case 27: // Escape
-            this.app.mouse.selectedObjects = [];
+            this.app.mouse.selection = [];
             break;
           case 65: // A key
             event.preventDefault();
+            this.app.contextManager.context = 0; // switch to selection context
             if (event.ctrlKey) {
-              this.app.mouse.selectedObjects = this.app.gameObjects;
+              this.app.mouse.selection = this.app.gameObjects.map(function(
+                obj
+              ) {
+                return {
+                  object: obj,
+                  startingRect: new AABB({
+                    x: obj.x,
+                    y: obj.y,
+                    width: obj.width,
+                    height: obj.height
+                  })
+                };
+              });
             }
             break;
           default:

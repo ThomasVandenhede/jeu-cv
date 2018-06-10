@@ -113,13 +113,12 @@ var contextManager = (function() {
     var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
     var gameObjects = this.app.gameObjects;
     var clickedObject = null;
-    var selectedObjects = [];
-    var selectedObjectsStart = [];
+    var newSelection = [];
 
     switch (e.button) {
       case 0:
         // Did the player click a resize handle?
-        if (this.selectedObjects) {
+        if (this.selection) {
           var selectionRectangle = this.app.getSelectionBoundingRect();
           var resizeHandlePos = camera.apply(
             selectionRectangle.right,
@@ -133,22 +132,10 @@ var contextManager = (function() {
           });
           if (resizeHandleRectangle.contains(this.clickX, this.clickY)) {
             this.resizeHandleClicked = true;
-            this.startingDimensions = this.selectedObjects.map(function(
-              selectedObject
-            ) {
-              return {
-                width: selectedObject.width,
-                height: selectedObject.height
-              };
-            });
-            console.log(
-              "​handleMouseDown -> this.startingDimensions",
-              this.startingDimensions
-            );
+            return;
           } else {
             this.resizeHandleClicked = false;
           }
-          return;
         }
 
         // find the most recently added game object the click was inside of
@@ -157,24 +144,34 @@ var contextManager = (function() {
           // if some game object is clicked and object doesn't belong to selection
           if (gameObject.contains(mouseGamePos.x, mouseGamePos.y)) {
             clickedObject = gameObject;
-            selectedObjects = [clickedObject];
-            selectedObjectsStart = [new Vector(gameObject.x, gameObject.y)]; // store starting position in order to move the object with the mouse
+            newSelection = [
+              {
+                object: clickedObject,
+                startingRect: new AABB({
+                  x: gameObject.x,
+                  y: gameObject.y,
+                  width: gameObject.width,
+                  height: gameObject.height
+                })
+              }
+            ];
           }
         }
 
         // check if selected object already belongs to a previous selection
+        var selectionObjects = this.selection.map(function(item) {
+          return item.object;
+        });
         if (
-          this.selectedObjects &&
-          this.selectedObjects.includes(selectedObjects[0])
+          newSelection.length &&
+          selectionObjects.includes(newSelection[0].object)
         ) {
-          selectedObjects = this.selectedObjects;
-          selectedObjectsStart = this.selectedObjectsStart;
+          newSelection = this.selection;
         }
 
         this.clickedObject = clickedObject;
-        this.selectedObjects = selectedObjects;
-        this.selectedObjectsStart = selectedObjectsStart;
-        if (!selectedObjects.length) {
+        this.selection = newSelection;
+        if (!this.selection.length) {
           this.selectionArea = new AABB({
             x: mouseGamePos.x,
             y: mouseGamePos.y
@@ -195,39 +192,61 @@ var contextManager = (function() {
     this.buttons[e.button] = false;
     switch (e.button) {
       case 0:
-        // selection resize handle mouse up
+        // selection resize handle is selected
         if (this.resizeHandleClicked) {
           this.resizeHandleClicked = false;
+          this.selection.forEach(function(item) {
+            item.startingRect.width = item.object.width;
+            item.startingRect.height = item.object.height;
+          });
           return;
         }
 
-        // left mouse button
-        var gameObjects = this.app.gameObjects;
-        if (this.selectedObjects && this.selectedObjects.length) {
-          // update starting positions
-          this.selectedObjectsStart = this.selectedObjects.map(function(obj) {
-            return new Vector(obj.x, obj.y);
-          });
-
-          // If click and release at the same spot, select the most recently added game object the click was inside of
+        if (this.selection.length) {
           if (releaseX === this.clickX && releaseY === this.clickY) {
-            this.selectedObjects = [this.clickedObject];
-            this.selectedObjectsStart = [
-              new Vector(this.clickedObject.x, this.clickedObject.y)
+            // If click and release at the same spot, select the most recently added game object the click was inside of
+            console.log("CLICK AND RELEASE AT THE SAME SPOT");
+            var obj = this.clickedObject;
+            this.selection = [
+              {
+                object: obj,
+                startingRect: new AABB({
+                  x: obj.x,
+                  y: obj.y,
+                  width: obj.width,
+                  height: obj.height
+                })
+              }
             ];
+          } else {
+            // update starting positions
+            this.selection.forEach(function(item) {
+              item.startingRect = new AABB({
+                x: item.object.x,
+                y: item.object.y,
+                width: item.object.width,
+                height: item.object.height
+              });
+            });
           }
         } else {
-          this.selectedObjects = [];
-          this.selectedObjectsStart = [];
-          for (var i = 0; i < gameObjects.length; i++) {
-            var gameObject = gameObjects[i];
-            if (gameObject.overlaps(this.selectionArea)) {
-              this.selectedObjects.push(gameObject);
-              this.selectedObjectsStart.push(
-                new Vector(gameObject.x, gameObject.y)
-              );
-            }
-          }
+          // which objects are in the selection area?
+          this.selection = [];
+          this.app.gameObjects.forEach(
+            function(obj) {
+              if (obj.overlaps(this.selectionArea)) {
+                this.selection.push({
+                  object: obj,
+                  startingRect: new AABB({
+                    x: obj.x,
+                    y: obj.y,
+                    width: obj.width,
+                    height: obj.height
+                  })
+                });
+              }
+            }.bind(this)
+          );
           delete this.selectionArea;
         }
         break;
@@ -253,17 +272,14 @@ var contextManager = (function() {
       clickGamePosSnappedToGrid
     );
 
-    // move camera when mouse wheel is held down
     if (this.buttons[0]) {
+      // resize selection objects if resize handle was clicked
       if (this.resizeHandleClicked) {
-        this.selectedObjects.forEach(
-          function(selectedObject, index) {
-            selectedObject.width =
-              this.startingDimensions[index].width + mouseGameDisplacement.x;
-            selectedObject.height =
-              this.startingDimensions[index].height + mouseGameDisplacement.y;
-          }.bind(this)
-        );
+        this.selection.forEach(function(item) {
+          item.object.width = item.startingRect.width + mouseGameDisplacement.x;
+          item.object.height =
+            item.startingRect.height + mouseGameDisplacement.y;
+        });
         return;
       }
 
@@ -271,25 +287,25 @@ var contextManager = (function() {
         this.selectionArea.width = mouseGameDisplacement.x;
         this.selectionArea.height = mouseGameDisplacement.y;
       } else {
-        var selectedObjects = this.selectedObjects;
-        for (var i = 0; i < selectedObjects.length; i++) {
-          var selectedObject = selectedObjects[i];
-          selectedObject.x =
-            this.selectedObjectsStart[i].x + mouseGameDisplacement.x;
-          selectedObject.y =
-            this.selectedObjectsStart[i].y + mouseGameDisplacement.y;
+        var selection = this.selection;
+        selection.forEach(
+          function(item) {
+            item.object.x = item.startingRect.x + mouseGameDisplacement.x;
+            item.object.y = item.startingRect.y + mouseGameDisplacement.y;
 
-          if (selectedObject.constructor.name === "MovingPlatform") {
-            selectedObject.xStart =
-              this.selectedObjectsStart[i].x + mouseGameDisplacement.x;
-            selectedObject.yStart =
-              this.selectedObjectsStart[i].y + mouseGameDisplacement.y;
-            selectedObject.xEnd =
-              this.selectedObjectsStart[i].xEnd + mouseGameDisplacement.x;
-            selectedObject.yEnd =
-              this.selectedObjectsStart[i].yEnd + mouseGameDisplacement.y;
-          }
-        }
+            // special case for Moving Platform
+            if (item.object.constructor.name === "MovingPlatform") {
+              selectedObject.xStart =
+                this.selectedObjectsStart[i].x + mouseGameDisplacement.x;
+              selectedObject.yStart =
+                this.selectedObjectsStart[i].y + mouseGameDisplacement.y;
+              selectedObject.xEnd =
+                this.selectedObjectsStart[i].xEnd + mouseGameDisplacement.x;
+              selectedObject.yEnd =
+                this.selectedObjectsStart[i].yEnd + mouseGameDisplacement.y;
+            }
+          }.bind(this)
+        );
       }
     }
     if (this.buttons[2]) {
