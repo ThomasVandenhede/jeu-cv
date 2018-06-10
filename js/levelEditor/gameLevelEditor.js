@@ -358,7 +358,7 @@ var LevelEditor = (function() {
     // worldRect
     this.data.worldRect = {
       type: "AABB",
-      options: {
+      props: {
         x: this.worldRect.x,
         y: this.worldRect.y,
         width: this.worldRect.width,
@@ -377,7 +377,7 @@ var LevelEditor = (function() {
     this.data.player = player
       ? {
           type: "Player",
-          options: {
+          props: {
             x: player.x,
             y: player.y,
             color: player.color
@@ -388,7 +388,6 @@ var LevelEditor = (function() {
     // platforms
     this.data.platforms = [];
     var platforms = gameObjects.filter(function(gameObject) {
-      console.log(gameObject.constructor.name);
       return (
         gameObject.constructor.name === "Platform" ||
         gameObject.constructor.name === "MovingPlatform"
@@ -399,20 +398,20 @@ var LevelEditor = (function() {
         var constructorName = gameObject.constructor.name;
         var platformData = {
           type: constructorName,
-          options: {
+          props: {
             width: gameObject.width,
             height: gameObject.height
           }
         };
         if (constructorName === "Platform") {
-          platformData.options.x = gameObject.x;
-          platformData.options.y = gameObject.y;
+          platformData.props.x = gameObject.x;
+          platformData.props.y = gameObject.y;
         }
         if (constructorName === "MovingPlatform") {
-          platformData.options.xStart = gameObject.xStart;
-          platformData.options.yStart = gameObject.yStart;
-          platformData.options.xEnd = gameObject.xEnd;
-          platformData.options.yEnd = gameObject.yEnd;
+          platformData.props.xStart = gameObject.xStart;
+          platformData.props.yStart = gameObject.yStart;
+          platformData.props.xEnd = gameObject.xEnd;
+          platformData.props.yEnd = gameObject.yEnd;
         }
         this.data.platforms.push(platformData);
       }.bind(this)
@@ -427,8 +426,10 @@ var LevelEditor = (function() {
       function(ennemy) {
         var ennemyData = {
           type: "Ennemy",
-          x: ennemy.x,
-          y: ennemy.y
+          props: {
+            x: ennemy.x,
+            y: ennemy.y
+          }
         };
         this.data.ennemies.push(ennemyData);
       }.bind(this)
@@ -443,8 +444,10 @@ var LevelEditor = (function() {
       function(skill) {
         var skillData = {
           type: "Skill",
-          x: skill.x,
-          y: skill.y
+          props: {
+            x: skill.x,
+            y: skill.y
+          }
         };
         this.data.skills.push(skillData);
       }.bind(this)
