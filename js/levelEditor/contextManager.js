@@ -101,7 +101,6 @@ var contextManager = (function() {
 
   // SELECTION EVENT HANDLERS
   function handleMouseDown(e) {
-    console.log("HANDLE MOUSE DOWN");
     var camera = this.app.camera;
     var clickX = e.clientX + this.canvas.offsetLeft;
     var clickY = e.clientY + this.canvas.offsetTop;
@@ -201,34 +200,17 @@ var contextManager = (function() {
   }
 
   function handleMouseMove(e) {
-    // console.log("mouse pos: ", this.x, this.y);
-    // console.log("mouse click: ", this.clickX, this.clickY);
-    // var camera = this.app.camera;
     var clickGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
       this.clickX,
       this.clickY
     );
-    console.log(
-      "​handleMouseMove -> clickGamePosSnappedToGrid",
-      clickGamePosSnappedToGrid
-    );
-    // var clickGamePos = camera.unapply(clickPos.x, clickPos.y);
     var mouseGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
       this.x,
       this.y
     );
-    // console.log(
-    //   "​handleMouseMove -> mouseGamePosSnappedToGrid",
-    //   mouseGamePosSnappedToGrid
-    // );
-    // var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
     var mouseGameDisplacement = Vector.subtract(
       mouseGamePosSnappedToGrid,
       clickGamePosSnappedToGrid
-    );
-    console.log(
-      "​handleMouseMove -> mouseGameDisplacement",
-      mouseGameDisplacement
     );
 
     // move camera when mouse wheel is held down
@@ -236,10 +218,6 @@ var contextManager = (function() {
       if (this.selectionArea) {
         this.selectionArea.width = mouseGameDisplacement.x;
         this.selectionArea.height = mouseGameDisplacement.y;
-        console.log(
-          "​handleMouseMove -> this.selectionArea",
-          this.selectionArea
-        );
       } else {
         var selectedObjects = this.selectedObjects;
         for (var i = 0; i < selectedObjects.length; i++) {
@@ -309,17 +287,12 @@ var contextManager = (function() {
           i++
         ) {
           var name = Object.getOwnPropertyNames(gameObject)[i];
-          console.log(name, gameObject[name]);
         }
         this.app.gameObjects.push(gameObject);
         switch (Constructor.name) {
           case "Platform":
           case "MovingPlatform":
             this.currentObject = gameObject;
-            console.log(
-              "​contextManager -> this.currentObject",
-              this.currentObject
-            );
             break;
           default:
             this.currentObject = null;
@@ -391,7 +364,6 @@ var contextManager = (function() {
 
     // move camera when mouse wheel is held down
     if (this.buttons[0]) {
-      console.log(this.currentObject);
       if (this.currentObject) {
         this.currentObject.width = Math.max(0, mouseGameDisplacement.x);
         this.currentObject.height = Math.max(0, mouseGameDisplacement.y);

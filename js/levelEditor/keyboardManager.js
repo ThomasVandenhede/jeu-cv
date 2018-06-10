@@ -45,6 +45,7 @@ var keyboardManager = (function() {
         switch (event.keyCode) {
           case 46: // Delete
             var selectedObjects = this.app.mouse.selectedObjects;
+            console.log(selectedObjects);
             if (selectedObjects && selectedObjects.length) {
               while (selectedObjects[0]) {
                 var selectedObject = selectedObjects[0];
@@ -53,8 +54,8 @@ var keyboardManager = (function() {
                 );
                 gameObjectIndex >= 0 &&
                   this.app.gameObjects.splice(gameObjectIndex, 1);
+                this.app.mouse.selectedObjects.shift();
               }
-              this.app.mouse.selectedObjects.shift();
             }
             break;
           case 27: // Escape
