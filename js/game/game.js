@@ -5,8 +5,8 @@ var Game = (function() {
     PAUSED: "paused",
     RUNNING: "running",
     INTRO: "intro",
-    GAME_OVER: "",
-    VICTORY: "",
+    GAME_OVER: "game over",
+    VICTORY: "victory",
     EXIT: 0
   };
 
@@ -106,7 +106,7 @@ var Game = (function() {
       e(
         "a",
         { href: "./level-editor.html", class: "game-menu__link" },
-        "ALLER À L'ÉDITEUR"
+        "OUVRIR L'ÉDITEUR"
       )
     );
     this.aboutButton = e(
@@ -166,6 +166,8 @@ var Game = (function() {
       e("h2", null, "PERDU !"),
       e("ul", { class: "game-menu__list" }, [
         this.restartButton,
+        this.loadButton,
+        this.editorButton,
         this.exitButton
       ])
     ]);
@@ -183,6 +185,8 @@ var Game = (function() {
       ]),
       e("ul", { class: "game-menu__list" }, [
         this.restartButton,
+        this.loadButton,
+        this.editorButton,
         this.exitButton
       ])
     ]);
@@ -257,6 +261,9 @@ var Game = (function() {
                     "game.currentLevelName = '" +
                     gameData.levels[key].name +
                     "';" +
+                    "game.state = '" +
+                    states.PAUSED +
+                    "';" +
                     "game.startGame();"
                   // "game.buildGameLevel(game.currentLevelName);" +
                   // "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10, " +
@@ -302,7 +309,9 @@ var Game = (function() {
     };
     this.handleBackButtonClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-      this.showPauseMenu();
+      this.state === states.PAUSED && this.showPauseMenu();
+      this.state === states.VICTORY && this.showVictoryMenu();
+      this.state === states.GAME_OVER && this.showGameOverMenu();
     };
     this.handleLoadMenuClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
@@ -596,10 +605,12 @@ var Game = (function() {
   };
 
   Game.prototype.pause = function() {
-    !this.gameMenuEl && this.showPauseMenu();
-    this.timer.pause();
-    this.soundManager.pauseAll();
-    this.state = states.PAUSED;
+    if (this.state !== states.GAME_OVER && this.state !== states.VICTORY) {
+      !this.gameMenuEl && this.showPauseMenu();
+      this.timer.pause();
+      this.soundManager.pauseAll();
+      this.state = states.PAUSED;
+    }
   };
 
   Game.prototype.unpause = function() {
@@ -813,10 +824,9 @@ var Game = (function() {
 
   Game.prototype.restartGame = function() {
     this.ghostIndex = 0;
-    this.closeGameMenu();
     cancelAnimationFrame(this.rAF);
+    this.closeGameMenu();
     this.unpause();
-    // this.init();
     this.startGame();
   };
 
