@@ -17,11 +17,12 @@ body {
 }
 
 .page {
-  padding: 4rem 0;
+  padding: 4rem 1rem;
+  max-width: 800px;
+  margin: auto;
 }
 
 .game-intro {
-  width: 800px;
   max-width: 100vw;
   margin: auto;
 }
