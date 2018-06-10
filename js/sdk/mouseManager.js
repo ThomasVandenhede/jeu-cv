@@ -26,8 +26,12 @@ var mouse = (function() {
     this.eventListeners = {};
 
     this.canvas.addEventListener("contextmenu", function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
     });
+
+    // EXTRACT THIS INTO A SEPARATE 'CONTEXT' CLASS
+    this.selectedObjects = [];
+    this.selectionArea = null;
   }
 
   Mouse.prototype.init = function(app) {

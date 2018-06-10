@@ -118,6 +118,39 @@ var contextManager = (function() {
 
     switch (e.button) {
       case 0:
+        // Did the player click a resize handle?
+        if (this.selectedObjects) {
+          var selectionRectangle = this.app.getSelectionBoundingRect();
+          var resizeHandlePos = camera.apply(
+            selectionRectangle.right,
+            selectionRectangle.bottom
+          );
+          var resizeHandleRectangle = new AABB({
+            x: resizeHandlePos.x,
+            y: resizeHandlePos.y,
+            width: 20,
+            height: 20
+          });
+          if (resizeHandleRectangle.contains(this.clickX, this.clickY)) {
+            this.resizeHandleClicked = true;
+            this.startingDimensions = this.selectedObjects.map(function(
+              selectedObject
+            ) {
+              return {
+                width: selectedObject.width,
+                height: selectedObject.height
+              };
+            });
+            console.log(
+              "​handleMouseDown -> this.startingDimensions",
+              this.startingDimensions
+            );
+          } else {
+            this.resizeHandleClicked = false;
+          }
+          return;
+        }
+
         // find the most recently added game object the click was inside of
         for (var i = 0; i < gameObjects.length; i++) {
           var gameObject = gameObjects[i];
@@ -128,7 +161,8 @@ var contextManager = (function() {
             selectedObjectsStart = [new Vector(gameObject.x, gameObject.y)]; // store starting position in order to move the object with the mouse
           }
         }
-        // check if selected object already belongs to a selection
+
+        // check if selected object already belongs to a previous selection
         if (
           this.selectedObjects &&
           this.selectedObjects.includes(selectedObjects[0])
@@ -161,6 +195,12 @@ var contextManager = (function() {
     this.buttons[e.button] = false;
     switch (e.button) {
       case 0:
+        // selection resize handle mouse up
+        if (this.resizeHandleClicked) {
+          this.resizeHandleClicked = false;
+          return;
+        }
+
         // left mouse button
         var gameObjects = this.app.gameObjects;
         if (this.selectedObjects && this.selectedObjects.length) {
@@ -215,6 +255,18 @@ var contextManager = (function() {
 
     // move camera when mouse wheel is held down
     if (this.buttons[0]) {
+      if (this.resizeHandleClicked) {
+        this.selectedObjects.forEach(
+          function(selectedObject, index) {
+            selectedObject.width =
+              this.startingDimensions[index].width + mouseGameDisplacement.x;
+            selectedObject.height =
+              this.startingDimensions[index].height + mouseGameDisplacement.y;
+          }.bind(this)
+        );
+        return;
+      }
+
       if (this.selectionArea) {
         this.selectionArea.width = mouseGameDisplacement.x;
         this.selectionArea.height = mouseGameDisplacement.y;
@@ -329,6 +381,7 @@ var contextManager = (function() {
       case 0:
         // left mouse button
         this.canvas.style.cursor = "";
+        this.resizeHandleClicked = false;
         // this.grabbed = null;
         break;
       case 1:
