@@ -127,7 +127,7 @@ var Game = (function() {
 
     // // display pause menu
     // this.showPauseMenu();
-    // this.uiContainerEl.append(this.gameMenuEl);
+    // this.uiContainerEl.appendChild(this.gameMenuEl);
 
     // attach event handlers for game menu
     this.attachEventHandlers();
@@ -199,7 +199,7 @@ var Game = (function() {
 
   // Build different game menus
   Game.prototype.showGameOverMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    this.closeGameMenu();
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "PERDU !"),
       e("ul", { class: "game-menu__list" }, [
@@ -207,11 +207,11 @@ var Game = (function() {
         this.exitButton
       ])
     ]);
-    this.uiContainerEl.append(this.gameMenuEl);
+    this.uiContainerEl.appendChild(this.gameMenuEl);
   };
 
   Game.prototype.showVictoryMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    this.closeGameMenu();
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "VICTOIRE !"),
       e("p", null, [
@@ -224,11 +224,11 @@ var Game = (function() {
         this.exitButton
       ])
     ]);
-    this.uiContainerEl.append(this.gameMenuEl);
+    this.uiContainerEl.appendChild(this.gameMenuEl);
   };
 
   Game.prototype.showPauseMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    this.closeGameMenu();
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "JEU EN PAUSE"),
       e("ul", { class: "game-menu__list" }, [
@@ -241,20 +241,20 @@ var Game = (function() {
         this.exitButton
       ])
     ]);
-    this.uiContainerEl.append(this.gameMenuEl);
+    this.uiContainerEl.appendChild(this.gameMenuEl);
   };
 
   Game.prototype.showControlsMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    this.closeGameMenu();
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "CONTRÔLES"),
       e("ul", { class: "game-menu__list" }, [this.controlsEl, this.backButton])
     ]);
-    this.uiContainerEl.append(this.gameMenuEl);
+    this.uiContainerEl.appendChild(this.gameMenuEl);
   };
 
   Game.prototype.showAboutMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    this.closeGameMenu();
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "À PROPOS"),
       e("p", null, [
@@ -271,11 +271,11 @@ var Game = (function() {
       ]),
       e("ul", { class: "game-menu__list" }, [this.backButton])
     ]);
-    this.uiContainerEl.append(this.gameMenuEl);
+    this.uiContainerEl.appendChild(this.gameMenuEl);
   };
 
   Game.prototype.showLoadMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    this.closeGameMenu();
     this.gameMenuEl = e("div", { class: "game-menu" }, [
       e("h2", null, "CHARGER UN NIVEAU"),
       e(
@@ -291,7 +291,7 @@ var Game = (function() {
                 {
                   href: "",
                   onclick:
-                    "event.preventDefault();" +
+                    "event.preventDefault ? event.preventDefault() : (event.returnValue = false);;" +
                     "game.buildGameLevel('" +
                     gameData.levels[key].name +
                     "');" +
@@ -305,42 +305,42 @@ var Game = (function() {
       ),
       e("ul", { class: "game-menu__list" }, [this.backButton])
     ]);
-    this.uiContainerEl.append(this.gameMenuEl);
+    this.uiContainerEl.appendChild(this.gameMenuEl);
   };
 
   Game.prototype.attachEventHandlers = function() {
     this.handleMenuResumeClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.unpause();
     };
     this.handleMenuLevelClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
     };
     this.handleMenuAboutClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
     };
     this.handleMenuExitClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.exit();
     };
     this.handleRestartClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.restartGame();
     };
     this.handleControlsButtonClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.showControlsMenu();
     };
     this.handleAboutButtonClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.showAboutMenu();
     };
     this.handleBackButtonClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.showPauseMenu();
     };
     this.handleLoadMenuClick = function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
       this.showLoadMenu();
     };
     this.resumeButton.onclick = this.handleMenuResumeClick.bind(this);
@@ -382,7 +382,11 @@ var Game = (function() {
   };
 
   Game.prototype.closeGameMenu = function() {
-    this.uiContainerEl.innerHTML = "";
+    var el = this.gameMenuEl;
+    if (el) {
+      emptyElement(this.gameMenuEl);
+      this.uiContainerEl.removeChild(this.gameMenuEl)
+    }
     this.gameMenuEl = null;
   };
 

@@ -27,15 +27,30 @@ var incrementID = (function() {
 
 function e(type, props, children) {
   var el = document.createElement(type);
+  var nodes, node;
   for (var key in props) {
     el.setAttribute(key, props[key]);
   }
   if (Array.isArray(children)) {
-    for (var i = 0; i < children.length; i++) {
-      el.append(children[i]);
-    }
+    nodes = children;
   } else {
-    el.append(children);
+    nodes = [children];
   }
+  // console.log(nodes)
+  for (var i = 0; i < nodes.length; i++) {
+    if (typeof nodes[i] === "string") {
+      node = document.createTextNode(nodes[i])
+    } else {
+      node = nodes[i];
+    }
+    el.appendChild(node);
+  }
+  console.log(el)
   return el;
+}
+
+function emptyElement(el) {
+  while (el.firstChild) {
+    el.removeChild(el.firstChild);
+  }
 }

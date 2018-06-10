@@ -13,7 +13,7 @@ var toolbarFactory = (function() {
       "click",
       function(e) {
         var app = this.app;
-        e.preventDefault();
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
         app.contextManager.context = 0;
       }.bind(this)
     );
@@ -21,7 +21,7 @@ var toolbarFactory = (function() {
       "click",
       function(e) {
         var app = this.app;
-        e.preventDefault();
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
         app.contextManager.context = 1;
       }.bind(this)
     );
@@ -29,7 +29,7 @@ var toolbarFactory = (function() {
       "click",
       function(e) {
         var app = this.app;
-        e.preventDefault();
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
         app.saveToLocalStorage();
       }.bind(this)
     );
@@ -38,7 +38,7 @@ var toolbarFactory = (function() {
       "change",
       function(e) {
         var app = this.app;
-        e.preventDefault();
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
         var objectType = this.getGameObjectType();
         switch (objectType) {
           case "Player":

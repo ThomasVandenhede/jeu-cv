@@ -26,7 +26,7 @@ var mouse = (function() {
     this.grabbedStartingY;
 
     this.canvas.addEventListener("contextmenu", function(e) {
-      e.preventDefault();
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
     });
   }
 
