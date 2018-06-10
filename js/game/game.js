@@ -142,60 +142,22 @@ var Game = (function() {
     this.levelManager = levelManager.getInstance();
     this.levelManager.init(this);
 
-    // load local storage data
-    this.loadGameDataFromLocalStorage();
-    this.buildGameLevel("level 1");
-
-    // player ghost
-    this.ghostIndex = 0;
-    this.ghostPositions =
-      Array.isArray(this.ghostPositionsTemp) &&
-      this.ghostPositionsTemp.length !== 0
-        ? this.ghostPositionsTemp.slice(0)
-        : [];
-    this.ghostPositionsTemp = [];
-
-    // temporary objects
-    this.lasers = [];
-    this.particles = [];
-
-    // game objects
-    this.buildGameObjects();
-
-    // background
-    this.canvas.style.backgroundImage =
-      "url('./assets/images/background_2000_stars.png')";
-    this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
-
     // camera
     this.camera = new Camera(this);
-    this.camera.follow(
-      this.player,
-      (this.canvas.width - this.player.width) / 2 - 10,
-      (this.canvas.height - this.player.height) / 2 - 10
-    );
 
-    // UI
-    this.timer = new GameTimer({
-      x: canvas.width - 170,
-      y: 35,
-      width: 80,
-      height: 30,
-      countDownStart: 0.5 * 60 * 1000
-    });
-    this.lifeBar = new LifeBar({
-      x: 60,
-      y: 40,
-      width: 200,
-      height: 15,
-      gameObject: this.player
-    });
+    // grid
     this.grid = new Grid({
       canvas: this.canvas,
       camera: this.camera,
       mouse: this.mouse
     });
   };
+
+  Game.prototype.setBackground = function(path) {
+    this.canvas.style.backgroundImage =
+      "url(" + path + ")";
+    this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
+  }
 
   // Build different game menus
   Game.prototype.showGameOverMenu = function() {
@@ -847,12 +809,55 @@ var Game = (function() {
     this.closeGameMenu();
     cancelAnimationFrame(this.rAF);
     this.unpause();
-    this.init();
+    // this.init();
     this.startGame();
   };
 
   Game.prototype.startGame = function() {
     // game state
+    this.loadGameDataFromLocalStorage();
+    this.buildGameLevel("level 1");
+
+    // player ghost
+    this.ghostIndex = 0;
+    this.ghostPositions =
+      Array.isArray(this.ghostPositionsTemp) &&
+      this.ghostPositionsTemp.length !== 0
+        ? this.ghostPositionsTemp.slice(0)
+        : [];
+    this.ghostPositionsTemp = [];
+
+    // temporary objects
+    this.lasers = [];
+    this.particles = [];
+
+    // game objects
+    this.buildGameObjects();
+
+    // background
+    this.setBackground('./assets/images/background_2000_stars.png')
+
+    this.camera.follow(
+      this.player,
+      (this.canvas.width - this.player.width) / 2 - 10,
+      (this.canvas.height - this.player.height) / 2 - 10
+    );
+
+    // UI
+    this.timer = new GameTimer({
+      x: canvas.width - 170,
+      y: 35,
+      width: 80,
+      height: 30,
+      countDownStart: 0.5 * 60 * 1000
+    });
+    this.lifeBar = new LifeBar({
+      x: 60,
+      y: 40,
+      width: 200,
+      height: 15,
+      gameObject: this.player
+    });
     requestAnimationFrame(this.pauseMenuLoop.bind(this));
   };
 
