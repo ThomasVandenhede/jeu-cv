@@ -990,6 +990,7 @@ var Game = (function() {
   Game.prototype.pauseMenuLoop = function() {
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
+    this.camera.update(); // continue updating camera in case browser window is resized
     this.renderScene(this.ctx, this.camera);
 
     switch (this.state) {
