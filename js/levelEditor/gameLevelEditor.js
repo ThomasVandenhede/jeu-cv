@@ -201,7 +201,6 @@ var LevelEditor = (function() {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
-    var applyCam = camera.apply.bind(camera);
     var selectedObjects = this.mouse.selectedObjects;
 
     if (!selectedObjects || selectedObjects.length === 0) return;
@@ -223,6 +222,9 @@ var LevelEditor = (function() {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
+
+    // optimize rendering by only drawing objects that are on screen
+    this.drawGrid(ctx, camera);
 
     // draw game objects
     this.gameObjects.forEach(function(gameObject) {
@@ -305,9 +307,6 @@ var LevelEditor = (function() {
         ctx.restore();
       }
     });
-
-    // optimize rendering by only drawing objects that are on screen
-    this.drawGrid(ctx, camera);
 
     // draw selection rectangle
     this.drawSelectionRectangle(ctx, camera);
