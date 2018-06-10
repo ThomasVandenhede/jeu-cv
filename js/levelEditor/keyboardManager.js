@@ -43,30 +43,28 @@ var keyboardManager = (function() {
         }
 
         switch (event.keyCode) {
-          case 46:
+          case 46: // Delete
             var selectedObjects = this.app.mouse.selectedObjects;
             if (selectedObjects && selectedObjects.length) {
-              selectedObjects.forEach(
-                function(selectedObject, index) {
-                  var gameObjectIndex = this.app.gameObjects.indexOf(
-                    selectedObject
-                  );
-                  if (gameObjectIndex >= 0) {
-                    this.app.gameObjects.splice(gameObjectIndex, 1);
-                  }
-                }.bind(this)
-              );
-              this.app.mouse.selectedObjects = [];
+              while (selectedObjects[0]) {
+                var selectedObject = selectedObjects[0];
+                var gameObjectIndex = this.app.gameObjects.indexOf(
+                  selectedObject
+                );
+                gameObjectIndex >= 0 &&
+                  this.app.gameObjects.splice(gameObjectIndex, 1);
+              }
+              this.app.mouse.selectedObjects.shift();
             }
             break;
-          case 27:
+          case 27: // Escape
             this.app.mouse.selectedObjects = [];
             break;
-          case 71:
-            this.app.player.reverseGravity();
-            break;
-          case 72:
-            this.app.player.zeroGravity();
+          case 65: // A key
+            event.preventDefault();
+            if (event.ctrlKey) {
+              this.app.mouse.selectedObjects = this.app.gameObjects;
+            }
             break;
           default:
         }
