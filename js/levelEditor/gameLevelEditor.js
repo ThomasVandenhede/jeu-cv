@@ -33,7 +33,7 @@ var LevelEditor = (function() {
     this.contexts = {};
 
     // initialize world size
-    worldRect = new AABB(0, 0, 10000, 10000);
+    worldRect = new AABB({ x: 0, y: 0, width: 10000, height: 10000 });
 
     // initialize world objects
     this.gameObjects = [];
@@ -145,7 +145,7 @@ var LevelEditor = (function() {
           return selectedObject.getBoundingRect().bottom;
         })
       ) - top;
-    return new AABB(left, top, width, height);
+    return new AABB({ x: left, y: top, width: width, height: height });
   };
 
   LevelEditor.prototype.drawSelectionOutlines = function(ctx, camera) {
@@ -348,6 +348,9 @@ var LevelEditor = (function() {
     // level name
     this.data.name = this.toolbar.levelNameInput.value;
 
+    // level name
+    this.data.countdownStart = parseInt(this.toolbar.countdownInput.value);
+
     // worldRect
     this.data.worldRect = {
       type: "AABB",
@@ -361,9 +364,12 @@ var LevelEditor = (function() {
 
     // player
     var player = gameObjects.filter(function(gameObject) {
-      console.log(gameObject.constructor);
       return gameObject.constructor.name === "Player";
     })[0];
+    if (!player) {
+      alert("You must add at least one player");
+      return false;
+    }
     this.data.player = player
       ? {
           type: "Player",
@@ -418,26 +424,41 @@ var LevelEditor = (function() {
         var ennemyData = {
           type: "Ennemy",
           x: ennemy.x,
-          y: ennemy.x
+          y: ennemy.y
         };
         this.data.ennemies.push(ennemyData);
       }.bind(this)
     );
 
     // skills
+    this.data.skills = [];
+    var skills = gameObjects.filter(function(gameObject) {
+      return gameObject.constructor.name === "Skill";
+    });
+    skills.forEach(
+      function(skill) {
+        var skillData = {
+          type: "Skill",
+          x: skill.x,
+          y: skill.y
+        };
+        this.data.skills.push(skillData);
+      }.bind(this)
+    );
+
+    return true;
   };
 
   LevelEditor.prototype.saveToLocalStorage = function() {
-    console.log(this.generateJSONdata());
-    gameData.levels[this.data.name] = this.data;
-
-    console.log(
-      "​LevelEditor.prototype.saveToLocalStorage -> gameData",
-      gameData
-    );
-    var json = JSON.stringify(gameData);
-
-    localStorage.setItem("gameData", json);
+    if (this.generateJSONdata()) {
+      gameData.levels[this.data.name] = this.data;
+      console.log(
+        "​LevelEditor.prototype.saveToLocalStorage -> gameData",
+        gameData
+      );
+      var json = JSON.stringify(gameData);
+      localStorage.setItem("gameData", json);
+    }
   };
 
   return LevelEditor;

@@ -54,6 +54,7 @@ var gameData = {
   levels: {
     "test level": {
       name: "test level",
+      countdownStart: 5000,
       cssBackground: {
         src: "./assets/images/background_1000_stars.png",
         size: "800px 600px"
@@ -90,6 +91,10 @@ var gameData = {
         {
           type: "Platform",
           props: { x: 500, y: -270, width: 80, height: 80 }
+        },
+        {
+          type: "Platform",
+          props: { x: 600, y: -500, width: 400, height: 20 }
         }
       ],
       ennemies: [],
@@ -138,6 +143,7 @@ var gameData = {
     },
     "level 1": {
       name: "level 1",
+      countdownStart: 15000,
       cssBackground: {
         src: "./assets/images/background_1000_stars.png",
         size: "800px 600px"

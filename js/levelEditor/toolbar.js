@@ -4,6 +4,7 @@ var toolbarFactory = (function() {
   function Toolbar() {
     this.el = document.getElementById("toolbar");
     this.levelNameInput = document.getElementById("level-name");
+    this.countdownInput = document.getElementById("level-countdown");
     this.selectButton = document.getElementById("button-select");
     this.createButton = document.getElementById("button-create");
     this.saveButton = document.getElementById("save-button");
@@ -13,7 +14,7 @@ var toolbarFactory = (function() {
       "click",
       function(e) {
         var app = this.app;
-        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
         app.contextManager.context = 0;
       }.bind(this)
     );
@@ -21,7 +22,7 @@ var toolbarFactory = (function() {
       "click",
       function(e) {
         var app = this.app;
-        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
         app.contextManager.context = 1;
       }.bind(this)
     );
@@ -29,7 +30,7 @@ var toolbarFactory = (function() {
       "click",
       function(e) {
         var app = this.app;
-        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
         app.saveToLocalStorage();
       }.bind(this)
     );
@@ -38,7 +39,7 @@ var toolbarFactory = (function() {
       "change",
       function(e) {
         var app = this.app;
-        e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
         var objectType = this.getGameObjectType();
         switch (objectType) {
           case "Player":

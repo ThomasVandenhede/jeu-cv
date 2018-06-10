@@ -6,7 +6,7 @@ var GameTimer = (function() {
     this.previousTime = this.currentTime;
     this.isPaused = false;
     this.isCountDown = true;
-    this.countDownStart = props.countDownStart || 0.5 * 60 * 1000; // ms
+    this.countdownStart = props.countdownStart || 0.5 * 60 * 1000; // ms
   }
 
   GameTimer.prototype = Object.create(AABB.prototype);
@@ -36,7 +36,7 @@ var GameTimer = (function() {
   GameTimer.prototype.draw = function(ctx) {
     var displayTime = new Date();
     this.isCountDown
-      ? displayTime.setTime(Math.max(0, this.countDownStart - this.totalTime))
+      ? displayTime.setTime(Math.max(0, this.countdownStart - this.totalTime))
       : displayTime.setTime(this.totalTime);
     seconds = displayTime.getSeconds();
     minutes = displayTime.getMinutes();
@@ -53,7 +53,7 @@ var GameTimer = (function() {
     var center = this.center;
     var r = height / 2;
     var color =
-      this.isCountDown && this.countDownStart - this.totalTime < 16000
+      this.isCountDown && this.countdownStart - this.totalTime < 16000
         ? "red"
         : "white";
 

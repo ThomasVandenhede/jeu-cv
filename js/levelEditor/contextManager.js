@@ -285,6 +285,14 @@ var contextManager = (function() {
           x: mouseGamePos.x,
           y: mouseGamePos.y
         });
+        for (
+          var i = 0;
+          i < Object.getOwnPropertyNames(gameObject).length;
+          i++
+        ) {
+          var name = Object.getOwnPropertyNames(gameObject)[i];
+          console.log(name, gameObject[name]);
+        }
         this.app.gameObjects.push(gameObject);
         switch (Constructor.name) {
           case "Platform":
@@ -445,7 +453,6 @@ var contextManager = (function() {
   Object.defineProperties(ContextManager.prototype, {
     context: {
       set: function(id) {
-        console.log(id);
         if (id !== contextID) {
           this.unsetEventHandlersForContext(contextID);
           this.setEventHandlersForContext(id);

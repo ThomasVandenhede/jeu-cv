@@ -155,10 +155,9 @@ var Game = (function() {
   };
 
   Game.prototype.setBackground = function(path) {
-    this.canvas.style.backgroundImage =
-      "url(" + path + ")";
+    this.canvas.style.backgroundImage = "url(" + path + ")";
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
-  }
+  };
 
   // Build different game menus
   Game.prototype.showGameOverMenu = function() {
@@ -251,14 +250,17 @@ var Game = (function() {
               null,
               e(
                 "a",
-                { 
+                {
                   href: "",
                   onclick:
                     "event.preventDefault ? event.preventDefault() : (event.returnValue = false);" +
-                    "game.currentLevelName = '" + gameData.levels[key].name + "';" +
-                    "game.buildGameLevel(game.currentLevelName);" +
-                    "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10, " +
-                    "(game.canvas.height - game.player.height) / 2 - 10)"
+                    "game.currentLevelName = '" +
+                    gameData.levels[key].name +
+                    "';" +
+                    "game.startGame();"
+                  // "game.buildGameLevel(game.currentLevelName);" +
+                  // "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10, " +
+                  // "(game.canvas.height - game.player.height) / 2 - 10)"
                 },
                 gameData.levels[key].name
               )
@@ -273,37 +275,37 @@ var Game = (function() {
 
   Game.prototype.attachEventHandlers = function() {
     this.handleMenuResumeClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.unpause();
     };
     this.handleMenuLevelClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
     };
     this.handleMenuAboutClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
     };
     this.handleMenuExitClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.exit();
     };
     this.handleRestartClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.restartGame();
     };
     this.handleControlsButtonClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.showControlsMenu();
     };
     this.handleAboutButtonClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.showAboutMenu();
     };
     this.handleBackButtonClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.showPauseMenu();
     };
     this.handleLoadMenuClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.showLoadMenu();
     };
     this.resumeButton.onclick = this.handleMenuResumeClick.bind(this);
@@ -352,7 +354,7 @@ var Game = (function() {
     var el = this.gameMenuEl;
     if (el) {
       emptyElement(this.gameMenuEl);
-      this.uiContainerEl.removeChild(this.gameMenuEl)
+      this.uiContainerEl.removeChild(this.gameMenuEl);
     }
     this.gameMenuEl = null;
   };
@@ -670,7 +672,7 @@ var Game = (function() {
         var skillBox = skill.getBoundingRect();
         if (physics.collision.AABBWithAABB(playerBox, skillBox)) {
           this.player.skills.push(skill);
-          this.timer.countDownStart += 5 * 1000; // add 5s to timer
+          this.timer.countdownStart += 5 * 1000; // add 5s to timer
           this.skills.splice(index, 1);
         }
       }.bind(this)
@@ -819,6 +821,7 @@ var Game = (function() {
   };
 
   Game.prototype.startGame = function() {
+    this.rAF && cancelAnimationFrame(this.rAF);
     // game state
     this.loadGameDataFromLocalStorage();
     this.buildGameLevel(this.currentLevelName);
@@ -836,7 +839,7 @@ var Game = (function() {
     this.ghostPositionsTemp = [];
 
     // background
-    this.setBackground('./assets/images/background_2000_stars.png')
+    this.setBackground("./assets/images/background_2000_stars.png");
 
     // camera
     this.camera.follow(
@@ -851,7 +854,7 @@ var Game = (function() {
       y: 35,
       width: 80,
       height: 30,
-      countDownStart: 0.5 * 60 * 1000
+      countdownStart: this.level.countdownStart
     });
     this.lifeBar = new LifeBar({
       x: 60,
@@ -945,7 +948,7 @@ var Game = (function() {
 
     // kill player if countdown is finished
     !this.player.isDead &&
-      this.timer.countDownStart - this.timer.totalTime < 1000 &&
+      this.timer.countdownStart - this.timer.totalTime < 1000 &&
       this.player.die();
 
     // keyboard

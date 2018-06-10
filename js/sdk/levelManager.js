@@ -32,6 +32,7 @@ var levelManager = (function() {
     var level = {};
 
     level.name = name;
+    level.countdownStart = levelData.countdownStart;
     level.worldRect = new AABB({
       x: worldRectData.props.x,
       y: worldRectData.props.y,
