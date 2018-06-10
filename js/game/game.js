@@ -141,6 +141,7 @@ var Game = (function() {
     // initialize level manager
     this.levelManager = levelManager.getInstance();
     this.levelManager.init(this);
+    this.currentLevelName = "level 1";
 
     // camera
     this.camera = new Camera(this);
@@ -250,14 +251,14 @@ var Game = (function() {
               null,
               e(
                 "a",
-                {
+                { 
                   href: "",
                   onclick:
-                    "event.preventDefault ? event.preventDefault() : (event.returnValue = false);;" +
-                    "game.buildGameLevel('" +
-                    gameData.levels[key].name +
-                    "');" +
-                    "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10,                     (game.canvas.height - game.player.height) / 2 - 10)"
+                    "event.preventDefault ? event.preventDefault() : (event.returnValue = false);" +
+                    "game.currentLevelName = '" + gameData.levels[key].name + "';" +
+                    "game.buildGameLevel(game.currentLevelName);" +
+                    "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10, " +
+                    "(game.canvas.height - game.player.height) / 2 - 10)"
                 },
                 gameData.levels[key].name
               )
@@ -332,6 +333,10 @@ var Game = (function() {
       this.ennemies = this.level.ennemies;
       this.skills = this.level.skills;
     }
+
+    // temporary objects
+    this.lasers = [];
+    this.particles = [];
   };
 
   Game.prototype.buildGameObjects = function() {
@@ -816,7 +821,10 @@ var Game = (function() {
   Game.prototype.startGame = function() {
     // game state
     this.loadGameDataFromLocalStorage();
-    this.buildGameLevel("level 1");
+    this.buildGameLevel(this.currentLevelName);
+
+    // game objects
+    this.buildGameObjects();
 
     // player ghost
     this.ghostIndex = 0;
@@ -827,16 +835,10 @@ var Game = (function() {
         : [];
     this.ghostPositionsTemp = [];
 
-    // temporary objects
-    this.lasers = [];
-    this.particles = [];
-
-    // game objects
-    this.buildGameObjects();
-
     // background
     this.setBackground('./assets/images/background_2000_stars.png')
 
+    // camera
     this.camera.follow(
       this.player,
       (this.canvas.width - this.player.width) / 2 - 10,

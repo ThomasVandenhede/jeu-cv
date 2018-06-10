@@ -36,7 +36,6 @@ function e(type, props, children) {
   } else {
     nodes = [children];
   }
-  // console.log(nodes)
   for (var i = 0; i < nodes.length; i++) {
     if (typeof nodes[i] === "string") {
       node = document.createTextNode(nodes[i])
@@ -45,7 +44,6 @@ function e(type, props, children) {
     }
     el.appendChild(node);
   }
-  console.log(el)
   return el;
 }
 
