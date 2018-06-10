@@ -164,7 +164,7 @@ var Game = (function() {
 
     // background
     this.canvas.style.backgroundImage =
-      "url(./assets/images/background_2000_stars.png";
+      "url('./assets/images/background_2000_stars.png')";
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
 
     // camera
