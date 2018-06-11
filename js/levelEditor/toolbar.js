@@ -76,7 +76,7 @@ var toolbarFactory = (function() {
       function(e) {
         var app = this.app;
         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-        app.contextManager.context = 0;
+        app.toolManager.tool = 0;
       }.bind(this)
     );
     this.createButton.addEventListener(
@@ -84,7 +84,7 @@ var toolbarFactory = (function() {
       function(e) {
         var app = this.app;
         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-        app.contextManager.context = 1;
+        app.toolManager.tool = 1;
       }.bind(this)
     );
     this.saveButton.addEventListener(
@@ -102,7 +102,7 @@ var toolbarFactory = (function() {
         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
         var app = this.app;
         var objectType = this.getGameObjectType();
-        app.contextManager.context = 1;
+        app.toolManager.tool = 1;
         switch (objectType) {
           case "Player":
           case "Ennemy":
@@ -116,11 +116,11 @@ var toolbarFactory = (function() {
           case "SkillMongo":
           case "SkillNode":
           case "SkillMeteor":
-            app.contextManager.context = 1;
+            app.toolManager.tool = 1;
             break;
           case "Platform":
           case "MovingPlatform":
-            app.contextManager.context = 2;
+            app.toolManager.tool = 2;
             break;
           default:
             break;

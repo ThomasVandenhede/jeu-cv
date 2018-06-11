@@ -60,9 +60,9 @@ var keyboardManager = (function() {
             this.app.mouse.selection = [];
             break;
           case 65: // A key
-            // event.preventDefault();
-            this.app.contextManager.context = 0; // switch to selection context
+            this.app.toolManager.tool = 0; // switch to selection context
             if (event.ctrlKey) {
+              event.preventDefault();
               this.app.mouse.selection = this.app.gameObjects.map(function(
                 obj
               ) {
@@ -79,10 +79,10 @@ var keyboardManager = (function() {
             }
             break;
           case 83:
-            this.app.contextManager.context = 0;
+            this.app.toolManager.tool = 0;
             break;
           case 67:
-            this.app.contextManager.context = 1;
+            this.app.toolManager.tool = 1;
             break;
           default:
         }

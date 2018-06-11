@@ -1,10 +1,10 @@
-var contextManager = (function() {
+var toolManager = (function() {
   var instance = null;
 
-  var contextID = 0; // context
+  var toolID = 0; // context
 
   // map of all contexts to their ID
-  var allContexts = {
+  var allTools = {
     0: "select",
     1: "create"
   };
@@ -121,6 +121,12 @@ var contextManager = (function() {
       this.clickY
     );
     var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
+
+    var mouseGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
+      this.x,
+      this.y
+    );
+
     var gameObjects = this.app.gameObjects;
     var clickedObject = null;
     var newSelection = [];
@@ -165,6 +171,10 @@ var contextManager = (function() {
                 })
               }
             ];
+            if (newSelection[0].object.constructor.name === "MovingPlatform") {
+              newSelection[0].startingRect.xEnd = clickedObject.xEnd;
+              newSelection[0].startingRect.yEnd = clickedObject.yEnd;
+            }
           }
         }
 
@@ -186,6 +196,32 @@ var contextManager = (function() {
             x: mouseGamePos.x,
             y: mouseGamePos.y
           });
+        }
+        break;
+      case 2:
+        // find the most recently added game object the click was inside of
+        var movingPlatforms = gameObjects.filter(function(obj) {
+          return obj.constructor.name === "MovingPlatform";
+        });
+        movingPlatforms.forEach(
+          function(platform) {
+            // if a moving platform was right clicked
+            if (
+              platform.contains(
+                mouseGamePosSnappedToGrid.x,
+                mouseGamePosSnappedToGrid.y
+              )
+            ) {
+              this.clickedObject = platform;
+            }
+          }.bind(this)
+        );
+        console.log(this.clickedObject);
+        if (this.clickedObject) {
+          this.clickedObject.xStart = this.clickedObject.x;
+          this.clickedObject.yStart = this.clickedObject.y;
+          this.clickedObject.xEnd = this.clickedObject.xEnd;
+          this.clickedObject.yEnd = this.clickedObject.yEnd;
         }
         break;
       default:
@@ -215,7 +251,6 @@ var contextManager = (function() {
         if (this.selection.length) {
           if (releaseX === this.clickX && releaseY === this.clickY) {
             // If click and release at the same spot, select the most recently added game object the click was inside of
-            console.log("CLICK AND RELEASE AT THE SAME SPOT");
             var obj = this.clickedObject;
             this.selection = [
               {
@@ -305,20 +340,19 @@ var contextManager = (function() {
 
             // special case for Moving Platform
             if (item.object.constructor.name === "MovingPlatform") {
-              selectedObject.xStart =
-                this.selectedObjectsStart[i].x + mouseGameDisplacement.x;
-              selectedObject.yStart =
-                this.selectedObjectsStart[i].y + mouseGameDisplacement.y;
-              selectedObject.xEnd =
-                this.selectedObjectsStart[i].xEnd + mouseGameDisplacement.x;
-              selectedObject.yEnd =
-                this.selectedObjectsStart[i].yEnd + mouseGameDisplacement.y;
+              item.object.xStart =
+                item.startingRect.x + mouseGameDisplacement.x;
+              item.object.yStart =
+                item.startingRect.y + mouseGameDisplacement.y;
+              item.object.xEnd =
+                item.startingRect.xEnd + mouseGameDisplacement.x;
+              item.object.yEnd =
+                item.startingRect.yEnd + mouseGameDisplacement.y;
             }
           }.bind(this)
         );
       }
-    }
-    if (this.buttons[2]) {
+    } else if (this.buttons[2]) {
       if (this.clickedObject) {
         switch (this.currentObject.constructor.name) {
           case "MovingPlatform":
@@ -345,7 +379,11 @@ var contextManager = (function() {
       this.clickX,
       this.clickY
     );
-    var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
+    // var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
+    var mouseGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
+      this.x,
+      this.y
+    );
     var gameObjects = this.app.gameObjects;
     var clickedObject = null;
     var selectedObjects = [];
@@ -356,8 +394,8 @@ var contextManager = (function() {
         // left mouse button
         var Constructor = this.app.gameObjectConstructor;
         var gameObject = new Constructor({
-          x: mouseGamePos.x,
-          y: mouseGamePos.y
+          x: mouseGamePosSnappedToGrid.x,
+          y: mouseGamePosSnappedToGrid.y
         });
         for (
           var i = 0;
@@ -375,23 +413,6 @@ var contextManager = (function() {
           default:
             this.currentObject = null;
             break;
-        }
-      case 2:
-        // find the most recently added game object the click was inside of
-        var movingPlatforms = gameObjects.filter(function(gameObject) {
-          return gameObject.constructor.name === "MovingPlatform";
-        });
-        movingPlatforms.forEach(function(platform) {
-          // if some game object is clicked and object doesn't belong to selection
-          if (platform.contains(mouseGamePos.x, mouseGamePos.y)) {
-            this.clickedObject = gameObject;
-          }
-        });
-        if (this.clickedObject) {
-          selectedObjectsStart[0].xStart = this.clickedObject.xStart;
-          selectedObjectsStart[0].yStart = this.clickedObject.yStart;
-          selectedObjectsStart[0].xEnd = this.clickedObject.xEnd;
-          selectedObjectsStart[0].yEnd = this.clickedObject.yEnd;
         }
         break;
       default:
@@ -417,7 +438,7 @@ var contextManager = (function() {
         break;
       case 2:
         // right mouse button
-        // this.grabbed = null;
+        this.clickedObject = null;
         break;
       default:
         break;
@@ -425,21 +446,18 @@ var contextManager = (function() {
   }
 
   function handleMouseMove1(e) {
-    var camera = this.app.camera;
-    var unapplyCam = camera.unapply.bind(camera);
-    var clickPos = this.app.grid.getMousePosSnappedToGrid.call(
-      this.app.grid,
+    var clickGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
       this.clickX,
       this.clickY
     );
-    var clickGamePos = unapplyCam(clickPos.x, clickPos.y);
-    var mousePos = this.app.grid.getMousePosSnappedToGrid.call(
-      this.app.grid,
+    var mouseGamePosSnappedToGrid = this.app.grid.getGameMousePosSnappedToGrid(
       this.x,
       this.y
     );
-    var mouseGamePos = unapplyCam(mousePos.x, mousePos.y);
-    var mouseGameDisplacement = Vector.subtract(mouseGamePos, clickGamePos);
+    var mouseGameDisplacement = Vector.subtract(
+      mouseGamePosSnappedToGrid,
+      clickGamePosSnappedToGrid
+    );
 
     // move camera when mouse wheel is held down
     if (this.buttons[0]) {
@@ -517,34 +535,34 @@ var contextManager = (function() {
     }
   };
 
-  function ContextManager() {}
+  function ToolManager() {}
 
-  Object.defineProperties(ContextManager.prototype, {
-    context: {
+  Object.defineProperties(ToolManager.prototype, {
+    tool: {
       get: function() {
-        return contextID;
+        return toolID;
       },
       set: function(id) {
-        if (id !== contextID) {
-          this.unsetEventHandlersForContext(contextID);
+        if (id !== toolID) {
+          this.unsetEventHandlersForContext(toolID);
           this.setEventHandlersForContext(id);
-          contextID = id;
+          toolID = id;
         }
       }
     }
   });
 
-  ContextManager.prototype.init = function(app) {
+  ToolManager.prototype.init = function(app) {
     this.app = app;
     this.setGenericEventHandlers();
-    this.setEventHandlersForContext(contextID);
+    this.setEventHandlersForContext(toolID);
   };
 
-  ContextManager.prototype.setGenericEventHandlers = function() {
+  ToolManager.prototype.setGenericEventHandlers = function() {
     this.setEventHandlersForContext("generic");
   };
 
-  ContextManager.prototype.unsetEventHandlersForContext = function(id) {
+  ToolManager.prototype.unsetEventHandlersForContext = function(id) {
     var app = this.app;
     var entries = Object.entries(contextEventHandlers[id].mouse);
     for (var i = 0; i < entries.length; i++) {
@@ -554,7 +572,7 @@ var contextManager = (function() {
     }
   };
 
-  ContextManager.prototype.setEventHandlersForContext = function(id) {
+  ToolManager.prototype.setEventHandlersForContext = function(id) {
     var app = this.app;
     var entries = Object.entries(contextEventHandlers[id].mouse);
     for (var i = 0; i < entries.length; i++) {
@@ -567,7 +585,7 @@ var contextManager = (function() {
   return {
     getInstance: function() {
       if (!instance) {
-        instance = new ContextManager();
+        instance = new ToolManager();
       }
       return instance;
     }

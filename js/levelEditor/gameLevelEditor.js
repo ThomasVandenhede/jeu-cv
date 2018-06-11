@@ -16,8 +16,8 @@ var LevelEditor = (function() {
     this.keyboard.init(this);
     this.mouse = mouse.getInstance();
     this.mouse.init(this); // pass the game object to the mouse as its context
-    this.contextManager = contextManager.getInstance();
-    this.contextManager.init(this);
+    this.toolManager = toolManager.getInstance();
+    this.toolManager.init(this);
     this.toolbar = toolbarFactory.getInstance();
     this.toolbar.init(this);
     this.soundManager = soundManager.getInstance();
@@ -377,8 +377,8 @@ var LevelEditor = (function() {
     // initialize world objects
     this.gameObjects = [];
 
-    // contexts
-    this.contexts = {};
+    // tools
+    this.tools = {};
 
     // local storage
     this.loadGameDataFromLocalStorage();
