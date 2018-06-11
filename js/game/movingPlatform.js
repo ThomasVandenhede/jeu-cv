@@ -4,8 +4,8 @@ var MovingPlatform = (function() {
 
     this.xStart = props.x !== undefined ? props.x : 0;
     this.yStart = props.x !== undefined ? props.y : 0;
-    this.xEnd = props.xEnd !== undefined ? props.xEnd : props.xStart;
-    this.yEnd = props.yEnd !== undefined ? props.yEnd : props.yStart;
+    this.xEnd = props.xEnd !== undefined ? props.xEnd : this.xStart;
+    this.yEnd = props.yEnd !== undefined ? props.yEnd : this.yStart;
 
     this.speed = props.speed || 50;
     this.v = new Vector(this.xEnd - this.x, this.yEnd - this.y);

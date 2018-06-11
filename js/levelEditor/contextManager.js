@@ -9,6 +9,16 @@ var contextManager = (function() {
     1: "create"
   };
 
+  var defaultOptions = {
+    Platform: {
+      passthrough: false
+    },
+    MovingPlatform: {
+      passthrough: false,
+      positionRatio: 0
+    }
+  };
+
   // DEFAULT EVENT HANDLERS
   // Generic event handlers are NEVER detached,
   // they are the common behavior for all contexts.

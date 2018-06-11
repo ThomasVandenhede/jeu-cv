@@ -10,17 +10,18 @@ var Camera = (function() {
     this.zoomLevel = props.zoomLevel || 1;
     this.height = canvas.height / this.zoomLevel;
     this.width = canvas.width / this.zoomLevel;
+    this.canvas = props.canvas;
     this.worldRect = props.worldRect;
 
     AABB.call(this, {
       x: props.x,
       y: props.y,
-      width: canvas.width,
-      height: canvas.height
+      width: this.canvas.width,
+      height: this.canvas.height
     });
 
-    this.xDeadZone = canvas.width / 3; // min distance to horizontal borders
-    this.yDeadZone = canvas.height / 3; // min distance to vertical borders
+    this.xDeadZone = this.canvas.width / 3; // min distance to horizontal borders
+    this.yDeadZone = this.canvas.height / 3; // min distance to vertical borders
 
     this.axis = AXIS.BOTH;
 
@@ -43,8 +44,7 @@ var Camera = (function() {
   };
 
   Camera.prototype.update = function() {
-    this.height = canvas.height / this.zoomLevel;
-    this.width = canvas.width / this.zoomLevel;
+    this.updateDimensions();
     if (this.followed) {
       var xDeadZone = Math.min(
         (this.width - this.followed.width) / 2,
@@ -101,18 +101,23 @@ var Camera = (function() {
     }
   };
 
+  Camera.prototype.updateDimensions = function() {
+    this.height = this.canvas.height / this.zoomLevel;
+    this.width = this.canvas.width / this.zoomLevel;
+  };
+
   Camera.prototype.zoomIn = function() {
     this.zoomLevel *= 1.1;
-    this.height = canvas.height / this.zoomLevel;
-    this.width = canvas.width / this.zoomLevel;
+    this.height = this.canvas.height / this.zoomLevel;
+    this.width = this.canvas.width / this.zoomLevel;
     this.x = this.followed.center.x - this.width / 2;
     this.y = this.followed.center.y - this.height / 2;
   };
 
   Camera.prototype.zoomOut = function() {
     this.zoomLevel /= 1.1;
-    this.height = canvas.height / this.zoomLevel;
-    this.width = canvas.width / this.zoomLevel;
+    this.height = this.canvas.height / this.zoomLevel;
+    this.width = this.canvas.width / this.zoomLevel;
     this.x = this.followed.center.x - this.width / 2;
     this.y = this.followed.center.y - this.height / 2;
   };

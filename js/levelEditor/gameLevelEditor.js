@@ -10,12 +10,6 @@ var LevelEditor = (function() {
         : true;
     this.canvas = document.getElementById("canvas");
     this.backgroundCanvas = document.getElementById("background");
-    this.camera = new Camera({
-      x: -1000,
-      y: -1000,
-      zoomLevel: 0.05,
-      worldRect: this.worldRect
-    });
     this.ctx = this.canvas.getContext("2d");
     this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
@@ -28,31 +22,52 @@ var LevelEditor = (function() {
     this.toolbar.init(this);
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
-    this.grid = new Grid({
-      camera: this.camera,
-      canvas: this.canvas,
-      mouse: this.mouse
-    });
+    this.levelManager = levelManager.getInstance();
+    this.levelManager.init(this);
+  };
 
-    // contexts
-    this.contexts = {};
+  LevelEditor.prototype.loadGameDataFromLocalStorage = function() {
+    var savedData = localStorage.getItem("gameData");
+    if (savedData) {
+      gameData = JSON.parse(savedData);
+    }
+  };
 
-    // initialize world size
-    this.worldRect = new AABB({ x: 0, y: 0, width: 10000, height: 10000 });
+  LevelEditor.prototype.fillToolbar = function() {};
 
-    // initialize world objects
-    this.gameObjects = [];
+  LevelEditor.prototype.buildLevel = function(name) {
+    this.level = this.levelManager.buildLevel(name);
+    this.countdownStart = this.level.countdownStart;
+    this.worldRect = this.level.worldRect;
+    this.gameObjects = [].concat(
+      this.level.player,
+      this.level.platforms,
+      this.level.ennemies,
+      this.level.skills
+    );
+    this.updateToolbar();
+  };
 
-    // initialize background
-    this.starCount = 0;
-    this.stars = [];
-    for (var i = 0; i < this.starCount; i++) {
-      this.stars.push({
-        x: Math.floor(Math.random() * (this.canvas.width + 1)),
-        y: Math.floor(Math.random() * (this.canvas.height + 1)),
-        r: Math.random() * 1 + 0.5,
-        opacity: Math.random() * 0.5 + 0.4
-      });
+  LevelEditor.prototype.updateToolbar = function() {
+    emptyElement(this.toolbar.loadLevelSelect);
+    var levelSelectionOptions = [e("option", { value: "" }, "")].concat(
+      Object.keys(gameData.levels).map(function(item) {
+        return e("option", { id: item, value: item }, item);
+      })
+    );
+    levelSelectionOptions.forEach(
+      function(option) {
+        this.toolbar.loadLevelSelect.appendChild(option);
+      }.bind(this)
+    );
+    if (this.level) {
+      this.toolbar.loadLevelSelect.value = this.level.name;
+      this.toolbar.levelNameInput.value = this.level.name;
+      this.toolbar.countdownInput.value = this.level.countdownStart;
+      this.toolbar.worldXInput.value = this.level.worldRect.x;
+      this.toolbar.worldYInput.value = this.level.worldRect.y;
+      this.toolbar.worldWidthInput.value = this.level.worldRect.width;
+      this.toolbar.worldHeightInput.value = this.level.worldRect.height;
     }
   };
 
@@ -336,6 +351,38 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.start = function() {
+    // initialize world size
+    this.worldRect = new AABB({
+      x: -5000,
+      y: -5000,
+      width: 10000,
+      height: 10000
+    });
+
+    // camera
+    this.camera = new Camera({
+      zoomLevel: 0.05,
+      worldRect: this.worldRect,
+      canvas: this.canvas
+    });
+    this.camera.updateDimensions();
+    this.camera.x = this.worldRect.center.x - this.camera.width / 2;
+    this.camera.y = this.worldRect.center.y - this.camera.height / 2;
+    this.grid = new Grid({
+      camera: this.camera,
+      canvas: this.canvas,
+      mouse: this.mouse
+    });
+
+    // initialize world objects
+    this.gameObjects = [];
+
+    // contexts
+    this.contexts = {};
+
+    // local storage
+    this.loadGameDataFromLocalStorage();
+    this.updateToolbar();
     this.main();
   };
 
@@ -433,7 +480,9 @@ var LevelEditor = (function() {
           type: "Ennemy",
           props: {
             x: ennemy.x,
-            y: ennemy.y
+            y: ennemy.y,
+            width: ennemy.width,
+            height: ennemy.height
           }
         };
         this.data.ennemies.push(ennemyData);
@@ -443,15 +492,17 @@ var LevelEditor = (function() {
     // skills
     this.data.skills = [];
     var skills = gameObjects.filter(function(gameObject) {
-      return gameObject.constructor.name === "Skill";
+      return gameObject.constructor.name.startsWith("Skill");
     });
     skills.forEach(
       function(skill) {
         var skillData = {
-          type: "Skill",
+          type: skill.constructor.name,
           props: {
             x: skill.x,
-            y: skill.y
+            y: skill.y,
+            width: skill.width,
+            height: skill.height
           }
         };
         this.data.skills.push(skillData);
@@ -470,6 +521,7 @@ var LevelEditor = (function() {
       );
       var json = JSON.stringify(gameData);
       localStorage.setItem("gameData", json);
+      this.updateToolbar();
     }
   };
 

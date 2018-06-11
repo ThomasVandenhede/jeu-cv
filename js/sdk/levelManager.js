@@ -6,7 +6,16 @@ var levelManager = (function() {
     Ennemy: Ennemy,
     Platform: Platform,
     MovingPlatform: MovingPlatform,
-    Skill: Skill
+    SkillHtml: SkillHtml,
+    SkillCss: SkillCss,
+    SkillSass: SkillSass,
+    SkillBootstrap: SkillBootstrap,
+    SkillReact: SkillReact,
+    SkillAngular: SkillAngular,
+    SkillJquery: SkillJquery,
+    SkillNode: SkillNode,
+    SkillMongo: SkillMongo,
+    SkillMeteor: SkillMeteor
   };
 
   function LevelManager(props) {

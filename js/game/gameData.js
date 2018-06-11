@@ -100,43 +100,39 @@ var gameData = {
       ennemies: [],
       skills: [
         {
-          type: "Skill",
+          type: "SkillHtml",
           props: {
             x: 350,
             y: -570,
             width: 50,
-            height: 50,
-            src: "./assets/images/html-5-icon.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillCss",
           props: {
             x: 500,
             y: -600,
             width: 50,
-            height: 50,
-            src: "./assets/images/css-3-icon.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillJquery",
           props: {
             x: 1000,
             y: -600,
             width: 50,
-            height: 50,
-            src: "./assets/images/jquery-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillMongo",
           props: {
             x: 200,
             y: 0,
             width: 50,
-            height: 50,
-            src: "./assets/images/mongodb-logo.png"
+            height: 50
           }
         }
       ]
@@ -462,103 +458,93 @@ var gameData = {
       ],
       skills: [
         {
-          type: "Skill",
+          type: "SkillHtml",
           props: {
             x: 350,
             y: -570,
             width: 50,
-            height: 50,
-            src: "./assets/images/html-5-icon.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillCss",
           props: {
             x: 500,
             y: -600,
             width: 50,
-            height: 50,
-            src: "./assets/images/css-3-icon.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillJquery",
           props: {
             x: 1000,
             y: -600,
             width: 50,
-            height: 50,
-            src: "./assets/images/jquery-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillMongo",
           props: {
             x: 200,
             y: 0,
             width: 50,
-            height: 50,
-            src: "./assets/images/mongodb-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillReact",
           props: {
             x: 500,
             y: -200,
             width: 50,
-            height: 50,
-            src: "./assets/images/react-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillAngular",
           props: {
             x: 1300,
             y: -600,
             width: 50,
-            height: 50,
-            src: "./assets/images/angular-logo.svg"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillMeteor",
           props: {
             x: 10,
             y: -880,
             width: 50,
-            height: 50,
-            src: "./assets/images/meteor-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillSass",
           props: {
             x: 830,
             y: 50,
             width: 50,
-            height: 50,
-            src: "./assets/images/sass-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillBootstrap",
           props: {
             x: 20,
             y: -350,
             width: 50,
-            height: 50,
-            src: "./assets/images/bootstrap-logo.png"
+            height: 50
           }
         },
         {
-          type: "Skill",
+          type: "SkillNode",
           props: {
             x: 1000,
             y: -450,
             width: 50,
-            height: 50,
-            src: "./assets/images/nodejs-logo.png"
+            height: 50
           }
         }
       ]

@@ -1,6 +1,11 @@
 var Ennemy = (function() {
   function Ennemy(props) {
-    AABB.call(this, { x: props.x, y: props.y, width: 20, height: 20 });
+    AABB.call(this, {
+      x: props.x,
+      y: props.y,
+      width: props.width || 20,
+      height: props.height || 20
+    });
 
     this.v = new Vector();
     this.solid = false;

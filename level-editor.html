@@ -19,7 +19,11 @@
     </div>
 
     <div class="toolbar" id="toolbar">
+      <h4>Load Level</h4>
+      <select name="load" id="load">
+      </select>
       <h4>Level Details</h4>
+
       <form action="" id="toolbar-form">
         <div>
           <label for="level-name">
@@ -66,11 +70,21 @@
               <option value="platform">platform</option>
               <option value="movingPlatform">moving platform</option>
               <option value="ennemy">ennemy</option>
-              <option value="skill">skill</option>
+              <option value="skillHtml">skill HTML</option>
+              <option value="skillCss">skill CSS</option>
+              <option value="skillSass">skill Sass</option>
+              <option value="skillBootstrap">skill Bootstrap</option>
+              <option value="skillJquery">skill jQuery</option>
+              <option value="skillReact">skill ReactJS</option>
+              <option value="skillAngular">skill AngularJS</option>
+              <option value="skillNode">skill NodeJS</option>
+              <option value="skillMongo">skill MongoDB</option>
+              <option value="skillMeteor">skill Meteor</option>
             </select>
           </p>
           <p>
             <button type="submit" id="save-button" class="btn btn-primary">SAVE</button>
+            <button id="delete-button" class="btn btn-danger">DELETE</button>
           </p>
         </div>
 
@@ -105,6 +119,7 @@
   <script src="./js/game/laser.js"></script>
   <script src="./js/game/ennemy.js"></script>
   <script src="./js/game/skill.js"></script>
+  <script src="./js/game/skills.js"></script>
   <script src=" ./js/game/player.js "></script>
   <script src="./js/game/gameData.js "></script>
   <!-- levels -->

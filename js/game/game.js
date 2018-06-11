@@ -144,7 +144,10 @@ var Game = (function() {
     this.currentLevelName = "level 1";
 
     // camera
-    this.camera = new Camera({ worldRect: this.worldRect });
+    this.camera = new Camera({
+      worldRect: this.worldRect,
+      canvas: this.canvas
+    });
 
     // grid
     this.grid = new Grid({
@@ -1003,7 +1006,7 @@ var Game = (function() {
   Game.prototype.pauseMenuLoop = function() {
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
-    this.camera.update(); // continue updating camera in case browser window is resized
+    this.camera.updateDimensions(); // continue updating camera in case browser window is resized
     this.renderScene(this.ctx, this.camera);
 
     switch (this.state) {
