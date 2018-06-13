@@ -14,16 +14,49 @@ var LevelEditor = (function() {
     this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
     this.keyboard.init(this);
-    this.mouse = mouse.getInstance();
+    this.mouse = mouseManager.getInstance();
     this.mouse.init(this); // pass the game object to the mouse as its context
-    this.toolManager = toolManager.getInstance();
-    this.toolManager.init(this);
-    this.toolbar = toolbarFactory.getInstance();
-    this.toolbar.init(this);
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
     this.levelManager = levelManager.getInstance();
     this.levelManager.init(this);
+    this.gameObjects = [];
+    this.camera = new Camera({
+      zoomLevel: 0.05,
+      worldRect: this.worldRect,
+      canvas: this.canvas
+    });
+    this.grid = new Grid({
+      camera: this.camera,
+      canvas: this.canvas,
+      mouse: this.mouse
+    });
+    this.selectionTool = new SelectionTool({
+      gameObjects: this.gameObjects,
+      camera: this.camera,
+      mouse: this.mouse,
+      grid: this.grid,
+      canvas: this.canvas
+    });
+    this.creationTool = new CreationTool({
+      gameObjects: this.gameObjects,
+      camera: this.camera,
+      mouse: this.mouse,
+      grid: this.grid,
+      canvas: this.canvas
+    });
+    this.tools = {
+      0: this.selectionTool,
+      1: this.creationTool
+    };
+    this.toolManager = toolManager.getInstance();
+    this.toolManager.init({
+      mouse: this.mouse,
+      canvas: this.canvas,
+      tools: this.tools
+    });
+    this.toolbar = toolbarFactory.getInstance();
+    this.toolbar.init({ app: this, tools: this.tools });
   };
 
   LevelEditor.prototype.loadGameDataFromLocalStorage = function() {
@@ -33,13 +66,12 @@ var LevelEditor = (function() {
     }
   };
 
-  LevelEditor.prototype.fillToolbar = function() {};
-
   LevelEditor.prototype.buildLevel = function(name) {
     this.level = this.levelManager.buildLevel(name);
     this.countdownStart = this.level.countdownStart;
     this.worldRect = this.level.worldRect;
-    this.gameObjects = [].concat(
+    this.gameObjects.length = 0; // clear the array without reassigning
+    this.gameObjects = this.gameObjects.concat(
       this.level.player,
       this.level.platforms,
       this.level.ennemies,
@@ -74,7 +106,6 @@ var LevelEditor = (function() {
   LevelEditor.prototype.handleKeyboard = function() {};
 
   LevelEditor.prototype.updateScene = function() {
-    // update objects to be rendered
     this.camera.update();
   };
 
@@ -123,7 +154,7 @@ var LevelEditor = (function() {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
-    var selectionArea = this.mouse.selectionArea;
+    var selectionArea = this.selectionTool.selectionArea;
     if (selectionArea) {
       ctx.save();
       ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
@@ -138,51 +169,18 @@ var LevelEditor = (function() {
     }
   };
 
-  LevelEditor.prototype.getSelectionBoundingRect = function() {
-    var selectedObjects = this.mouse.selection.map(function(item) {
-      return item.object;
-    });
-    var left = Math.min.apply(
-      null,
-      selectedObjects.map(function(obj) {
-        return obj.getBoundingRect().left;
-      })
-    );
-    var top = Math.min.apply(
-      null,
-      selectedObjects.map(function(obj) {
-        return obj.getBoundingRect().top;
-      })
-    );
-    var width =
-      Math.max.apply(
-        null,
-        selectedObjects.map(function(obj) {
-          return obj.getBoundingRect().right;
-        })
-      ) - left;
-    var height =
-      Math.max.apply(
-        null,
-        selectedObjects.map(function(obj) {
-          return obj.getBoundingRect().bottom;
-        })
-      ) - top;
-    return new AABB({ x: left, y: top, width: width, height: height });
-  };
-
   LevelEditor.prototype.drawSelectionOutlines = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
     var applyCam = camera.apply.bind(camera);
-    var selectedObjects = this.mouse.selection.map(function(item) {
+    var selectedObjects = this.selectionTool.selection.map(function(item) {
       return item.object;
     });
 
     if (!selectedObjects || selectedObjects.length === 0) return;
 
-    var selectionRectangle = this.getSelectionBoundingRect();
+    var selectionRectangle = this.selectionTool.getSelectionBoundingRect();
     var lineWidth = 1;
 
     ctx.save();
@@ -222,14 +220,14 @@ var LevelEditor = (function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
 
-    if (!this.mouse.selection.length) {
+    if (!this.selectionTool.selection.length) {
       return;
     }
 
-    var selectionRectangle = this.getSelectionBoundingRect();
+    var selectionRectangle = this.selectionTool.getSelectionBoundingRect();
 
     ctx.save();
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = this.tools[0].resizeHandleHovered ? "cyan" : "blue";
     ctx.fillRect.apply(
       ctx,
       applyCamToArr(selectionRectangle.right, selectionRectangle.bottom).concat(
@@ -255,11 +253,13 @@ var LevelEditor = (function() {
       if (gameObject.constructor.name === "MovingPlatform") {
         var lineWidth = 2;
         ctx.save();
+        ctx.globalAlpha = 0.4;
         ctx.strokeStyle = gameObject.color;
-        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = "red";
+        ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.lineWidth = lineWidth;
         ctx.beginPath();
-        ctx.strokeRect.apply(
+        ctx.rect.apply(
           ctx,
           Object.values(
             Vector.sum(
@@ -271,58 +271,22 @@ var LevelEditor = (function() {
             gameObject.height * camera.zoomLevel - lineWidth
           ])
         );
-
-        // joining line TOP LEFT
-        ctx.beginPath();
-        ctx.moveTo.apply(
-          ctx,
-          applyCamToArr(gameObject.xStart, gameObject.yStart)
-        );
-        ctx.lineTo.apply(ctx, applyCamToArr(gameObject.xEnd, gameObject.yEnd));
         ctx.stroke();
+        ctx.fill();
 
-        // joining line TOP RIGHT
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo.apply(
           ctx,
-          applyCamToArr(gameObject.xStart + gameObject.width, gameObject.yStart)
-        );
-        ctx.lineTo.apply(
-          ctx,
-          applyCamToArr(gameObject.xEnd + gameObject.width, gameObject.yEnd)
-        );
-        ctx.stroke();
-
-        // joining line BOTTOM RIGHT
-        ctx.beginPath();
-        ctx.moveTo.apply(
-          ctx,
-          applyCamToArr(
-            gameObject.xStart + gameObject.width,
-            gameObject.yStart + gameObject.height
-          )
+          applyCamToArr(gameObject.center.x, gameObject.center.y)
         );
         ctx.lineTo.apply(
           ctx,
           applyCamToArr(
-            gameObject.xEnd + gameObject.width,
-            gameObject.yEnd + gameObject.height
+            gameObject.xEnd + gameObject.width / 2,
+            gameObject.yEnd + gameObject.height / 2
           )
-        );
-        ctx.stroke();
-
-        // joining line BOTTOM LEFT
-        ctx.beginPath();
-        ctx.moveTo.apply(
-          ctx,
-          applyCamToArr(
-            gameObject.xStart,
-            gameObject.yStart + gameObject.height
-          )
-        );
-        ctx.lineTo.apply(
-          ctx,
-          applyCamToArr(gameObject.xEnd, gameObject.yEnd + gameObject.height)
         );
         ctx.stroke();
         ctx.restore();
@@ -358,27 +322,9 @@ var LevelEditor = (function() {
       width: 10000,
       height: 10000
     });
-
-    // camera
-    this.camera = new Camera({
-      zoomLevel: 0.05,
-      worldRect: this.worldRect,
-      canvas: this.canvas
-    });
     this.camera.updateDimensions();
     this.camera.x = this.worldRect.center.x - this.camera.width / 2;
     this.camera.y = this.worldRect.center.y - this.camera.height / 2;
-    this.grid = new Grid({
-      camera: this.camera,
-      canvas: this.canvas,
-      mouse: this.mouse
-    });
-
-    // initialize world objects
-    this.gameObjects = [];
-
-    // tools
-    this.tools = {};
 
     // local storage
     this.loadGameDataFromLocalStorage();
@@ -455,10 +401,9 @@ var LevelEditor = (function() {
             height: gameObject.height
           }
         };
-        if (constructorName === "Platform") {
-          platformData.props.x = gameObject.x;
-          platformData.props.y = gameObject.y;
-        }
+        platformData.props.x = gameObject.x;
+        platformData.props.y = gameObject.y;
+
         if (constructorName === "MovingPlatform") {
           platformData.props.xStart = gameObject.xStart;
           platformData.props.yStart = gameObject.yStart;

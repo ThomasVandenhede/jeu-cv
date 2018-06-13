@@ -100,6 +100,7 @@ var toolbarFactory = (function() {
       "change",
       function(e) {
         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+        this.objectTypeDropDown.focus();
         var app = this.app;
         var objectType = this.getGameObjectType();
         app.toolManager.tool = 1;
@@ -129,8 +130,9 @@ var toolbarFactory = (function() {
     );
   }
 
-  Toolbar.prototype.init = function(app) {
-    this.app = app;
+  Toolbar.prototype.init = function(props) {
+    this.tools = props.tools;
+    this.app = props.app;
     this.getGameObjectType();
   };
 
@@ -153,7 +155,7 @@ var toolbarFactory = (function() {
       skillMongo: SkillMongo,
       skillMeteor: SkillMeteor
     };
-    app.gameObjectConstructor = objectTypeMap[type];
+    this.tools[1].gameObjectConstructor = objectTypeMap[type];
   };
 
   return {

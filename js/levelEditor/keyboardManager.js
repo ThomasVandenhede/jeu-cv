@@ -44,36 +44,32 @@ var keyboardManager = (function() {
 
         switch (event.keyCode) {
           case 46: // Delete
-            if (this.app.mouse.selection.length) {
-              while (this.app.mouse.selection[0]) {
-                var selectedObject = this.app.mouse.selection[0].object;
+            var selection = this.app.tools[0].selection;
+            if (selection.length) {
+              while (selection[0]) {
+                var selectedObject = selection[0].object;
                 var gameObjectIndex = this.app.gameObjects.indexOf(
                   selectedObject
                 );
                 gameObjectIndex >= 0 &&
                   this.app.gameObjects.splice(gameObjectIndex, 1);
-                this.app.mouse.selection.shift();
+                selection.shift();
               }
             }
             break;
           case 27: // Escape
-            this.app.mouse.selection = [];
+            this.app.tools[0].selection = [];
             break;
           case 65: // A key
             this.app.toolManager.tool = 0; // switch to selection context
             if (event.ctrlKey) {
               event.preventDefault();
-              this.app.mouse.selection = this.app.gameObjects.map(function(
+              this.app.tools[0].selection = this.app.gameObjects.map(function(
                 obj
               ) {
                 return {
                   object: obj,
-                  startingRect: new AABB({
-                    x: obj.x,
-                    y: obj.y,
-                    width: obj.width,
-                    height: obj.height
-                  })
+                  objectStart: Object.assign({}, obj)
                 };
               });
             }
@@ -83,6 +79,7 @@ var keyboardManager = (function() {
             break;
           case 67:
             this.app.toolManager.tool = 1;
+            this.app.toolbar.objectTypeDropDown.focus();
             break;
           default:
         }
