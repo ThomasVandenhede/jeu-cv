@@ -25,7 +25,7 @@ var Grid = (function() {
     return camera.apply(snappedMouseGamePos.x, snappedMouseGamePos.y);
   };
 
-  Grid.prototype.getGameMousePosSnappedToGrid = function(mouseX, mouseY) {
+  Grid.prototype.getMouseGamePosSnappedToGrid = function(mouseX, mouseY) {
     var camera = this.camera;
     var mousePosSnappedToGrid = this.getMousePosSnappedToGrid(mouseX, mouseY);
     return camera.unapply(mousePosSnappedToGrid.x, mousePosSnappedToGrid.y);

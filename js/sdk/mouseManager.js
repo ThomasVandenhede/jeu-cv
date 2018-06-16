@@ -91,44 +91,22 @@ var mouseManager = (function() {
     this.canvas.addEventListener(
       "wheel",
       function(e) {
-        var grid = this.app.grid;
         var camera = this.app.camera;
-        var zoomingRatePerScroll = 1.2;
-        var unapplyCamera = camera.unapply.bind(camera);
         var deltaY = e.deltaY;
-        var mouseX = e.clientX + this.canvas.offsetLeft;
-        var mouseY = e.clientY + this.canvas.offsetTop;
-        var mouseGamePos = unapplyCamera(mouseX, mouseY);
-        var snappedMouseGamePos = new Vector(
-          Math.round(mouseGamePos.x / 10) * 10,
-          Math.round(mouseGamePos.y / 10) * 10
+        var mouseGamePosSnappedToGrid = this.app.grid.getMouseGamePosSnappedToGrid(
+          this.x,
+          this.y
         );
 
-        if (deltaY > 0) {
-          camera.zoomLevel /= zoomingRatePerScroll;
-          if (camera.zoomLevel < 0.02) {
-            camera.zoomLevel = 0.02;
-          } else {
-            camera.x =
-              (camera.x - mouseGamePos.x) * zoomingRatePerScroll +
-              mouseGamePos.x;
-            camera.y =
-              (camera.y - mouseGamePos.y) * zoomingRatePerScroll +
-              mouseGamePos.y;
-          }
-        } else {
-          camera.zoomLevel *= zoomingRatePerScroll;
-          if (camera.zoomLevel > 8) {
-            camera.zoomLevel = 8;
-          } else {
-            camera.x =
-              (camera.x - mouseGamePos.x) / zoomingRatePerScroll +
-              mouseGamePos.x;
-            camera.y =
-              (camera.y - mouseGamePos.y) / zoomingRatePerScroll +
-              mouseGamePos.y;
-          }
-        }
+        deltaY > 0
+          ? camera.zoomIn(
+              mouseGamePosSnappedToGrid.x,
+              mouseGamePosSnappedToGrid.y
+            )
+          : camera.zoomOut(
+              mouseGamePosSnappedToGrid.x,
+              mouseGamePosSnappedToGrid.y
+            );
       }.bind(this)
     );
   }
@@ -138,12 +116,12 @@ var mouseManager = (function() {
   };
 
   MouseManager.prototype.on = function(el, type, callback) {
-    console.log("ON", el, type, callback);
+    // console.log("ON", el, type, callback);
     el.addEventListener(type, callback, arguments[3]);
   };
 
   MouseManager.prototype.off = function(el, type, callback) {
-    console.log("OFF", el, type, callback);
+    // console.log("OFF", el, type, callback);
     el.removeEventListener(type, callback, arguments[3]);
   };
 

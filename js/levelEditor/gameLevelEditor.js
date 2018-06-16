@@ -57,6 +57,7 @@ var LevelEditor = (function() {
     });
     this.toolbar = toolbarFactory.getInstance();
     this.toolbar.init({ app: this, tools: this.tools });
+    // this.currentLevelName = "level 1";
   };
 
   LevelEditor.prototype.loadGameDataFromLocalStorage = function() {
@@ -71,11 +72,14 @@ var LevelEditor = (function() {
     this.countdownStart = this.level.countdownStart;
     this.worldRect = this.level.worldRect;
     this.gameObjects.length = 0; // clear the array without reassigning
-    this.gameObjects = this.gameObjects.concat(
-      this.level.player,
-      this.level.platforms,
-      this.level.ennemies,
-      this.level.skills
+    Array.prototype.push.apply(
+      this.gameObjects,
+      [].concat(
+        this.level.player,
+        this.level.platforms,
+        this.level.ennemies,
+        this.level.skills
+      )
     );
     this.updateToolbar();
   };
@@ -251,8 +255,8 @@ var LevelEditor = (function() {
 
       // draw the end state of moving platforms
       if (gameObject.constructor.name === "MovingPlatform") {
-        var lineWidth = 2;
         ctx.save();
+        var lineWidth = 2;
         ctx.globalAlpha = 0.4;
         ctx.strokeStyle = gameObject.color;
         ctx.strokeStyle = "red";
@@ -328,6 +332,7 @@ var LevelEditor = (function() {
 
     // local storage
     this.loadGameDataFromLocalStorage();
+    // this.buildLevel();
     this.updateToolbar();
     this.main();
   };
@@ -460,10 +465,6 @@ var LevelEditor = (function() {
   LevelEditor.prototype.saveToLocalStorage = function() {
     if (this.generateJSONdata()) {
       gameData.levels[this.data.name] = this.data;
-      console.log(
-        "​LevelEditor.prototype.saveToLocalStorage -> gameData",
-        gameData
-      );
       var json = JSON.stringify(gameData);
       localStorage.setItem("gameData", json);
       this.updateToolbar();

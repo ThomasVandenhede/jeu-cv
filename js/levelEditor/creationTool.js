@@ -42,7 +42,7 @@ var CreationTool = (function() {
   }
 
   CreationTool.prototype.handleMouseDown = function handleMouseDown(e) {
-    var mouseGamePosSnappedToGrid = this.grid.getGameMousePosSnappedToGrid(
+    var mouseGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.x,
       this.mouse.y
     );
@@ -73,12 +73,10 @@ var CreationTool = (function() {
 
   CreationTool.prototype.handleMouseUp = function handleMouseUp(e) {
     switch (e.button) {
-      case 0:
-        // left mouse button
+      case 0: // left mouse button
         this.canvas.style.cursor = "";
         break;
-      case 2:
-        // right mouse button
+      case 2: // right mouse button
         this.clickedObject = null;
         break;
       default:
@@ -87,11 +85,11 @@ var CreationTool = (function() {
   };
 
   CreationTool.prototype.handleMouseMove = function handleMouseMove(e) {
-    var clickGamePosSnappedToGrid = this.grid.getGameMousePosSnappedToGrid(
+    var clickGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.clickX,
       this.mouse.clickY
     );
-    var mouseGamePosSnappedToGrid = this.grid.getGameMousePosSnappedToGrid(
+    var mouseGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.x,
       this.mouse.y
     );

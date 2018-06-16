@@ -106,20 +106,32 @@ var Camera = (function() {
     this.width = this.canvas.width / this.zoomLevel;
   };
 
-  Camera.prototype.zoomIn = function() {
-    this.zoomLevel *= 1.1;
-    this.height = this.canvas.height / this.zoomLevel;
-    this.width = this.canvas.width / this.zoomLevel;
-    this.x = this.followed.center.x - this.width / 2;
-    this.y = this.followed.center.y - this.height / 2;
+  Camera.prototype.zoomIn = function(x, y) {
+    var centerX = x !== undefined ? x : this.followed.center.x;
+    var centerY = y !== undefined ? y : this.followed.center.y;
+    var zoomRatio = 1.1;
+
+    this.zoomLevel *= zoomRatio;
+    if (this.zoomLevel > 8) {
+      this.zoomLevel = 8;
+    } else {
+      this.x = (this.x - centerX) / zoomRatio + centerX;
+      this.y = (this.y - centerY) / zoomRatio + centerY;
+    }
   };
 
-  Camera.prototype.zoomOut = function() {
-    this.zoomLevel /= 1.1;
-    this.height = this.canvas.height / this.zoomLevel;
-    this.width = this.canvas.width / this.zoomLevel;
-    this.x = this.followed.center.x - this.width / 2;
-    this.y = this.followed.center.y - this.height / 2;
+  Camera.prototype.zoomOut = function(x, y) {
+    var centerX = x !== undefined ? x : this.followed.center.x;
+    var centerY = y !== undefined ? y : this.followed.center.y;
+    var zoomRatio = 1.1;
+
+    this.zoomLevel /= zoomRatio;
+    if (this.zoomLevel < 0.02) {
+      this.zoomLevel = 0.02;
+    } else {
+      this.x = (this.x - centerX) * zoomRatio + centerX;
+      this.y = (this.y - centerY) * zoomRatio + centerY;
+    }
   };
 
   Camera.prototype.apply = function(x, y) {

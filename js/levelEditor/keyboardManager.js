@@ -33,14 +33,10 @@ var keyboardManager = (function() {
     window.addEventListener(
       "keydown",
       function(event) {
-        var code = event.code || event.keyCode;
-        var mappings = event.code ? codeMappings : keyCodeMappings;
-        if (mappings[code] && !this[mappings[code]]) {
-          if (this[mappings[code]]) {
-            this.keyRepeat[code] = true;
-          }
-          this[mappings[code]] = true;
-        }
+        var mouseGamePosSnappedToGrid = this.app.grid.getMouseGamePosSnappedToGrid(
+          this.app.mouse.x,
+          this.app.mouse.y
+        );
 
         switch (event.keyCode) {
           case 46: // Delete
@@ -81,29 +77,34 @@ var keyboardManager = (function() {
             this.app.toolManager.tool = 1;
             this.app.toolbar.objectTypeDropDown.focus();
             break;
+          case 37:
+            this.app.camera.x -= 20 / this.app.camera.zoomLevel;
+            break;
+          case 38:
+            this.app.camera.y -= 20 / this.app.camera.zoomLevel;
+            break;
+          case 39:
+            this.app.camera.x += 20 / this.app.camera.zoomLevel;
+            break;
+          case 40:
+            this.app.camera.y += 20 / this.app.camera.zoomLevel;
+            break;
+          case 187:
+            event.preventDefault();
+            event.shiftKey
+              ? this.app.camera.zoomOut(
+                  mouseGamePosSnappedToGrid.x,
+                  mouseGamePosSnappedToGrid.y
+                )
+              : this.app.camera.zoomIn(
+                  mouseGamePosSnappedToGrid.x,
+                  mouseGamePosSnappedToGrid.y
+                );
+            break;
           default:
         }
       }.bind(this)
     );
-
-    window.addEventListener(
-      "keyup",
-      function(event) {
-        var code = event.code || event.keyCode;
-        var mappings = event.code ? codeMappings : keyCodeMappings;
-        if (mappings[code]) {
-          this.keyRepeat[code] = false;
-          this[mappings[code]] = false;
-        }
-      }.bind(this)
-    );
-
-    this.UP = false;
-    this.DOWN = false;
-    this.RIGHT = false;
-    this.LEFT = false;
-    this.ENTER = false;
-    this.SPACE = false;
 
     this.keyRepeat = {};
   }
