@@ -54,6 +54,16 @@ var Game = (function() {
 
     // ghost
     this.ghost = new Ghost();
+
+    // timer
+
+    // game timer
+    this.timer = new GameTimer({
+      x: canvas.width - 170,
+      y: 35,
+      width: 80,
+      height: 30
+    });
   };
 
   Game.prototype.setBackground = function(path) {
@@ -525,14 +535,8 @@ var Game = (function() {
     this.loadGameDataFromLocalStorage();
     this.buildGameLevel(this.currentLevelName);
 
-    // game timer
-    this.timer = new GameTimer({
-      x: canvas.width - 170,
-      y: 35,
-      width: 80,
-      height: 30,
-      countdownStart: this.level.countdownStart
-    });
+    // reset timer
+    this.timer.reset.call(this.timer, this.level.countdownStart);
 
     // game objects
     this.buildGameObjects();

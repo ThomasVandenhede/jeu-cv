@@ -8,7 +8,6 @@ Ghost.prototype.init = function(props) {
 
 Ghost.prototype.reset = function() {
   this.ghostIndex = 0;
-  console.log("RESET");
   this.ghostPositions =
     Array.isArray(this.ghostPositionsTemp) &&
     this.ghostPositionsTemp.length !== 0
@@ -61,7 +60,6 @@ Ghost.prototype.update = function() {
 
 Ghost.prototype.draw = function(ctx, camera) {
   if (this.ghost) {
-    console.log("DRAWING GHOST");
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };

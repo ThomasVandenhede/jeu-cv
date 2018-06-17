@@ -1,12 +1,8 @@
 var GameTimer = (function() {
   function GameTimer(props) {
     AABB.call(this, props);
-    this.totalTime = 0;
-    this.currentTime = Date.now();
-    this.previousTime = this.currentTime;
     this.isPaused = false;
     this.isCountDown = true;
-    this.countdownStart = props.countdownStart || 0.5 * 60 * 1000; // ms
   }
 
   GameTimer.prototype = Object.create(AABB.prototype);
@@ -31,6 +27,13 @@ var GameTimer = (function() {
       this.currentTime = Date.now();
       this.totalTime += this.currentTime - this.previousTime;
     }
+  };
+
+  GameTimer.prototype.reset = function(timestamp) {
+    this.totalTime = 0;
+    this.currentTime = Date.now();
+    this.previousTime = this.currentTime;
+    this.countdownStart = timestamp || 0.5 * 60 * 1000; // ms;
   };
 
   GameTimer.prototype.draw = function(ctx) {
