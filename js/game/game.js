@@ -1,5 +1,5 @@
 var Game = (function() {
-  function Game(props) {}
+  function Game() {}
 
   window.states = {
     PAUSED: "paused",
@@ -51,6 +51,9 @@ var Game = (function() {
       camera: this.camera,
       mouse: this.mouse
     });
+
+    // ghost
+    this.ghost = new Ghost();
   };
 
   Game.prototype.setBackground = function(path) {
@@ -178,36 +181,6 @@ var Game = (function() {
     }
   };
 
-  Game.prototype.displaySkills = function(ctx, camera) {
-    var acquiredSkillsCount = this.player.skills.length;
-    var totalSkillsCount = acquiredSkillsCount + this.skills.length;
-    ctx.save();
-    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    ctx.fillRect(
-      60,
-      100,
-      100,
-      100 + ((acquiredSkillsCount + (acquiredSkillsCount % 2)) / 2) * 45
-    );
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.font = "16px arial";
-    ctx.fillText("Skills", 110, 130);
-    ctx.fillText(acquiredSkillsCount + " / " + totalSkillsCount, 110, 160);
-    this.player.skills.forEach(
-      function(skill, index) {
-        ctx.drawImage(
-          skill.image,
-          70 + (index % 2) * 45,
-          200 + ((index - (index % 2)) / 2) * 45,
-          30,
-          30
-        );
-      }.bind(this)
-    );
-    ctx.restore();
-  };
-
   Game.prototype.updateScene = function() {
     var player = this.player;
 
@@ -271,7 +244,7 @@ var Game = (function() {
         obj.getBoundingRect().overlaps(this.camera) && obj.draw(ctx, camera);
       }.bind(this)
     );
-    this.ghostPositions.length && this.displayGhost(ctx, camera);
+    this.ghost.draw(ctx, camera);
     this.particles.forEach(function(particle) {
       particle.draw(ctx, camera);
     });
@@ -279,46 +252,7 @@ var Game = (function() {
     this.timer.draw(ctx);
     this.shouldDisplayRulers &&
       this.grid.draw(ctx, camera, { isGame: true, shouldDisplayRulers: true });
-    this.displaySkills(ctx, camera);
-  };
-
-  Game.prototype.displayGhost = function(ctx, camera) {
-    if (this.ghost) {
-      var applyCamToArr = function() {
-        return Object.values(camera.apply.apply(camera, arguments));
-      };
-      ctx.save();
-      ctx.fillStyle = "rgba(180, 180, 180, 0.7)";
-      ctx.fillRect.apply(
-        ctx,
-        applyCamToArr(this.ghost.x, this.ghost.y).concat([
-          this.player.width * camera.zoomLevel,
-          this.player.height * camera.zoomLevel
-        ])
-      );
-      if (!this.ghostPositions[this.ghostIndex + 1]) {
-        ctx.strokeStyle = "black";
-        ctx.beginPath();
-        ctx.moveTo.apply(ctx, applyCamToArr(this.ghost.x, this.ghost.y));
-        ctx.lineTo.apply(
-          ctx,
-          applyCamToArr(
-            this.ghost.x + this.player.width,
-            this.ghost.y + this.player.height
-          )
-        );
-        ctx.moveTo.apply(
-          ctx,
-          applyCamToArr(this.ghost.x + this.player.width, this.ghost.y)
-        );
-        ctx.lineTo.apply(
-          ctx,
-          applyCamToArr(this.ghost.x, this.ghost.y + this.player.height)
-        );
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
+    this.skillBar.draw(ctx, camera);
   };
 
   Game.prototype.clearCanvas = function(ctx) {
@@ -389,12 +323,8 @@ var Game = (function() {
     this.lasers.splice(index, 1);
   };
 
-  Game.prototype.destroyParticleSet = function(index) {
-    this.particleSet;
-  };
-
-  Game.prototype.detectCollisions = function() {
-    this.detectCollisionsWithPlatforms();
+  Game.prototype.handleCollisions = function() {
+    this.handleCollisionsWithPlatforms();
     this.handleCollisionsWithSkills();
     this.handleCollisionsWithLasers();
   };
@@ -411,7 +341,7 @@ var Game = (function() {
                 playerBox.contains(laser.A.x, laser.A.y) ||
                 playerBox.contains(laser.B.x, laser.B.y) ||
                 physics.collision.segmentAABB(laser.A, laser.B, playerBox) <
-                  Math.POSITIVE_INFINITY
+                  Number.POSITIVE_INFINITY
               ) {
                 this.player.applyDamage(laser.damage);
                 this.player.hitPoints <= 0 && this.player.die();
@@ -496,7 +426,7 @@ var Game = (function() {
     return collisions;
   };
 
-  Game.prototype.detectCollisionsWithPlatforms = function() {
+  Game.prototype.handleCollisionsWithPlatforms = function() {
     var player = this.player;
     var collidableWith = this.getCollidablePlatformsInViewport();
     var collisions;
@@ -582,7 +512,6 @@ var Game = (function() {
   };
 
   Game.prototype.restartGame = function() {
-    this.ghostIndex = 0;
     cancelAnimationFrame(this.rAF);
     this.gameMenu.close();
     this.unpause();
@@ -591,21 +520,28 @@ var Game = (function() {
 
   Game.prototype.startGame = function() {
     this.rAF && cancelAnimationFrame(this.rAF);
+
     // game state
     this.loadGameDataFromLocalStorage();
     this.buildGameLevel(this.currentLevelName);
+
+    // game timer
+    this.timer = new GameTimer({
+      x: canvas.width - 170,
+      y: 35,
+      width: 80,
+      height: 30,
+      countdownStart: this.level.countdownStart
+    });
 
     // game objects
     this.buildGameObjects();
 
     // player ghost
-    this.ghostIndex = 0;
-    this.ghostPositions =
-      Array.isArray(this.ghostPositionsTemp) &&
-      this.ghostPositionsTemp.length !== 0
-        ? this.ghostPositionsTemp.slice(0)
-        : [];
-    this.ghostPositionsTemp = [];
+    this.ghost.init({
+      timer: this.timer,
+      player: this.player
+    });
 
     // background
     this.setBackground("./assets/images/background_2000_stars.png");
@@ -616,21 +552,16 @@ var Game = (function() {
       (this.canvas.width - this.player.width) / 2 - 10,
       (this.canvas.height - this.player.height) / 2 - 10
     );
-
-    // UI
-    this.timer = new GameTimer({
-      x: canvas.width - 170,
-      y: 35,
-      width: 80,
-      height: 30,
-      countdownStart: this.level.countdownStart
-    });
     this.lifeBar = new LifeBar({
       x: 60,
       y: 40,
       width: 200,
       height: 15,
       gameObject: this.player
+    });
+    this.skillBar = new SkillBar({
+      player: this.player,
+      skills: this.skills
     });
     requestAnimationFrame(this.pauseMenuLoop.bind(this));
   };
@@ -667,9 +598,6 @@ var Game = (function() {
     }
   };
 
-  /**
-   * Intro loop
-   */
   Game.prototype.introLoop = function() {
     switch (this.state) {
       case states.INTRO:
@@ -687,48 +615,6 @@ var Game = (function() {
       default:
         break;
     }
-  };
-
-  Game.prototype.updateGhost = function() {
-    var totalTime = this.timer.totalTime;
-    var ghostTimes = this.ghostPositions.map(function(position) {
-      return position.time;
-    });
-    var currentGhostTime = ghostTimes.find(function(time, index) {
-      return totalTime >= time && totalTime < ghostTimes[index + 1];
-    });
-    var ghostIndex = ghostTimes.indexOf(currentGhostTime);
-    var nextGhostTime = ghostTimes[ghostIndex + 1];
-
-    var timeRatio =
-      (totalTime - currentGhostTime) / (nextGhostTime - currentGhostTime);
-    console.log("​Game.prototype.updateGhost -> timeRatio", timeRatio);
-
-    if (this.ghostPositions.length) {
-      this.ghost = {};
-      this.ghost.x =
-        this.ghostPositions[ghostIndex].x +
-        (this.ghostPositions[ghostIndex + 1].x -
-          this.ghostPositions[ghostIndex].x) *
-          timeRatio;
-      this.ghost.y =
-        this.ghostPositions[ghostIndex].y +
-        (this.ghostPositions[ghostIndex + 1].y -
-          this.ghostPositions[ghostIndex].y) *
-          timeRatio;
-    } else {
-      this.ghost = null;
-    }
-    // this.ghost = this.ghostPositions.length
-    //   ? this.ghostPositions[this.ghostIndex]
-    //   : null;
-
-    // store position for next ghost
-    this.ghostPositionsTemp.push({
-      time: this.timer.totalTime,
-      x: this.player.x,
-      y: this.player.y
-    });
   };
 
   Game.prototype.requestLoop = function() {
@@ -750,16 +636,13 @@ var Game = (function() {
     }
   };
 
-  /**
-   * Main game loop
-   */
   Game.prototype.mainLoop = function() {
     // time management
     this.timer.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
 
     // ghost
-    this.updateGhost();
+    this.ghost.update();
 
     // kill player if countdown is finished
     !this.player.isDead &&
@@ -769,14 +652,13 @@ var Game = (function() {
     // keyboard
     this.handleKeyboard();
 
-    //
     for (var i = 0; i < this.gameObjects.length; i++) {
       var drawable = this.gameObjects[i];
       typeof drawable.updateVelocity === "function" &&
         drawable.updateVelocity();
     }
 
-    !this.player.isDead && this.detectCollisions();
+    !this.player.isDead && this.handleCollisions();
     this.updateScene();
     this.checkVictory();
     this.checkDefeat();
@@ -786,10 +668,6 @@ var Game = (function() {
 
     this.requestLoop();
   };
-
-  /**
-   * Pause menu loop
-   */
 
   Game.prototype.pauseMenuLoop = function() {
     this.clearCanvas(this.ctx);
