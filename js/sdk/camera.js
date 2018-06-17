@@ -13,6 +13,8 @@ var Camera = (function() {
     this.canvas = props.canvas;
     this.worldRect = props.worldRect;
 
+    this.zoomingRate = 1.1;
+
     AABB.call(this, {
       x: props.x,
       y: props.y,
@@ -109,28 +111,26 @@ var Camera = (function() {
   Camera.prototype.zoomIn = function(x, y) {
     var centerX = x !== undefined ? x : this.followed.center.x;
     var centerY = y !== undefined ? y : this.followed.center.y;
-    var zoomRatio = 1.1;
 
-    this.zoomLevel *= zoomRatio;
+    this.zoomLevel *= this.zoomingRate;
     if (this.zoomLevel > 8) {
       this.zoomLevel = 8;
     } else {
-      this.x = (this.x - centerX) / zoomRatio + centerX;
-      this.y = (this.y - centerY) / zoomRatio + centerY;
+      this.x = (this.x - centerX) / this.zoomingRate + centerX;
+      this.y = (this.y - centerY) / this.zoomingRate + centerY;
     }
   };
 
   Camera.prototype.zoomOut = function(x, y) {
     var centerX = x !== undefined ? x : this.followed.center.x;
     var centerY = y !== undefined ? y : this.followed.center.y;
-    var zoomRatio = 1.1;
 
-    this.zoomLevel /= zoomRatio;
+    this.zoomLevel /= this.zoomingRate;
     if (this.zoomLevel < 0.02) {
       this.zoomLevel = 0.02;
     } else {
-      this.x = (this.x - centerX) * zoomRatio + centerX;
-      this.y = (this.y - centerY) * zoomRatio + centerY;
+      this.x = (this.x - centerX) * this.zoomingRate + centerX;
+      this.y = (this.y - centerY) * this.zoomingRate + centerY;
     }
   };
 
