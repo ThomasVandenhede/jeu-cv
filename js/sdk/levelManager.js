@@ -1,5 +1,6 @@
 var levelManager = (function() {
   var instance;
+  var level = {};
 
   var gameEntityConstructors = {
     Player: Player,
@@ -38,8 +39,6 @@ var levelManager = (function() {
     var ennemiesData = levelData.ennemies;
     var skillsData = levelData.skills;
 
-    var level = {};
-
     level.name = name;
     level.countdownStart = levelData.countdownStart;
     level.worldRect = new AABB({
@@ -68,7 +67,20 @@ var levelManager = (function() {
       level.skills.push(new gameEntityConstructors[skill.type](skill.props));
     });
 
+    // temporary objects
+    level.lasers = [];
+    level.particles = [];
+
     return level;
+  };
+
+  LevelManager.prototype.buildEntities = function() {
+    level.entities = []
+      .concat(level.platforms)
+      .concat(level.skills)
+      .concat(level.ennemies)
+      .concat(level.lasers)
+      .concat([level.player]);
   };
 
   LevelManager.prototype.deleteLevel = function(name) {
