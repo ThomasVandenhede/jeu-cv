@@ -1,7 +1,7 @@
 var Game = (function() {
   function Game(props) {}
 
-  var states = {
+  window.states = {
     PAUSED: "paused",
     RUNNING: "running",
     INTRO: "intro",
@@ -24,112 +24,8 @@ var Game = (function() {
     this.canvas = document.getElementById("canvas");
     this.ctx = this.canvas.getContext("2d");
 
-    // initialize game menu elements
-    this.gameContainerEl = document.getElementById("game-container");
-    this.uiContainerEl = document.getElementById("ui-container");
-    this.gameIntroEl = document.getElementById("game-intro");
-
-    this.controlsTableEl = e("table", { class: "controls" }, [
-      e("tr", null, [
-        e("th", null, [
-          e("span", { class: "kbd" }, "\u2190"),
-          " / ",
-          e("span", { class: "kbd" }, "\u2192"),
-          " ou ",
-          e("span", { class: "kbd" }, "Q"),
-          " / ",
-          e("span", { class: "kbd" }, "D")
-        ]),
-        e("td", null, "Se déplacer horizontalement")
-      ]),
-      e("tr", null, [
-        e("th", null, [
-          e("span", { class: "kbd" }, "\u2191"),
-          " ou ",
-          e("span", { class: "kbd" }, "Espace"),
-          " ou ",
-          e("span", { class: "kbd" }, "Z")
-        ]),
-        e("td", null, "Sauter")
-      ]),
-      e("tr", null, [
-        e("th", null, e("span", { class: "kbd" }, "\u21b2")),
-        e("td", null, "Ouvrir le bouclier")
-      ]),
-      e("tr", null, [
-        e("th", null, e("span", { class: "kbd" }, "Échap")),
-        e("td", null, "Afficher cet écran")
-      ]),
-      e("tr", null, [
-        e("th", null, e("span", { class: "kbd" }, "F11")),
-        e("td", null, "Plein écran")
-      ]),
-      e("tr", null, [
-        e("th", null, [
-          e("span", { class: "kbd" }, "+"),
-          " / ",
-          e("span", { class: "kbd" }, ")")
-        ]),
-        e("td", null, "Zoomer / Dézoomer")
-      ])
-    ]);
-    this.controlsEl = e(
-      "div",
-      { class: "controls-container" },
-      this.controlsTableEl
-    );
-
-    // MENU BUTTONS
-    this.resumeButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "REPRENDRE")
-    );
-    this.restartButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "RECOMMENCER")
-    );
-    this.controlsButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "CONTRÔLES")
-    );
-    this.loadButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "CHARGER UN NIVEAU")
-    );
-    this.editorButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e(
-        "a",
-        { href: "./level-editor.html", class: "game-menu__link" },
-        "OUVRIR L'ÉDITEUR"
-      )
-    );
-    this.aboutButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "À PROPOS")
-    );
-    this.exitButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "QUITTER LE JEU")
-    );
-    this.backButton = e(
-      "li",
-      { class: "game-menu__item" },
-      e("a", { href: "", class: "game-menu__link" }, "RETOUR")
-    );
-
-    // // display pause menu
-    // this.showPauseMenu();
-    // this.uiContainerEl.appendChild(this.gameMenuEl);
-
-    // attach event handlers for game menu
+    // game menu
+    this.gameMenu = new GameMenu();
     this.attachEventHandlers();
 
     // initialize keyboard & sound
@@ -162,137 +58,10 @@ var Game = (function() {
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
   };
 
-  // Build different game menus
-  Game.prototype.showGameOverMenu = function() {
-    this.closeGameMenu();
-    this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "PERDU !"),
-      e("ul", { class: "game-menu__list" }, [
-        this.restartButton,
-        this.loadButton,
-        this.editorButton,
-        this.exitButton
-      ])
-    ]);
-    this.uiContainerEl.appendChild(this.gameMenuEl);
-  };
-
-  Game.prototype.showVictoryMenu = function() {
-    this.closeGameMenu();
-    this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "VICTOIRE !"),
-      e("p", null, [
-        "Vous avez retrouvé toutes mes principales compétences, vous pouvez avoir plus d'infos en consultant mon cv détaillé ",
-        e("a", { href: "./assets/files/CV Thomas Vandenhede.pdf" }, "ici"),
-        ". Ou bien essayez de battre votre score."
-      ]),
-      e("ul", { class: "game-menu__list" }, [
-        this.restartButton,
-        this.loadButton,
-        this.editorButton,
-        this.exitButton
-      ])
-    ]);
-    this.uiContainerEl.appendChild(this.gameMenuEl);
-  };
-
-  Game.prototype.showPauseMenu = function() {
-    this.closeGameMenu();
-    this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "JEU EN PAUSE"),
-      e("ul", { class: "game-menu__list" }, [
-        this.resumeButton,
-        this.restartButton,
-        this.controlsButton,
-        this.loadButton,
-        this.editorButton,
-        this.aboutButton,
-        this.exitButton
-      ])
-    ]);
-    this.uiContainerEl.appendChild(this.gameMenuEl);
-  };
-
-  Game.prototype.showControlsMenu = function() {
-    this.closeGameMenu();
-    this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "CONTRÔLES"),
-      e("ul", { class: "game-menu__list" }, [this.controlsEl, this.backButton])
-    ]);
-    this.uiContainerEl.appendChild(this.gameMenuEl);
-  };
-
-  Game.prototype.showAboutMenu = function() {
-    this.closeGameMenu();
-    this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "À PROPOS"),
-      e("p", null, [
-        e(
-          "p",
-          null,
-          "Ce jeu est un projet que j'ai réalisé pour ma formation de Dev JS à l'Ifocop de Paris. Il a nécessité un bon mois de travail et pas mal de nuits blanches."
-        ),
-        e(
-          "p",
-          null,
-          "Le code est entièrement écrit en JavaScript, HTML et CSS et n'utilise aucun framework (hormis une touche de Bootstrap pour l'éditeur de niveaux)."
-        )
-      ]),
-      e("ul", { class: "game-menu__list" }, [this.backButton])
-    ]);
-    this.uiContainerEl.appendChild(this.gameMenuEl);
-  };
-
-  Game.prototype.showLoadMenu = function() {
-    this.closeGameMenu();
-    this.gameMenuEl = e("div", { class: "game-menu" }, [
-      e("h2", null, "CHARGER UN NIVEAU"),
-      e(
-        "ul",
-        { class: "game-menu__list" },
-        Object.keys(gameData.levels).map(
-          function(key) {
-            return e(
-              "li",
-              null,
-              e(
-                "a",
-                {
-                  href: "",
-                  onclick:
-                    "event.preventDefault ? event.preventDefault() : (event.returnValue = false);" +
-                    "game.currentLevelName = '" +
-                    gameData.levels[key].name +
-                    "';" +
-                    "game.state = '" +
-                    states.PAUSED +
-                    "';" +
-                    "game.startGame();"
-                  // "game.buildGameLevel(game.currentLevelName);" +
-                  // "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10, " +
-                  // "(game.canvas.height - game.player.height) / 2 - 10)"
-                },
-                gameData.levels[key].name
-              )
-            );
-          }.bind(this)
-        )
-      ),
-      e("ul", { class: "game-menu__list" }, [this.backButton])
-    ]);
-    this.uiContainerEl.appendChild(this.gameMenuEl);
-  };
-
   Game.prototype.attachEventHandlers = function() {
     this.handleMenuResumeClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.unpause();
-    };
-    this.handleMenuLevelClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    };
-    this.handleMenuAboutClick = function(e) {
-      e.preventDefault ? e.preventDefault() : (e.returnValue = false);
     };
     this.handleMenuExitClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
@@ -304,31 +73,31 @@ var Game = (function() {
     };
     this.handleControlsButtonClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-      this.showControlsMenu();
+      this.gameMenu.showControlsMenu();
     };
     this.handleAboutButtonClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-      this.showAboutMenu();
+      this.gameMenu.showAboutMenu();
     };
     this.handleBackButtonClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-      this.state === states.PAUSED && this.showPauseMenu();
-      this.state === states.VICTORY && this.showVictoryMenu();
-      this.state === states.GAME_OVER && this.showGameOverMenu();
+      this.state === states.PAUSED && this.gameMenu.showPauseMenu();
+      this.state === states.VICTORY && this.gameMenu.showVictoryMenu();
+      this.state === states.GAME_OVER && this.gameMenu.showGameOverMenu();
     };
     this.handleLoadMenuClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-      this.showLoadMenu();
+      this.gameMenu.showLoadMenu();
     };
-    this.resumeButton.onclick = this.handleMenuResumeClick.bind(this);
-    this.restartButton.onclick = this.handleRestartClick.bind(this);
-    this.loadButton.onclick = this.handleMenuLevelClick.bind(this);
-    this.aboutButton.onclick = this.handleMenuAboutClick.bind(this);
-    this.exitButton.onclick = this.handleMenuExitClick.bind(this);
-    this.controlsButton.onclick = this.handleControlsButtonClick.bind(this);
-    this.aboutButton.onclick = this.handleAboutButtonClick.bind(this);
-    this.backButton.onclick = this.handleBackButtonClick.bind(this);
-    this.loadButton.onclick = this.handleLoadMenuClick.bind(this);
+    this.gameMenu.resumeButton.onclick = this.handleMenuResumeClick.bind(this);
+    this.gameMenu.restartButton.onclick = this.handleRestartClick.bind(this);
+    this.gameMenu.controlsButton.onclick = this.handleControlsButtonClick.bind(
+      this
+    );
+    this.gameMenu.aboutButton.onclick = this.handleAboutButtonClick.bind(this);
+    this.gameMenu.backButton.onclick = this.handleBackButtonClick.bind(this);
+    this.gameMenu.loadButton.onclick = this.handleLoadMenuClick.bind(this);
+    this.gameMenu.exitButton.onclick = this.handleMenuExitClick.bind(this);
   };
 
   Game.prototype.loadGameDataFromLocalStorage = function() {
@@ -360,15 +129,6 @@ var Game = (function() {
       .concat(this.ennemies)
       .concat(this.lasers)
       .concat([this.player]);
-  };
-
-  Game.prototype.closeGameMenu = function() {
-    var el = this.gameMenuEl;
-    if (el) {
-      emptyElement(this.gameMenuEl);
-      this.uiContainerEl.removeChild(this.gameMenuEl);
-    }
-    this.gameMenuEl = null;
   };
 
   Game.prototype.handleKeyboard = function() {
@@ -609,7 +369,7 @@ var Game = (function() {
 
   Game.prototype.pause = function() {
     if (this.state !== states.GAME_OVER && this.state !== states.VICTORY) {
-      !this.gameMenuEl && this.showPauseMenu();
+      !this.gameMenuEl && this.gameMenu.showPauseMenu();
       this.timer.pause();
       this.soundManager.pauseAll();
       this.state = states.PAUSED;
@@ -619,7 +379,7 @@ var Game = (function() {
   Game.prototype.unpause = function() {
     this.state !== states.GAME_OVER &&
       this.state !== states.VICTORY &&
-      this.closeGameMenu();
+      this.gameMenu.close();
     this.timer.play();
     this.soundManager.playPaused();
     this.state = states.RUNNING;
@@ -751,10 +511,6 @@ var Game = (function() {
     /**
      * COLLISION RESOLUTION
      **/
-    // // no collision detected, do nothing
-    // if (!collisions.length) {
-    //   return;
-    // }
 
     // determine FINAL COLLISION characteristics
     var dH = 0,
@@ -828,7 +584,7 @@ var Game = (function() {
   Game.prototype.restartGame = function() {
     this.ghostIndex = 0;
     cancelAnimationFrame(this.rAF);
-    this.closeGameMenu();
+    this.gameMenu.close();
     this.unpause();
     this.startGame();
   };
@@ -880,9 +636,9 @@ var Game = (function() {
   };
 
   Game.prototype.exit = function() {
-    show(this.gameIntroEl);
-    this.closeGameMenu();
-    hide(this.gameContainerEl);
+    show(this.gameMenu.gameIntroEl);
+    this.gameMenu.close();
+    hide(this.gameMenu.gameContainerEl);
     this.state = states.EXIT;
     delete game;
   };
@@ -892,7 +648,7 @@ var Game = (function() {
       this.state = states.VICTORY;
       setTimeout(
         function() {
-          this.showVictoryMenu();
+          this.gameMenu.showVictoryMenu();
         }.bind(this),
         1000
       );
@@ -904,7 +660,7 @@ var Game = (function() {
       this.state = states.GAME_OVER;
       setTimeout(
         function() {
-          this.showGameOverMenu();
+          this.gameMenu.showGameOverMenu();
         }.bind(this),
         1000
       );
@@ -934,18 +690,64 @@ var Game = (function() {
   };
 
   Game.prototype.updateGhost = function() {
-    // display current ghost
-    this.ghost = this.ghostPositions.length
-      ? this.ghostPositions[this.ghostIndex]
-      : null;
+    var totalTime = this.timer.totalTime;
+    var ghostTimes = this.ghostPositions.map(function(position) {
+      return position.time;
+    });
+    var currentGhostTime = ghostTimes.find(function(time, index) {
+      return totalTime >= time && totalTime < ghostTimes[index + 1];
+    });
+    var ghostIndex = ghostTimes.indexOf(currentGhostTime);
+    var nextGhostTime = ghostTimes[ghostIndex + 1];
+
+    var timeRatio =
+      (totalTime - currentGhostTime) / (nextGhostTime - currentGhostTime);
+    console.log("​Game.prototype.updateGhost -> timeRatio", timeRatio);
+
+    if (this.ghostPositions.length) {
+      this.ghost = {};
+      this.ghost.x =
+        this.ghostPositions[ghostIndex].x +
+        (this.ghostPositions[ghostIndex + 1].x -
+          this.ghostPositions[ghostIndex].x) *
+          timeRatio;
+      this.ghost.y =
+        this.ghostPositions[ghostIndex].y +
+        (this.ghostPositions[ghostIndex + 1].y -
+          this.ghostPositions[ghostIndex].y) *
+          timeRatio;
+    } else {
+      this.ghost = null;
+    }
+    // this.ghost = this.ghostPositions.length
+    //   ? this.ghostPositions[this.ghostIndex]
+    //   : null;
 
     // store position for next ghost
-    this.ghostPositions[this.ghostIndex + 1] && this.ghostIndex++;
     this.ghostPositionsTemp.push({
       time: this.timer.totalTime,
       x: this.player.x,
       y: this.player.y
     });
+  };
+
+  Game.prototype.requestLoop = function() {
+    switch (this.state) {
+      case states.INTRO:
+        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
+        break;
+      case states.RUNNING:
+        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
+        break;
+      case states.PAUSED:
+        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
+        break;
+      case states.GAME_OVER:
+      case states.VICTORY:
+        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
+      default:
+        break;
+    }
   };
 
   /**
@@ -982,49 +784,20 @@ var Game = (function() {
     this.renderBackground(this.ctx, this.camera);
     this.renderScene(this.ctx, this.camera);
 
-    switch (this.state) {
-      case states.INTRO:
-        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
-        break;
-      case states.RUNNING:
-        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
-        break;
-      case states.PAUSED:
-        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
-        break;
-      case states.GAME_OVER:
-      case states.VICTORY:
-        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
-      default:
-        break;
-    }
+    this.requestLoop();
   };
 
   /**
    * Pause menu loop
    */
+
   Game.prototype.pauseMenuLoop = function() {
     this.clearCanvas(this.ctx);
     this.renderBackground(this.ctx, this.camera);
     this.camera.updateDimensions(); // continue updating camera in case browser window is resized
     this.renderScene(this.ctx, this.camera);
 
-    switch (this.state) {
-      case states.INTRO:
-        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
-        break;
-      case states.RUNNING:
-        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
-        break;
-      case states.PAUSED:
-        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
-        break;
-      case states.GAME_OVER:
-      case states.VICTORY:
-        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
-      default:
-        break;
-    }
+    this.requestLoop();
   };
 
   Game.prototype.gameOverLoop = function() {
@@ -1033,22 +806,7 @@ var Game = (function() {
     this.renderBackground(this.ctx, this.camera);
     this.renderScene(this.ctx, this.camera);
 
-    switch (this.state) {
-      case states.INTRO:
-        this.rAF = requestAnimationFrame(this.introLoop.bind(this));
-        break;
-      case states.RUNNING:
-        this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
-        break;
-      case states.PAUSED:
-        this.rAF = requestAnimationFrame(this.pauseMenuLoop.bind(this));
-        break;
-      case states.GAME_OVER:
-      case states.VICTORY:
-        this.rAF = requestAnimationFrame(this.gameOverLoop.bind(this));
-      default:
-        break;
-    }
+    this.requestLoop();
   };
 
   Game.prototype.updateDebugInfo = function() {
