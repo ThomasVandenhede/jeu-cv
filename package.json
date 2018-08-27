@@ -1,0 +1,25 @@
+{
+  "name": "jeu-cv",
+  "version": "1.0.0",
+  "description": "Projet de CV sous forme de jeu pour la formation de Dev Full Stack JS à l'Ifocop",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasVandenhede/jeu-cv.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThomasVandenhede/jeu-cv/issues"
+  },
+  "homepage": "https://github.com/ThomasVandenhede/jeu-cv#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "webpack": "^4.17.1"
+  }
+}
