@@ -1,18 +1,18 @@
-var CreationTool = (function() {
-  var defaultOptions = {
-    Player: {},
-    Ennemy: {},
-    Skill: {},
-    Platform: {
-      passthrough: false
-    },
-    MovingPlatform: {
-      passthrough: false,
-      positionRatio: 0
-    }
-  };
+var defaultOptions = {
+  Player: {},
+  Ennemy: {},
+  Skill: {},
+  Platform: {
+    passthrough: false
+  },
+  MovingPlatform: {
+    passthrough: false,
+    positionRatio: 0
+  }
+};
 
-  function CreationTool(props) {
+class CreationTool {
+  constructor(props) {
     this.gameObjects = props.gameObjects;
     this.camera = props.camera;
     this.mouse = props.mouse;
@@ -41,7 +41,7 @@ var CreationTool = (function() {
     };
   }
 
-  CreationTool.prototype.handleMouseDown = function handleMouseDown(e) {
+  handleMouseDown(e) {
     var mouseGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.x,
       this.mouse.y
@@ -69,9 +69,9 @@ var CreationTool = (function() {
       default:
         break;
     }
-  };
+  }
 
-  CreationTool.prototype.handleMouseUp = function handleMouseUp(e) {
+  handleMouseUp(e) {
     switch (e.button) {
       case 0: // left mouse button
         this.canvas.style.cursor = "";
@@ -82,9 +82,9 @@ var CreationTool = (function() {
       default:
         break;
     }
-  };
+  }
 
-  CreationTool.prototype.handleMouseMove = function handleMouseMove(e) {
+  handleMouseMove(e) {
     var clickGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.clickX,
       this.mouse.clickY
@@ -105,7 +105,5 @@ var CreationTool = (function() {
         this.currentObject.height = Math.max(0, mouseGameDisplacement.y);
       }
     }
-  };
-
-  return CreationTool;
-})();
+  }
+}

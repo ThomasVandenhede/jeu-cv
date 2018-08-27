@@ -1,35 +1,37 @@
 // Singleton pattern
-var keyboardManager = (function() {
-  var instance;
+var codeMappings = {
+  ArrowLeft: "LEFT",
+  ArrowUp: "UP",
+  ArrowRight: "RIGHT",
+  ArrowDown: "DOWN",
+  KeyW: "UP",
+  KeyA: "LEFT",
+  KeyS: "DOWN",
+  KeyD: "RIGHT",
+  Enter: "ENTER",
+  Space: "SPACE",
+  Escape: "ESCAPE"
+};
+var keyCodeMappings = {
+  37: "LEFT",
+  38: "UP",
+  39: "RIGHT",
+  40: "DOWN",
+  90: "UP",
+  81: "LEFT",
+  93: "DOWN",
+  68: "RIGHT",
+  13: "ENTER",
+  32: "SPACE",
+  27: "ESCAPE"
+};
 
-  function KeyboardManager() {
-    var codeMappings = {
-      ArrowLeft: "LEFT",
-      ArrowUp: "UP",
-      ArrowRight: "RIGHT",
-      ArrowDown: "DOWN",
-      KeyW: "UP",
-      KeyA: "LEFT",
-      KeyS: "DOWN",
-      KeyD: "RIGHT",
-      Enter: "ENTER",
-      Space: "SPACE",
-      Escape: "ESCAPE"
-    };
-    var keyCodeMappings = {
-      37: "LEFT",
-      38: "UP",
-      39: "RIGHT",
-      40: "DOWN",
-      90: "UP",
-      81: "LEFT",
-      93: "DOWN",
-      68: "RIGHT",
-      13: "ENTER",
-      32: "SPACE",
-      27: "ESCAPE"
-    };
-
+class KeyboardManager {
+  constructor({ app }) {
+    if (!KeyboardManager.instance) {
+      KeyboardManager.instance = this;
+    }
+    this.app = app;
     window.addEventListener(
       "keydown",
       function(event) {
@@ -88,18 +90,6 @@ var keyboardManager = (function() {
     this.SPACE = false;
 
     this.keyRepeat = {};
+    return KeyboardManager.instance;
   }
-
-  KeyboardManager.prototype.init = function(app) {
-    this.app = app;
-  };
-
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new KeyboardManager();
-      }
-      return instance;
-    }
-  };
-})();
+}

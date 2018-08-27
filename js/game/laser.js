@@ -1,9 +1,11 @@
-var Laser = (function() {
-  function Laser(props) {
-    this.length = 20;
+const length = 20;
+
+class Laser extends Segment {
+  constructor(props) {
     var A = new Vector(props.x, props.y);
-    var B = Vector.sum(A, props.direction.multiplyByScalar(this.length));
-    Segment.call(this, A, B);
+    var B = Vector.sum(A, props.direction.multiplyByScalar(length));
+    super(A, B);
+    this.length = length;
 
     this.origin = new Vector(props.x, props.y);
     this.speed = 250;
@@ -21,23 +23,20 @@ var Laser = (function() {
     this.color = props.color;
   }
 
-  Laser.prototype = Object.create(Segment.prototype);
-  Laser.prototype.constructor = Laser;
-
-  Laser.prototype.hasReachedMaxRange = function() {
+  hasReachedMaxRange() {
     return (
       Vector.subtract(this.B, this.origin).normSquared >=
       Math.pow(this.range, 2)
     );
-  };
+  }
 
-  Laser.prototype.update = function() {
+  update() {
     var dPos = this.v.multiplyByScalar(dt);
     this.A = Vector.sum(this.A, dPos);
     this.B = Vector.sum(this.B, dPos);
-  };
+  }
 
-  Laser.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -52,7 +51,5 @@ var Laser = (function() {
     ctx.lineTo.apply(ctx, applyCamToArr(B.x, B.y));
     ctx.stroke();
     ctx.restore();
-  };
-
-  return Laser;
-})();
+  }
+}

@@ -1,8 +1,10 @@
 // Singleton pattern
-var keyboardManager = (function() {
-  var instance;
-
-  function KeyboardManager() {
+class KeyboardManager {
+  constructor({ app }) {
+    this.app = app;
+    if (!KeyboardManager.instance) {
+      KeyboardManager.instance = this;
+    }
     var codeMappings = {
       ArrowLeft: "LEFT",
       ArrowUp: "UP",
@@ -107,18 +109,6 @@ var keyboardManager = (function() {
     );
 
     this.keyRepeat = {};
+    return KeyboardManager.instance;
   }
-
-  KeyboardManager.prototype.init = function(app) {
-    this.app = app;
-  };
-
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new KeyboardManager();
-      }
-      return instance;
-    }
-  };
-})();
+}

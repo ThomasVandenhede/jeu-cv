@@ -1,12 +1,18 @@
-var Camera = (function() {
-  var AXIS = {
-    NONE: "none",
-    HORIZONTAL: "horizontal",
-    VERTICAL: "vertical",
-    BOTH: "both"
-  };
+var AXIS = {
+  NONE: "none",
+  HORIZONTAL: "horizontal",
+  VERTICAL: "vertical",
+  BOTH: "both"
+};
 
-  function Camera(props) {
+class Camera extends AABB {
+  constructor(props) {
+    super({
+      x: props.x,
+      y: props.y,
+      width: props.canvas.width,
+      height: props.canvas.height
+    });
     this.zoomLevel = props.zoomLevel || 1;
     this.height = canvas.height / this.zoomLevel;
     this.width = canvas.width / this.zoomLevel;
@@ -14,13 +20,6 @@ var Camera = (function() {
     this.worldRect = props.worldRect;
 
     this.zoomingRate = 1.1;
-
-    AABB.call(this, {
-      x: props.x,
-      y: props.y,
-      width: this.canvas.width,
-      height: this.canvas.height
-    });
 
     this.xDeadZone = this.canvas.width / 3; // min distance to horizontal borders
     this.yDeadZone = this.canvas.height / 3; // min distance to vertical borders
@@ -32,10 +31,7 @@ var Camera = (function() {
     this.shouldStayWithinWorldBounds = false;
   }
 
-  Camera.prototype = Object.create(AABB.prototype);
-  Camera.prototype.constructor = Camera;
-
-  Camera.prototype.follow = function(gameObject, xDeadZone, yDeadZone) {
+  follow(gameObject, xDeadZone, yDeadZone) {
     this.followed = gameObject;
     this.x = this.followed.center.x - this.width / 2;
     this.y = this.followed.center.y - this.height / 2;
@@ -43,9 +39,9 @@ var Camera = (function() {
     this.yDeadZone = yDeadZone;
     // this.xClearZone = xClearZone;
     // this.yClearZone = yClearZone;
-  };
+  }
 
-  Camera.prototype.update = function() {
+  update() {
     this.updateDimensions();
     if (this.followed) {
       var xDeadZone = Math.min(
@@ -101,14 +97,14 @@ var Camera = (function() {
         this.y = this.worldRect.bottom - this.height;
       }
     }
-  };
+  }
 
-  Camera.prototype.updateDimensions = function() {
+  updateDimensions() {
     this.height = this.canvas.height / this.zoomLevel;
     this.width = this.canvas.width / this.zoomLevel;
-  };
+  }
 
-  Camera.prototype.zoomIn = function(x, y) {
+  zoomIn(x, y) {
     var centerX = x !== undefined ? x : this.followed.center.x;
     var centerY = y !== undefined ? y : this.followed.center.y;
 
@@ -119,9 +115,9 @@ var Camera = (function() {
       this.x = (this.x - centerX) / this.zoomingRate + centerX;
       this.y = (this.y - centerY) / this.zoomingRate + centerY;
     }
-  };
+  }
 
-  Camera.prototype.zoomOut = function(x, y) {
+  zoomOut(x, y) {
     var centerX = x !== undefined ? x : this.followed.center.x;
     var centerY = y !== undefined ? y : this.followed.center.y;
 
@@ -132,21 +128,19 @@ var Camera = (function() {
       this.x = (this.x - centerX) * this.zoomingRate + centerX;
       this.y = (this.y - centerY) * this.zoomingRate + centerY;
     }
-  };
+  }
 
-  Camera.prototype.apply = function(x, y) {
+  apply(x, y) {
     var screenX, screenY;
     screenX = toFixedPrecision((x - this.x) * this.zoomLevel, 4);
     screenY = toFixedPrecision((y - this.y) * this.zoomLevel, 4);
     return new Vector(screenX, screenY);
-  };
+  }
 
-  Camera.prototype.unapply = function(x, y) {
+  unapply(x, y) {
     var gameX, gameY;
     gameX = toFixedPrecision(x / this.zoomLevel + this.x, 2);
     gameY = toFixedPrecision(y / this.zoomLevel + this.y, 2);
     return new Vector(gameX, gameY);
-  };
-
-  return Camera;
-})();
+  }
+}

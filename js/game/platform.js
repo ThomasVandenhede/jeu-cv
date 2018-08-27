@@ -1,8 +1,8 @@
-var Platform = (function() {
-  var MAX_SPEED = 100;
+var MAX_SPEED = 100;
 
-  function Platform(props) {
-    AABB.call(this, props);
+class Platform extends AABB {
+  constructor(props) {
+    super(props);
 
     this.v = new Vector();
     this.solid = props && props.solid !== undefined ? props.solid : true; // can collide with other solid objects
@@ -12,12 +12,9 @@ var Platform = (function() {
     this.color = "#5e4c4c";
   }
 
-  Platform.prototype = Object.create(AABB.prototype);
-  Platform.prototype.constructor = Platform;
+  update() {}
 
-  Platform.prototype.update = function() {};
-
-  Platform.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -51,7 +48,5 @@ var Platform = (function() {
       );
     }
     ctx.restore();
-  };
-
-  return Platform;
-})();
+  }
+}

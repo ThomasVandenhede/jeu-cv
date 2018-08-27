@@ -1,48 +1,45 @@
-var GameTimer = (function() {
-  function GameTimer(props) {
-    AABB.call(this, props);
+class GameTimer extends AABB {
+  constructor(props) {
+    super(props);
     this.isPaused = false;
     this.isCountDown = true;
   }
 
-  GameTimer.prototype = Object.create(AABB.prototype);
-  GameTimer.prototype.constructor = GameTimer;
-
-  GameTimer.prototype.getEllapsedTime = function() {
+  getEllapsedTime() {
     return this.currentTime - this.previousTime;
-  };
+  }
 
-  GameTimer.prototype.pause = function() {
+  pause() {
     this.isPaused = true;
-  };
+  }
 
-  GameTimer.prototype.play = function() {
+  play() {
     this.isPaused = false;
     this.currentTime = Date.now();
-  };
+  }
 
-  GameTimer.prototype.update = function() {
+  update() {
     if (!this.isPaused) {
       this.previousTime = this.currentTime;
       this.currentTime = Date.now();
       this.totalTime += this.currentTime - this.previousTime;
     }
-  };
+  }
 
-  GameTimer.prototype.reset = function(timestamp) {
+  reset(timestamp) {
     this.totalTime = 0;
     this.currentTime = Date.now();
     this.previousTime = this.currentTime;
     this.countdownStart = timestamp || 0.5 * 60 * 1000; // ms;
-  };
+  }
 
-  GameTimer.prototype.draw = function(ctx) {
+  draw(ctx) {
     var displayTime = new Date();
     this.isCountDown
       ? displayTime.setTime(Math.max(0, this.countdownStart - this.totalTime))
       : displayTime.setTime(this.totalTime);
-    seconds = displayTime.getSeconds();
-    minutes = displayTime.getMinutes();
+    var seconds = displayTime.getSeconds();
+    var minutes = displayTime.getMinutes();
 
     seconds = seconds < 10 ? "0" + seconds : seconds;
     minutes = minutes < 10 ? "0" + minutes : minutes;
@@ -74,7 +71,5 @@ var GameTimer = (function() {
     ctx.fillStyle = color;
     ctx.fillText(minutes + ":" + seconds, center.x, bottom - 7);
     ctx.restore();
-  };
-
-  return GameTimer;
-})();
+  }
+}
