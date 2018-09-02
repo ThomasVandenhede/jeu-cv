@@ -51,6 +51,7 @@ class LevelEditor {
       tools: this.tools
     });
     this.toolbar = new Toolbar({ app: this, tools: this.tools });
+    this.timer = new Timer();
     // this.currentLevelName = "level 1";
   }
 
@@ -125,12 +126,6 @@ class LevelEditor {
       ctx.fill();
     }
     ctx.restore();
-  }
-
-  updateTimeEllapsed() {
-    this.previousTime = this.currentTime || Date.now();
-    this.currentTime = Date.now();
-    return (this.currentTime - this.previousTime) / 1000;
   }
 
   clearCanvas(ctx) {
@@ -333,7 +328,8 @@ class LevelEditor {
 
   main() {
     var camera = this.camera;
-    window.dt = this.updateTimeEllapsed();
+    window.dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
+    this.timer.update();
     // this.handleKeyboard();
     this.updateScene();
     this.clearCanvas(this.ctx, camera);

@@ -1,12 +1,9 @@
-class GameTimer extends AABB {
+class Clock extends AABB {
   constructor(props) {
     super(props);
+    this.timer = props.timer;
     this.isPaused = false;
     this.isCountDown = true;
-  }
-
-  getEllapsedTime() {
-    return this.currentTime - this.previousTime;
   }
 
   pause() {
@@ -28,8 +25,6 @@ class GameTimer extends AABB {
 
   reset(timestamp) {
     this.totalTime = 0;
-    this.currentTime = Date.now();
-    this.previousTime = this.currentTime;
     this.countdownStart = timestamp || 0.5 * 60 * 1000; // ms;
   }
 
@@ -44,14 +39,6 @@ class GameTimer extends AABB {
     seconds = seconds < 10 ? "0" + seconds : seconds;
     minutes = minutes < 10 ? "0" + minutes : minutes;
 
-    var left = this.left;
-    var right = this.right;
-    var top = this.top;
-    var bottom = this.bottom;
-    var width = this.width;
-    var height = this.height;
-    var center = this.center;
-    var r = height / 2;
     var color =
       this.isCountDown && this.countdownStart - this.totalTime < 16000
         ? "red"
@@ -62,14 +49,14 @@ class GameTimer extends AABB {
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.rect(left, top, width, height);
+    ctx.rect(this.left, this.top, this.width, this.height);
     ctx.stroke();
     ctx.fill();
 
     ctx.font = "bold 24px Arial";
     ctx.textAlign = "center";
     ctx.fillStyle = color;
-    ctx.fillText(minutes + ":" + seconds, center.x, bottom - 7);
+    ctx.fillText(minutes + ":" + seconds, this.center.x, this.bottom - 7);
     ctx.restore();
   }
 }

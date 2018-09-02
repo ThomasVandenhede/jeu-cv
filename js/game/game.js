@@ -51,7 +51,9 @@ class Game {
     this.ghost = new Ghost();
 
     // game timer
-    this.timer = new GameTimer({
+    this.timer = new Timer();
+    this.clock = new Clock({
+      timer: this.timer,
       x: canvas.width - 170,
       y: 35,
       width: 80,
@@ -159,6 +161,7 @@ class Game {
     var player = this.level.player;
 
     // update objects to be rendered
+    this.clock.update();
     !player.isDead &&
       this.level.ennemies.forEach(
         function(ennemy) {
@@ -235,7 +238,7 @@ class Game {
       particle.draw(ctx, camera);
     });
     this.lifeBar.draw(ctx);
-    this.timer.draw(ctx);
+    this.clock.draw(ctx);
     this.shouldDisplayRulers &&
       this.grid.draw(ctx, camera, { isGame: true, shouldDisplayRulers: true });
     this.skillBar.draw(ctx, camera);
@@ -257,11 +260,11 @@ class Game {
     this.rAF && cancelAnimationFrame(this.rAF);
     this.loadGameDataFromLocalStorage();
     this.level = this.levelManager.buildLevel(this.currentLevelName);
-    this.timer.reset.call(this.timer, this.level.countdownStart);
+    this.clock.reset(this.level.countdownStart);
     this.levelManager.buildEntities();
     this.collisionManager = new CollisionManager({
       level: this.level,
-      timer: this.timer,
+      clock: this.clock,
       camera: this.camera
     });
     this.ghost.init({
@@ -323,7 +326,7 @@ class Game {
   pause() {
     if (this.state !== states.GAME_OVER && this.state !== states.VICTORY) {
       !this.gameMenuEl && this.gameMenu.showPauseMenu();
-      this.timer.pause();
+      this.clock.pause();
       this.soundManager.pauseAll();
       this.state = states.PAUSED;
     }
@@ -333,7 +336,7 @@ class Game {
     this.state !== states.GAME_OVER &&
       this.state !== states.VICTORY &&
       this.gameMenu.close();
-    this.timer.play();
+    this.clock.play();
     this.soundManager.playPaused();
     this.state = states.RUNNING;
   }
@@ -359,7 +362,7 @@ class Game {
     window.dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.ghost.update();
     !this.level.player.isDead &&
-      this.timer.countdownStart - this.timer.totalTime < 1000 &&
+      this.clock.countdownStart - this.clock.totalTime < 1000 &&
       this.level.player.die();
     this.handleKeyboard();
     this.level.entities.forEach(function(entity) {
@@ -374,12 +377,14 @@ class Game {
   }
 
   pauseMenuLoop() {
+    this.timer.update();
     this.camera.updateDimensions(); // keep updating camera in case window is resized
     this.render(this.ctx, this.camera);
     this.requestLoop();
   }
 
   gameOverLoop() {
+    this.timer.update();
     this.updateScene();
     this.render(this.ctx, this.camera);
     this.requestLoop();
