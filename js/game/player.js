@@ -207,12 +207,12 @@ class Player extends AABB {
       ctx.save();
       ctx.strokeStyle = this.color;
       ctx.fillStyle = this.color;
-      ctx.lineWidth = lineWidth * camera.zoomLevel;
+      ctx.lineWidth = camera.scale(lineWidth);
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.x, this.y).concat(
-          this.width * camera.zoomLevel,
-          this.height * camera.zoomLevel
+          camera.scale(this.width),
+          camera.scale(this.height)
         )
       );
 
@@ -221,8 +221,8 @@ class Player extends AABB {
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.left, this.top + 10).concat([
-          this.width * camera.zoomLevel,
-          10 * camera.zoomLevel
+          camera.scale(this.width),
+          camera.scale(10)
         ])
       );
 

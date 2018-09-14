@@ -156,8 +156,8 @@ class Grid {
 
   _drawPrecisionArea(ctx, camera) {
     var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
-    var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
-    var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
+    var precisionAreaGameSize = camera.scale(this.precisionAreaSize);
+    var precisionGridSize = camera.scale(this.precisionGridSize);
     var minX = mousePos.x - precisionAreaGameSize / 2;
     var maxX = mousePos.x + precisionAreaGameSize / 2;
     var minY = mousePos.y - precisionAreaGameSize / 2;

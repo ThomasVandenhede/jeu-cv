@@ -19,7 +19,7 @@ class Skill extends AABB {
       ctx,
       [this.image]
         .concat(applyCamToArr(this.x, this.y))
-        .concat([this.width * camera.zoomLevel, this.height * camera.zoomLevel])
+        .concat([camera.scale(this.width), camera.scale(this.height)])
     );
     ctx.restore();
   }

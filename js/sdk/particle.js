@@ -32,8 +32,8 @@ class Particle extends Vector {
     ctx.fillRect.apply(
       ctx,
       applyCamToArr(this.x, this.y).concat([
-        size * camera.zoomLevel,
-        size * camera.zoomLevel
+        camera.scale(size),
+        camera.scale(size)
       ])
     );
   }

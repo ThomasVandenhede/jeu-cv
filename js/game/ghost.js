@@ -69,8 +69,8 @@ class Ghost {
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.ghost.x, this.ghost.y).concat([
-          this.player.width * camera.zoomLevel,
-          this.player.height * camera.zoomLevel
+          camera.scale(this.player.width),
+          camera.scale(this.player.height)
         ])
       );
       if (!this.ghostPositions[this.ghostIndex + 1]) {

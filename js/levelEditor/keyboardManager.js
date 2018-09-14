@@ -80,16 +80,16 @@ class KeyboardManager {
             this.app.toolbar.objectTypeDropDown.focus();
             break;
           case 37:
-            this.app.camera.x -= 20 / this.app.camera.zoomLevel;
+            this.app.camera.x -= this.app.camera.unscale(20);
             break;
           case 38:
-            this.app.camera.y -= 20 / this.app.camera.zoomLevel;
+            this.app.camera.y -= this.app.camera.unscale(20);
             break;
           case 39:
-            this.app.camera.x += 20 / this.app.camera.zoomLevel;
+            this.app.camera.x += this.app.camera.unscale(20);
             break;
           case 40:
-            this.app.camera.y += 20 / this.app.camera.zoomLevel;
+            this.app.camera.y += this.app.camera.unscale(20);
             break;
           case 187:
             event.preventDefault();

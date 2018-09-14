@@ -15,7 +15,7 @@ class SmokeParticle extends Particle {
       ctx,
       [this.image]
         .concat(applyCamToArr(this.x, this.y))
-        .concat([this.size * camera.zoomLevel, this.size * camera.zoomLevel])
+        .concat([camera.scale(this.size), camera.scale(this.size)])
     );
     ctx.restore();
   }

@@ -82,10 +82,10 @@ class MouseManager {
         if (this.buttons[1]) {
           this.grabbed.x =
             this.grabbedStartingX -
-            (scrollDirection * (this.x - this.clickX)) / camera.zoomLevel;
+            camera.unscale(scrollDirection * (this.x - this.clickX));
           this.grabbed.y =
             this.grabbedStartingY -
-            (scrollDirection * (this.y - this.clickY)) / camera.zoomLevel;
+            camera.unscale(scrollDirection * (this.y - this.clickY));
         }
       }.bind(this)
     );

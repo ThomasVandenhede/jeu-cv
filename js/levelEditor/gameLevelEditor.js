@@ -154,8 +154,8 @@ class LevelEditor {
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(selectionArea.x, selectionArea.y).concat([
-          selectionArea.width * camera.zoomLevel,
-          selectionArea.height * camera.zoomLevel
+          camera.scale(selectionArea.width),
+          camera.scale(selectionArea.height)
         ])
       );
       ctx.restore();
@@ -183,8 +183,8 @@ class LevelEditor {
     ctx.rect.apply(
       ctx,
       applyCamToArr(selectionRectangle.x, selectionRectangle.y).concat([
-        selectionRectangle.width * camera.zoomLevel,
-        selectionRectangle.height * camera.zoomLevel
+        camera.scale(selectionRectangle.width),
+        camera.scale(selectionRectangle.height)
       ])
     );
     ctx.stroke();
@@ -199,8 +199,8 @@ class LevelEditor {
             new Vector(lineWidth / 2, lineWidth / 2)
           )
         ).concat([
-          selectedObject.width * camera.zoomLevel + lineWidth,
-          selectedObject.height * camera.zoomLevel + lineWidth
+          camera.scale(selectedObject.width) + lineWidth,
+          camera.scale(selectedObject.height) + lineWidth
         ])
       );
       ctx.stroke();
@@ -260,8 +260,8 @@ class LevelEditor {
               new Vector(lineWidth / 2, lineWidth / 2)
             )
           ).concat([
-            gameObject.width * camera.zoomLevel - lineWidth,
-            gameObject.height * camera.zoomLevel - lineWidth
+            camera.scale(gameObject.width) - lineWidth,
+            camera.scale(gameObject.height) - lineWidth
           ])
         );
         ctx.stroke();
@@ -298,8 +298,8 @@ class LevelEditor {
     ctx.strokeRect.apply(
       ctx,
       applyCamToArr(this.worldRect.x, this.worldRect.y).concat([
-        this.worldRect.width * camera.zoomLevel,
-        this.worldRect.height * camera.zoomLevel
+        camera.scale(this.worldRect.width),
+        camera.scale(this.worldRect.height)
       ])
     );
     ctx.stroke();

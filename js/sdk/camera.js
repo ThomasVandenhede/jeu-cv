@@ -139,8 +139,16 @@ class Camera extends AABB {
 
   unapply(x, y) {
     var gameX, gameY;
-    gameX = toFixedPrecision(x / this.zoomLevel + this.x, 2);
-    gameY = toFixedPrecision(y / this.zoomLevel + this.y, 2);
+    gameX = toFixedPrecision(x / this.zoomLevel + this.x, 4);
+    gameY = toFixedPrecision(y / this.zoomLevel + this.y, 4);
     return new Vector(gameX, gameY);
+  }
+
+  scale(d) {
+    return d * this.zoomLevel;
+  }
+
+  unscale(d) {
+    return d / this.zoomLevel;
   }
 }

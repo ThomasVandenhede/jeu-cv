@@ -20,7 +20,7 @@ class Platform extends AABB {
     };
     var lineWidth = 3;
     ctx.save();
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.scale(lineWidth);
     if (this.touched || !this.passthrough) {
       ctx.strokeStyle = "#db0000";
       ctx.fillStyle = this.color;
@@ -28,8 +28,8 @@ class Platform extends AABB {
       ctx.rect.apply(
         ctx,
         applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
-          (this.width - lineWidth) * camera.zoomLevel,
-          (this.height - lineWidth) * camera.zoomLevel
+          camera.scale(this.width - lineWidth),
+          camera.scale(this.height - lineWidth)
         ])
       );
       ctx.fill();
@@ -37,13 +37,13 @@ class Platform extends AABB {
     } else {
       lineWidth = 3;
       ctx.strokeStyle = this.color;
-      ctx.lineWidth = lineWidth * camera.zoomLevel;
+      ctx.lineWidth = camera.scale(lineWidth);
       ctx.beginPath();
       ctx.strokeRect.apply(
         ctx,
         applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
-          (this.width - lineWidth) * camera.zoomLevel,
-          (this.height - lineWidth) * camera.zoomLevel
+          camera.scale(this.width - lineWidth),
+          camera.scale(this.height - lineWidth)
         ])
       );
     }

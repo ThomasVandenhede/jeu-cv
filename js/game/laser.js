@@ -45,7 +45,7 @@ class Laser extends Segment {
     var lineWidth = 3;
     ctx.save();
     ctx.strokeStyle = this.color;
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.scale(lineWidth);
     ctx.beginPath();
     ctx.moveTo.apply(ctx, applyCamToArr(A.x, A.y));
     ctx.lineTo.apply(ctx, applyCamToArr(B.x, B.y));

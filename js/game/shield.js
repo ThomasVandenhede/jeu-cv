@@ -128,35 +128,35 @@ class Shield {
     ctx.save();
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     ctx.strokeStyle = this.shielded.color;
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.scale(lineWidth);
     ctx.beginPath();
     ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(left, top)
         .concat(applyCamToArr(left + r, top))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(right, top)
         .concat(applyCamToArr(right, top + r))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(right, bottom)
         .concat(applyCamToArr(right - r, bottom))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(left, bottom)
         .concat(applyCamToArr(left, bottom - r))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.closePath();
     ctx.fill();

@@ -46,7 +46,7 @@ class Ennemy extends AABB {
     ctx.arc.apply(
       ctx,
       applyCamToArr(center.x, center.y).concat([
-        r * camera.zoomLevel,
+        camera.scale(r),
         0,
         Math.PI * 2
       ])
