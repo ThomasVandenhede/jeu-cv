@@ -1,7 +1,9 @@
-var mouseManager = (function() {
-  var instance = null;
-
-  function MouseManager() {
+class MouseManager {
+  constructor({ app }) {
+    if (!MouseManager.instance) {
+      MouseManager.instance = this;
+    }
+    this.app = app;
     this.canvas = document.getElementById("canvas");
     // mouse config
     this.naturalScrolling = true;
@@ -80,10 +82,10 @@ var mouseManager = (function() {
         if (this.buttons[1]) {
           this.grabbed.x =
             this.grabbedStartingX -
-            (scrollDirection * (this.x - this.clickX)) / camera.zoomLevel;
+            camera.unscale(scrollDirection * (this.x - this.clickX));
           this.grabbed.y =
             this.grabbedStartingY -
-            (scrollDirection * (this.y - this.clickY)) / camera.zoomLevel;
+            camera.unscale(scrollDirection * (this.y - this.clickY));
         }
       }.bind(this)
     );
@@ -109,28 +111,16 @@ var mouseManager = (function() {
             );
       }.bind(this)
     );
+    return MouseManager.instance;
   }
 
-  MouseManager.prototype.init = function(app) {
-    this.app = app;
-  };
-
-  MouseManager.prototype.on = function(el, type, callback) {
+  on(el, type, callback) {
     // console.log("ON", el, type, callback);
     el.addEventListener(type, callback, arguments[3]);
-  };
+  }
 
-  MouseManager.prototype.off = function(el, type, callback) {
+  off(el, type, callback) {
     // console.log("OFF", el, type, callback);
     el.removeEventListener(type, callback, arguments[3]);
-  };
-
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new MouseManager();
-      }
-      return instance;
-    }
-  };
-})();
+  }
+}

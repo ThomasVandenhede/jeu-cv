@@ -1,8 +1,8 @@
-var Shield = (function() {
-  var MIN_SIZE = 0;
-  var MAX_SIZE = 40;
+var MIN_SIZE = 0;
+var MAX_SIZE = 40;
 
-  function Shield(props) {
+class Shield {
+  constructor(props) {
     this.shielded = props.shielded || null; // object benefitting from the shield
     this.r = MIN_SIZE;
     this.isOpen = false;
@@ -22,7 +22,7 @@ var Shield = (function() {
     };
   }
 
-  Shield.prototype.getBoundingRect = function() {
+  getBoundingRect() {
     var shielded = this.shielded;
     return new AABB({
       x: shielded.left - this.r,
@@ -30,23 +30,23 @@ var Shield = (function() {
       width: shielded.width + this.r * 2,
       height: shielded.height + this.r * 2
     });
-  };
+  }
 
-  Shield.prototype.open = function() {
+  open() {
     this.sounds.close.stop();
     this.sounds.open.play();
     this.isOpen = true;
     this.isAnimating = true;
-  };
+  }
 
-  Shield.prototype.close = function() {
+  close() {
     this.sounds.open.stop();
     this.sounds.close.play();
     this.isOpen = false;
     this.isAnimating = true;
-  };
+  }
 
-  Shield.prototype.update = function() {
+  update() {
     var dr;
     if (this.isOpen) {
       dr = ((MAX_SIZE - MIN_SIZE) / this.openingDuration) * dt;
@@ -67,9 +67,9 @@ var Shield = (function() {
         this.isAnimating = false;
       }
     }
-  };
+  }
 
-  Shield.prototype.hasCollisionWithLaser = function(laser) {
+  hasCollisionWithLaser(laser) {
     var boundingRect = this.getBoundingRect();
     var collision = physics.collision;
     var shielded = this.shielded;
@@ -81,17 +81,17 @@ var Shield = (function() {
     }
 
     // the shield can be decomposed in 6 shapes
-    c1 = new Circle({ x: shielded.left, y: shielded.top, r: r });
-    c2 = new Circle({ x: shielded.right, y: shielded.top, r: r });
-    c3 = new Circle({ x: shielded.right, y: shielded.bottom, r: r });
-    c4 = new Circle({ x: shielded.left, y: shielded.bottom, r: r });
-    r1 = new AABB({
+    var c1 = new Circle({ x: shielded.left, y: shielded.top, r: r });
+    var c2 = new Circle({ x: shielded.right, y: shielded.top, r: r });
+    var c3 = new Circle({ x: shielded.right, y: shielded.bottom, r: r });
+    var c4 = new Circle({ x: shielded.left, y: shielded.bottom, r: r });
+    var r1 = new AABB({
       x: shielded.left - r,
       y: shielded.top,
       width: shielded.width + 2 * r,
       height: shielded.height
     });
-    r2 = new AABB({
+    var r2 = new AABB({
       x: shielded.left,
       y: shielded.top - r,
       width: shielded.width,
@@ -112,9 +112,9 @@ var Shield = (function() {
       r2.contains(laser.A.x, laser.A.y) ||
       r2.contains(laser.B.x, laser.B.y)
     );
-  };
+  }
 
-  Shield.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -128,41 +128,39 @@ var Shield = (function() {
     ctx.save();
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     ctx.strokeStyle = this.shielded.color;
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.scale(lineWidth);
     ctx.beginPath();
     ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(left, top)
         .concat(applyCamToArr(left + r, top))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(right, top)
         .concat(applyCamToArr(right, top + r))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(right, bottom)
         .concat(applyCamToArr(right - r, bottom))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
     ctx.arcTo.apply(
       ctx,
       applyCamToArr(left, bottom)
         .concat(applyCamToArr(left, bottom - r))
-        .concat([r * camera.zoomLevel])
+        .concat([camera.scale(r)])
     );
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-  };
-
-  return Shield;
-})();
+  }
+}

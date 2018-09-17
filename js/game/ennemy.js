@@ -1,6 +1,6 @@
-var Ennemy = (function() {
-  function Ennemy(props) {
-    AABB.call(this, {
+class Ennemy extends AABB {
+  constructor(props) {
+    super({
       x: props.x,
       y: props.y,
       width: props.width || 20,
@@ -17,10 +17,7 @@ var Ennemy = (function() {
     this.lastFiredAt = Number.NEGATIVE_INFINITY;
   }
 
-  Ennemy.prototype = Object.create(AABB.prototype);
-  Ennemy.prototype.constructor = Ennemy;
-
-  Ennemy.prototype.attack = function(direction) {
+  attack(direction) {
     var center = this.center;
     this.lastFiredAt = Date.now();
     return new Laser({
@@ -31,13 +28,13 @@ var Ennemy = (function() {
       range: this.attackRange,
       color: "lightgrey"
     });
-  };
+  }
 
-  Ennemy.prototype.update = function() {};
+  update() {}
 
-  Ennemy.prototype.updateVelocity = function() {};
+  updateVelocity() {}
 
-  Ennemy.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -49,14 +46,12 @@ var Ennemy = (function() {
     ctx.arc.apply(
       ctx,
       applyCamToArr(center.x, center.y).concat([
-        r * camera.zoomLevel,
+        camera.scale(r),
         0,
         Math.PI * 2
       ])
     );
     ctx.fill();
     ctx.restore();
-  };
-
-  return Ennemy;
-})();
+  }
+}

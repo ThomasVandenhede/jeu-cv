@@ -1,15 +1,15 @@
-var Game = (function() {
-  function Game() {}
+window.states = {
+  PAUSED: "paused",
+  RUNNING: "running",
+  GAME_OVER: "game over",
+  VICTORY: "victory",
+  EXIT: 0
+};
 
-  window.states = {
-    PAUSED: "paused",
-    RUNNING: "running",
-    GAME_OVER: "game over",
-    VICTORY: "victory",
-    EXIT: 0
-  };
+class Game {
+  constructor() {}
 
-  Game.prototype.init = function(config) {
+  init(config) {
     // config
     if (config) {
       this.shouldDisplayDebug = config.shouldDisplayDebug || false;
@@ -28,14 +28,11 @@ var Game = (function() {
     this.attachMenuEventHandlers();
 
     // initialize keyboard & sound
-    this.keyboard = keyboardManager.getInstance();
-    this.keyboard.init(this);
-    this.soundManager = soundManager.getInstance();
-    this.soundManager.init(gameData);
+    this.keyboard = new KeyboardManager({ app: this });
+    this.soundManager = new SoundManager({ gameData });
 
     // initialize level manager
-    this.levelManager = levelManager.getInstance();
-    this.levelManager.init(this);
+    this.levelManager = new LevelManager();
     this.currentLevelName = "level 1";
 
     // camera
@@ -54,15 +51,17 @@ var Game = (function() {
     this.ghost = new Ghost();
 
     // game timer
-    this.timer = new GameTimer({
+    this.timer = new Timer();
+    this.clock = new Clock({
+      timer: this.timer,
       x: canvas.width - 170,
       y: 35,
       width: 80,
       height: 30
     });
-  };
+  }
 
-  Game.prototype.attachMenuEventHandlers = function() {
+  attachMenuEventHandlers() {
     this.handleMenuResumeClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.unpause();
@@ -102,16 +101,16 @@ var Game = (function() {
     this.gameMenu.backButton.onclick = this.handleBackButtonClick.bind(this);
     this.gameMenu.loadButton.onclick = this.handleLoadMenuClick.bind(this);
     this.gameMenu.exitButton.onclick = this.handleMenuExitClick.bind(this);
-  };
+  }
 
-  Game.prototype.loadGameDataFromLocalStorage = function() {
+  loadGameDataFromLocalStorage() {
     var savedData = localStorage.getItem("gameData");
     if (savedData) {
       gameData = JSON.parse(savedData);
     }
-  };
+  }
 
-  Game.prototype.handleKeyboard = function() {
+  handleKeyboard() {
     var keyboard = this.keyboard;
     var player = this.level.player;
 
@@ -156,12 +155,13 @@ var Game = (function() {
         player.shield.isOpen ? player.shield.close() : player.shield.open();
       }
     }
-  };
+  }
 
-  Game.prototype.updateScene = function() {
+  updateScene() {
     var player = this.level.player;
 
     // update objects to be rendered
+    this.clock.update();
     !player.isDead &&
       this.level.ennemies.forEach(
         function(ennemy) {
@@ -206,24 +206,24 @@ var Game = (function() {
       player.die();
     }
     this.camera.update();
-  };
+  }
 
-  Game.prototype.render = function(ctx, camera) {
+  render(ctx, camera) {
     this.clearCanvas(ctx);
     this.renderBackground(ctx, camera);
     this.renderScene(ctx, camera);
-  };
+  }
 
-  Game.prototype.clearCanvas = function(ctx) {
+  clearCanvas(ctx) {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  };
+  }
 
-  Game.prototype.renderBackground = function(ctx, camera) {
+  renderBackground(ctx, camera) {
     this.canvas.style.backgroundPosition =
       -camera.x * 0.502 + "px " + -camera.y * 0.502 + "px";
-  };
+  }
 
-  Game.prototype.renderScene = function(ctx, camera) {
+  renderScene(ctx, camera) {
     this.levelManager.buildEntities();
 
     // only draw objects in the viewport
@@ -238,33 +238,33 @@ var Game = (function() {
       particle.draw(ctx, camera);
     });
     this.lifeBar.draw(ctx);
-    this.timer.draw(ctx);
+    this.clock.draw(ctx);
     this.shouldDisplayRulers &&
       this.grid.draw(ctx, camera, { isGame: true, shouldDisplayRulers: true });
     this.skillBar.draw(ctx, camera);
-  };
+  }
 
-  Game.prototype.setBackground = function(path) {
+  setBackground(path) {
     this.canvas.style.backgroundImage = "url(" + path + ")";
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
-  };
+  }
 
-  Game.prototype.restartGame = function() {
+  restartGame() {
     cancelAnimationFrame(this.rAF);
     this.gameMenu.close();
     this.unpause();
     this.startGame();
-  };
+  }
 
-  Game.prototype.startGame = function() {
+  startGame() {
     this.rAF && cancelAnimationFrame(this.rAF);
     this.loadGameDataFromLocalStorage();
     this.level = this.levelManager.buildLevel(this.currentLevelName);
-    this.timer.reset.call(this.timer, this.level.countdownStart);
+    this.clock.reset(this.level.countdownStart);
     this.levelManager.buildEntities();
     this.collisionManager = new CollisionManager({
       level: this.level,
-      timer: this.timer,
+      clock: this.clock,
       camera: this.camera
     });
     this.ghost.init({
@@ -289,17 +289,17 @@ var Game = (function() {
       skills: this.level.skills
     });
     requestAnimationFrame(this.pauseMenuLoop.bind(this));
-  };
+  }
 
-  Game.prototype.exit = function() {
+  exit() {
     show(this.gameMenu.gameIntroEl);
     this.gameMenu.close();
     hide(this.gameMenu.gameContainerEl);
     this.state = states.EXIT;
-    delete game;
-  };
+    delete window.game;
+  }
 
-  Game.prototype.checkVictory = function() {
+  checkVictory() {
     if (this.level.skills.length <= 0 && !(this.state === states.GAME_OVER)) {
       this.state = states.VICTORY;
       setTimeout(
@@ -309,9 +309,9 @@ var Game = (function() {
         1000
       );
     }
-  };
+  }
 
-  Game.prototype.checkDefeat = function() {
+  checkDefeat() {
     if (this.level.player.isDead && !(this.state === states.GAME_OVER)) {
       this.state = states.GAME_OVER;
       setTimeout(
@@ -321,27 +321,27 @@ var Game = (function() {
         1000
       );
     }
-  };
+  }
 
-  Game.prototype.pause = function() {
+  pause() {
     if (this.state !== states.GAME_OVER && this.state !== states.VICTORY) {
       !this.gameMenuEl && this.gameMenu.showPauseMenu();
-      this.timer.pause();
+      this.clock.pause();
       this.soundManager.pauseAll();
       this.state = states.PAUSED;
     }
-  };
+  }
 
-  Game.prototype.unpause = function() {
+  unpause() {
     this.state !== states.GAME_OVER &&
       this.state !== states.VICTORY &&
       this.gameMenu.close();
-    this.timer.play();
+    this.clock.play();
     this.soundManager.playPaused();
     this.state = states.RUNNING;
-  };
+  }
 
-  Game.prototype.requestLoop = function() {
+  requestLoop() {
     switch (this.state) {
       case states.RUNNING:
         this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
@@ -355,14 +355,14 @@ var Game = (function() {
       default:
         break;
     }
-  };
+  }
 
-  Game.prototype.mainLoop = function() {
+  mainLoop() {
     this.timer.update();
-    dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
+    window.dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.ghost.update();
     !this.level.player.isDead &&
-      this.timer.countdownStart - this.timer.totalTime < 1000 &&
+      this.clock.countdownStart - this.clock.totalTime < 1000 &&
       this.level.player.die();
     this.handleKeyboard();
     this.level.entities.forEach(function(entity) {
@@ -374,21 +374,23 @@ var Game = (function() {
     this.checkDefeat();
     this.render(this.ctx, this.camera);
     this.requestLoop();
-  };
+  }
 
-  Game.prototype.pauseMenuLoop = function() {
+  pauseMenuLoop() {
+    this.timer.update();
     this.camera.updateDimensions(); // keep updating camera in case window is resized
     this.render(this.ctx, this.camera);
     this.requestLoop();
-  };
+  }
 
-  Game.prototype.gameOverLoop = function() {
+  gameOverLoop() {
+    this.timer.update();
     this.updateScene();
     this.render(this.ctx, this.camera);
     this.requestLoop();
-  };
+  }
 
-  Game.prototype.updateDebugInfo = function() {
+  updateDebugInfo() {
     var player = this.level.player;
     var camera = this.camera;
 
@@ -436,7 +438,5 @@ var Game = (function() {
         e("p", null, [e("strong", null, "camY: "), this.camera.y])
       ])
     ]);
-  };
-
-  return Game;
-})();
+  }
+}

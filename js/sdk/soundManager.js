@@ -1,14 +1,13 @@
-var soundManager = (function() {
-  var instance;
-
-  function SoundManager() {
+class SoundManager {
+  constructor({ gameData }) {
+    if (!SoundManager.instance) {
+      SoundManager.instance = this;
+    }
     this.masterVolume = 1;
     this.sounds = {};
     this.musics = {};
     this.pausedSounds = [];
-  }
 
-  SoundManager.prototype.init = function(gameData) {
     var soundData = gameData.sounds;
     var musicData = gameData.musics;
     var location, files;
@@ -40,35 +39,28 @@ var soundManager = (function() {
         this.sounds[filename] = sound;
       }.bind(this)
     );
-  };
 
-  SoundManager.prototype.stopAll = function() {
+    return SoundManager.instance;
+  }
+
+  stopAll() {
     for (var sound in this.sounds) {
       sound.stop();
     }
-  };
+  }
 
-  SoundManager.prototype.pauseAll = function() {
+  pauseAll() {
     for (var sound in this.sounds) {
       if (sound.isPlaying) {
         this.pausedSounds.push(sound);
         sound.pause();
       }
     }
-  };
+  }
 
-  SoundManager.prototype.playPaused = function() {
+  playPaused() {
     this.pausedSounds.forEach(function(pausedSound) {
       pausedSound.play();
     });
-  };
-
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new SoundManager();
-      }
-      return instance;
-    }
-  };
-})();
+  }
+}

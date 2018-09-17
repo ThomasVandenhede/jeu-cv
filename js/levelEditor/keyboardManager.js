@@ -1,8 +1,10 @@
 // Singleton pattern
-var keyboardManager = (function() {
-  var instance;
-
-  function KeyboardManager() {
+class KeyboardManager {
+  constructor({ app }) {
+    this.app = app;
+    if (!KeyboardManager.instance) {
+      KeyboardManager.instance = this;
+    }
     var codeMappings = {
       ArrowLeft: "LEFT",
       ArrowUp: "UP",
@@ -78,16 +80,16 @@ var keyboardManager = (function() {
             this.app.toolbar.objectTypeDropDown.focus();
             break;
           case 37:
-            this.app.camera.x -= 20 / this.app.camera.zoomLevel;
+            this.app.camera.x -= this.app.camera.unscale(20);
             break;
           case 38:
-            this.app.camera.y -= 20 / this.app.camera.zoomLevel;
+            this.app.camera.y -= this.app.camera.unscale(20);
             break;
           case 39:
-            this.app.camera.x += 20 / this.app.camera.zoomLevel;
+            this.app.camera.x += this.app.camera.unscale(20);
             break;
           case 40:
-            this.app.camera.y += 20 / this.app.camera.zoomLevel;
+            this.app.camera.y += this.app.camera.unscale(20);
             break;
           case 187:
             event.preventDefault();
@@ -107,18 +109,6 @@ var keyboardManager = (function() {
     );
 
     this.keyRepeat = {};
+    return KeyboardManager.instance;
   }
-
-  KeyboardManager.prototype.init = function(app) {
-    this.app = app;
-  };
-
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new KeyboardManager();
-      }
-      return instance;
-    }
-  };
-})();
+}

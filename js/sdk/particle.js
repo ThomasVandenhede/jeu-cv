@@ -1,6 +1,6 @@
-var Particle = (function() {
-  function Particle(props) {
-    Vector.call(this, props.x, props.y);
+class Particle extends Vector {
+  constructor(props) {
+    super(props.x, props.y);
 
     this.size = props.size;
     this.color = props.color;
@@ -12,15 +12,12 @@ var Particle = (function() {
     //   hasTransparency !== undefined ? hasTransparency : false;
   }
 
-  Particle.prototype = Object.create(Vector.prototype);
-  Particle.prototype.constructor = Particle;
-
-  Particle.prototype.update = function() {
+  update() {
     this.x += this.v.x * dt;
     this.y += this.v.y * dt;
-  };
+  }
 
-  Particle.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -35,11 +32,9 @@ var Particle = (function() {
     ctx.fillRect.apply(
       ctx,
       applyCamToArr(this.x, this.y).concat([
-        size * camera.zoomLevel,
-        size * camera.zoomLevel
+        camera.scale(size),
+        camera.scale(size)
       ])
     );
-  };
-
-  return Particle;
-})();
+  }
+}

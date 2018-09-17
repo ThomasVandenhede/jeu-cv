@@ -1,9 +1,9 @@
-var LevelEditor = (function() {
-  function LevelEditor(options) {
+class LevelEditor {
+  constructor(options) {
     this.data = {};
   }
 
-  LevelEditor.prototype.init = function(config) {
+  init(config) {
     this.shouldDisplayRulers =
       config.shouldDisplayRulers !== undefined
         ? config.shouldDisplayRulers
@@ -12,14 +12,10 @@ var LevelEditor = (function() {
     this.backgroundCanvas = document.getElementById("background");
     this.ctx = this.canvas.getContext("2d");
     this.bgCtx = this.backgroundCanvas.getContext("2d");
-    this.keyboard = keyboardManager.getInstance();
-    this.keyboard.init(this);
-    this.mouse = mouseManager.getInstance();
-    this.mouse.init(this); // pass the game object to the mouse as its context
-    this.soundManager = soundManager.getInstance();
-    this.soundManager.init(gameData);
-    this.levelManager = levelManager.getInstance();
-    this.levelManager.init(this);
+    this.keyboard = new KeyboardManager({ app: this });
+    this.mouse = new MouseManager({ app: this });
+    this.soundManager = new SoundManager({ gameData });
+    this.levelManager = new LevelManager({ app: this });
     this.gameObjects = [];
     this.camera = new Camera({
       zoomLevel: 0.05,
@@ -49,25 +45,24 @@ var LevelEditor = (function() {
       0: this.selectionTool,
       1: this.creationTool
     };
-    this.toolManager = toolManager.getInstance();
-    this.toolManager.init({
+    this.toolManager = new ToolManager({
       mouse: this.mouse,
       canvas: this.canvas,
       tools: this.tools
     });
-    this.toolbar = toolbarFactory.getInstance();
-    this.toolbar.init({ app: this, tools: this.tools });
+    this.toolbar = new Toolbar({ app: this, tools: this.tools });
+    this.timer = new Timer();
     // this.currentLevelName = "level 1";
-  };
+  }
 
-  LevelEditor.prototype.loadGameDataFromLocalStorage = function() {
+  loadGameDataFromLocalStorage() {
     var savedData = localStorage.getItem("gameData");
     if (savedData) {
       gameData = JSON.parse(savedData);
     }
-  };
+  }
 
-  LevelEditor.prototype.buildLevel = function(name) {
+  buildLevel(name) {
     this.level = this.levelManager.buildLevel(name);
     this.countdownStart = this.level.countdownStart;
     this.worldRect = this.level.worldRect;
@@ -82,9 +77,9 @@ var LevelEditor = (function() {
       )
     );
     this.updateToolbar();
-  };
+  }
 
-  LevelEditor.prototype.updateToolbar = function() {
+  updateToolbar() {
     emptyElement(this.toolbar.loadLevelSelect);
     var levelSelectionOptions = [e("option", { value: "" }, "")].concat(
       Object.keys(gameData.levels).map(function(item) {
@@ -105,15 +100,15 @@ var LevelEditor = (function() {
       this.toolbar.worldWidthInput.value = this.level.worldRect.width;
       this.toolbar.worldHeightInput.value = this.level.worldRect.height;
     }
-  };
+  }
 
-  LevelEditor.prototype.handleKeyboard = function() {};
+  handleKeyboard() {}
 
-  LevelEditor.prototype.updateScene = function() {
+  updateScene() {
     this.camera.update();
-  };
+  }
 
-  LevelEditor.prototype.renderBackground = function(ctx) {
+  renderBackground(ctx) {
     this.fillCanvas(ctx, "#111");
     ctx.save();
     for (var i = 0; i < this.starCount; i++) {
@@ -131,30 +126,24 @@ var LevelEditor = (function() {
       ctx.fill();
     }
     ctx.restore();
-  };
+  }
 
-  LevelEditor.prototype.updateTimeEllapsed = function() {
-    this.previousTime = this.currentTime || Date.now();
-    this.currentTime = Date.now();
-    return (this.currentTime - this.previousTime) / 1000;
-  };
-
-  LevelEditor.prototype.clearCanvas = function(ctx) {
+  clearCanvas(ctx) {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  };
+  }
 
-  LevelEditor.prototype.fillCanvas = function(ctx, color) {
+  fillCanvas(ctx, color) {
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  };
+  }
 
-  LevelEditor.prototype.drawGrid = function(ctx) {
+  drawGrid(ctx) {
     this.grid.draw(ctx, this.camera, {
       shouldDisplayRulers: this.shouldDisplayRulers
     });
-  };
+  }
 
-  LevelEditor.prototype.drawSelectionRectangle = function(ctx, camera) {
+  drawSelectionRectangle(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -165,15 +154,15 @@ var LevelEditor = (function() {
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(selectionArea.x, selectionArea.y).concat([
-          selectionArea.width * camera.zoomLevel,
-          selectionArea.height * camera.zoomLevel
+          camera.scale(selectionArea.width),
+          camera.scale(selectionArea.height)
         ])
       );
       ctx.restore();
     }
-  };
+  }
 
-  LevelEditor.prototype.drawSelectionOutlines = function(ctx, camera) {
+  drawSelectionOutlines(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -194,8 +183,8 @@ var LevelEditor = (function() {
     ctx.rect.apply(
       ctx,
       applyCamToArr(selectionRectangle.x, selectionRectangle.y).concat([
-        selectionRectangle.width * camera.zoomLevel,
-        selectionRectangle.height * camera.zoomLevel
+        camera.scale(selectionRectangle.width),
+        camera.scale(selectionRectangle.height)
       ])
     );
     ctx.stroke();
@@ -210,16 +199,16 @@ var LevelEditor = (function() {
             new Vector(lineWidth / 2, lineWidth / 2)
           )
         ).concat([
-          selectedObject.width * camera.zoomLevel + lineWidth,
-          selectedObject.height * camera.zoomLevel + lineWidth
+          camera.scale(selectedObject.width) + lineWidth,
+          camera.scale(selectedObject.height) + lineWidth
         ])
       );
       ctx.stroke();
     });
     ctx.restore();
-  };
+  }
 
-  LevelEditor.prototype.drawResizeHandles = function(ctx, camera) {
+  drawResizeHandles(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -239,9 +228,9 @@ var LevelEditor = (function() {
       )
     );
     ctx.restore();
-  };
+  }
 
-  LevelEditor.prototype.renderScene = function(ctx, camera) {
+  renderScene(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -271,8 +260,8 @@ var LevelEditor = (function() {
               new Vector(lineWidth / 2, lineWidth / 2)
             )
           ).concat([
-            gameObject.width * camera.zoomLevel - lineWidth,
-            gameObject.height * camera.zoomLevel - lineWidth
+            camera.scale(gameObject.width) - lineWidth,
+            camera.scale(gameObject.height) - lineWidth
           ])
         );
         ctx.stroke();
@@ -309,16 +298,16 @@ var LevelEditor = (function() {
     ctx.strokeRect.apply(
       ctx,
       applyCamToArr(this.worldRect.x, this.worldRect.y).concat([
-        this.worldRect.width * camera.zoomLevel,
-        this.worldRect.height * camera.zoomLevel
+        camera.scale(this.worldRect.width),
+        camera.scale(this.worldRect.height)
       ])
     );
     ctx.stroke();
 
     ctx.restore();
-  };
+  }
 
-  LevelEditor.prototype.start = function() {
+  start() {
     // initialize world size
     this.worldRect = new AABB({
       x: -5000,
@@ -335,11 +324,12 @@ var LevelEditor = (function() {
     // this.buildLevel();
     this.updateToolbar();
     this.main();
-  };
+  }
 
-  LevelEditor.prototype.main = function() {
+  main() {
     var camera = this.camera;
-    dt = this.updateTimeEllapsed();
+    window.dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
+    this.timer.update();
     // this.handleKeyboard();
     this.updateScene();
     this.clearCanvas(this.ctx, camera);
@@ -347,9 +337,9 @@ var LevelEditor = (function() {
     this.renderScene(this.ctx, camera);
 
     requestAnimationFrame(this.main.bind(this));
-  };
+  }
 
-  LevelEditor.prototype.generateJSONdata = function() {
+  generateJSONdata() {
     var gameObjects = this.gameObjects;
 
     // level name
@@ -460,16 +450,14 @@ var LevelEditor = (function() {
     );
 
     return true;
-  };
+  }
 
-  LevelEditor.prototype.saveToLocalStorage = function() {
+  saveToLocalStorage() {
     if (this.generateJSONdata()) {
       gameData.levels[this.data.name] = this.data;
       var json = JSON.stringify(gameData);
       localStorage.setItem("gameData", json);
       this.updateToolbar();
     }
-  };
-
-  return LevelEditor;
-})();
+  }
+}

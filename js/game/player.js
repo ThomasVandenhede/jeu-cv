@@ -1,13 +1,13 @@
-var Player = (function() {
-  var ABS_JUMP_SPEED = 700;
-  var MAX_FALL_SPEED = 1000;
-  var animationID;
-  var INITIAL_WIDTH = 30;
-  var INITIAL_HEIGHT = 30;
-  var CROUCH_STAND_ANIMATION_DURATION = 0.2;
+var ABS_JUMP_SPEED = 700;
+var MAX_FALL_SPEED = 1000;
+var animationID;
+var INITIAL_WIDTH = 30;
+var INITIAL_HEIGHT = 30;
+var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
-  function Player(props) {
-    AABB.call(this, {
+class Player extends AABB {
+  constructor(props) {
+    super({
       x: props.x,
       y: props.y,
       width: INITIAL_WIDTH,
@@ -61,60 +61,57 @@ var Player = (function() {
     this.GRAVITY_ACCELERATION = gameData.constants.GRAVITY_ACCELERATION;
   }
 
-  Player.prototype = Object.create(AABB.prototype);
-  Player.prototype.constructor = Player;
-
-  Player.prototype.moveLeft = function() {
+  moveLeft() {
     this.v.x = -250;
-  };
+  }
 
-  Player.prototype.moveRight = function() {
+  moveRight() {
     this.v.x = 250;
-  };
+  }
 
-  Player.prototype.crouch = function() {
+  crouch() {
     this.isCrouching = true;
-  };
+  }
 
-  Player.prototype.stand = function() {
+  stand() {
     this.isCrouching = false;
-  };
+  }
 
-  Player.prototype.jump = function() {
+  jump() {
     if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
       this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
       this.isColliding[1] = 0;
       this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
     }
-  };
+  }
 
-  Player.prototype.reverseGravity = function() {
+  reverseGravity() {
     this.GRAVITY_ACCELERATION = -this.GRAVITY_ACCELERATION;
-  };
+  }
 
-  Player.prototype.zeroGravity = function() {
+  zeroGravity() {
     if (this.GRAVITY_ACCELERATION) {
       this.GRAVITY_ACCELERATION = 0;
     } else {
       this.GRAVITY_ACCELERATION = gameData.constants.GRAVITY_ACCELERATION;
     }
-  };
+  }
 
-  Player.prototype.applyDamage = function(damage) {
+  applyDamage(damage) {
     this.sounds.hurt.replay();
     this.hitPoints = toFixedPrecision(this.hitPoints - damage);
-  };
+  }
 
-  Player.prototype.die = function() {
+  die() {
     this.isDead = true;
     this.hitPoints = 0;
     this.color = this.getColorFromHP();
     this.sounds.still.stop();
     this.sounds.die.play();
     this.explosion = explosionParticles(this);
-  };
+  }
 
-  Player.prototype.getDeltaWidth = function() {
+  getDeltaWidth() {
     var deltaWidth;
     var computedDelta =
       (dt / CROUCH_STAND_ANIMATION_DURATION) * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
@@ -130,9 +127,9 @@ var Player = (function() {
           : -computedDelta;
     }
     return deltaWidth;
-  };
+  }
 
-  Player.prototype.updatePlayerSize = function(deltaWidth) {
+  updatePlayerSize(deltaWidth) {
     this.width = toFixedPrecision(this.width + deltaWidth, 3);
     this.height = toFixedPrecision(this.height - deltaWidth, 3);
     this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
@@ -140,9 +137,9 @@ var Player = (function() {
       this.GRAVITY_ACCELERATION < 0
         ? toFixedPrecision(this.y, 3)
         : toFixedPrecision(this.y + deltaWidth, 3);
-  };
+  }
 
-  Player.prototype.applyGravity = function() {
+  applyGravity() {
     // apply gravity if player is free falling
     this.acceleration.y = this.GRAVITY_ACCELERATION;
 
@@ -152,9 +149,9 @@ var Player = (function() {
       Math.abs(this.v.y) > MAX_FALL_SPEED
         ? Math.sign(this.v.y) * MAX_FALL_SPEED
         : this.v.y;
-  };
+  }
 
-  Player.prototype.update = function() {
+  update() {
     if (this.isDead) {
       this.explosion.update();
       return;
@@ -174,19 +171,19 @@ var Player = (function() {
     if (!this.isColliding[0]) {
       this.x = toFixedPrecision(this.x + dx, 2);
     }
-  };
+  }
 
-  Player.prototype.getHitPointsRatio = function() {
+  getHitPointsRatio() {
     return this.hitPoints / this.maxHitPoints;
-  };
+  }
 
-  Player.prototype.getColorFromHP = function() {
+  getColorFromHP() {
     var hitPointsRatio = this.getHitPointsRatio();
     var color = "hsl(" + hitPointsRatio * 120 + ", 100%, 50%)";
     return color;
-  };
+  }
 
-  Player.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -210,12 +207,12 @@ var Player = (function() {
       ctx.save();
       ctx.strokeStyle = this.color;
       ctx.fillStyle = this.color;
-      ctx.lineWidth = lineWidth * camera.zoomLevel;
+      ctx.lineWidth = camera.scale(lineWidth);
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.x, this.y).concat(
-          this.width * camera.zoomLevel,
-          this.height * camera.zoomLevel
+          camera.scale(this.width),
+          camera.scale(this.height)
         )
       );
 
@@ -224,8 +221,8 @@ var Player = (function() {
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.left, this.top + 10).concat([
-          this.width * camera.zoomLevel,
-          10 * camera.zoomLevel
+          camera.scale(this.width),
+          camera.scale(10)
         ])
       );
 
@@ -270,7 +267,5 @@ var Player = (function() {
         this.shield.draw(ctx, camera);
       }
     }
-  };
-
-  return Player;
-})();
+  }
+}

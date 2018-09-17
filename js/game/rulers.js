@@ -1,6 +1,5 @@
-var Rulers = function() {
-  function Rulers() {}
+class Rulers {
+  constructor() {}
 
-  Rulers.prototype.draw = function(ctx, camera) {};
-  return Rulers;
-};
+  draw(ctx, camera) {}
+}

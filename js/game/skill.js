@@ -1,6 +1,6 @@
-var Skill = (function() {
-  function Skill(props) {
-    AABB.call(this, props);
+class Skill extends AABB {
+  constructor(props) {
+    super(props);
 
     this.v = new Vector();
     this.solid = false;
@@ -8,12 +8,9 @@ var Skill = (function() {
     this.image.src = props.src;
   }
 
-  Skill.prototype = Object.create(AABB.prototype);
-  Skill.prototype.constructor = Skill;
+  update() {}
 
-  Skill.prototype.update = function() {};
-
-  Skill.prototype.draw = function(ctx, camera) {
+  draw(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -22,10 +19,8 @@ var Skill = (function() {
       ctx,
       [this.image]
         .concat(applyCamToArr(this.x, this.y))
-        .concat([this.width * camera.zoomLevel, this.height * camera.zoomLevel])
+        .concat([camera.scale(this.width), camera.scale(this.height)])
     );
     ctx.restore();
-  };
-
-  return Skill;
-})();
+  }
+}
