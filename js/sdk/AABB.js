@@ -6,18 +6,29 @@ class AABB {
     this.height = props.height !== undefined ? props.height : 0;
   }
 
+  static minkowskiDifference(r1, r2) {
+    return new AABB({
+      x: r1.left - r2.right,
+      y: r1.top - r2.bottom,
+      width: r1.width + r2.width,
+      height: r1.height + r2.height
+    });
+  }
+
   get left() {
     return this.width >= 0 ? this.x : this.x + this.width;
   }
   set left(left) {
     this.x = left;
   }
+
   get top() {
     return this.height >= 0 ? this.y : this.y + this.height;
   }
   set top(left) {
     this.y = bottom;
   }
+
   get right() {
     return this.width >= 0 ? this.x + this.width : this.x;
   }
@@ -28,6 +39,7 @@ class AABB {
       this.x = right - this.width;
     }
   }
+
   get bottom() {
     return this.height >= 0 ? this.y + this.height : this.y;
   }
@@ -38,6 +50,7 @@ class AABB {
       this.y = bottom - this.height;
     }
   }
+
   get center() {
     return new Vector(this.x + this.width / 2, this.y + this.height / 2);
   }
@@ -46,17 +59,6 @@ class AABB {
     this.y = y - this.height / 2;
   }
 
-  // static methods
-  static minkowskiDifference(r1, r2) {
-    return new AABB({
-      x: r1.left - r2.right,
-      y: r1.top - r2.bottom,
-      width: r1.width + r2.width,
-      height: r1.height + r2.height
-    });
-  }
-
-  // public methods
   getBoundingRect() {
     return this;
   }
