@@ -41,62 +41,75 @@ class Camera extends AABB {
     // this.yClearZone = yClearZone;
   }
 
+  // update() {
+  //   this.updateDimensions();
+  //   if (this.followed) {
+  //     var xDeadZone = Math.min(
+  //       (this.width - this.followed.width) / 2,
+  //       this.yDeadZone
+  //     );
+  //     var yDeadZone = Math.min(
+  //       (this.height - this.followed.height) / 2,
+  //       this.xDeadZone
+  //     );
+  //   }
+
+  //   // keep following the player (or other desired object)
+  //   if (this.followed != null) {
+  //     if (this.axis == AXIS.HORIZONTAL || this.axis == AXIS.BOTH) {
+  //       // moves camera on horizontal axis based on followed object position
+  //       if (this.followed.right + xDeadZone > this.right) {
+  //         this.x = this.followed.right + xDeadZone - this.width;
+  //       } else if (this.followed.left - xDeadZone < this.left) {
+  //         this.x = this.followed.left - xDeadZone;
+  //       }
+  //     }
+  //     if (this.axis == AXIS.VERTICAL || this.axis == AXIS.BOTH) {
+  //       // moves camera on vertical axis based on followed object position
+  //       if (this.followed.bottom + yDeadZone > this.bottom) {
+  //         this.y = this.followed.bottom + yDeadZone - this.height;
+  //       } else if (this.followed.top - yDeadZone < this.top) {
+  //         this.y = this.followed.top - yDeadZone;
+  //       }
+  //     }
+  //   }
+
+  //   // don't let camera leave the world's boundaries
+  //   if (
+  //     this.shouldStayWithinWorldBounds &&
+  //     !new AABB({
+  //       x: this.x,
+  //       y: this.y,
+  //       width: this.width,
+  //       height: this.height
+  //     }).within(this.worldRect)
+  //   ) {
+  //     if (this.x < this.worldRect.left) {
+  //       this.x = this.worldRect.left;
+  //     }
+  //     if (this.y < this.worldRect.top) {
+  //       this.y = this.worldRect.top;
+  //     }
+  //     if (this.x + this.width > this.worldRect.right) {
+  //       this.x = this.worldRect.right - this.width;
+  //     }
+  //     if (this.y + this.height > this.worldRect.bottom) {
+  //       this.y = this.worldRect.bottom - this.height;
+  //     }
+  //   }
+  // }
+
   update() {
     this.updateDimensions();
-    if (this.followed) {
-      var xDeadZone = Math.min(
-        (this.width - this.followed.width) / 2,
-        this.yDeadZone
-      );
-      var yDeadZone = Math.min(
-        (this.height - this.followed.height) / 2,
-        this.xDeadZone
-      );
-    }
+    var targetPos = new Vector(
+      this.followed.center.x - this.width / 2,
+      this.followed.center.y - this.height / 2
+    );
+    var dx = 0.1 * (targetPos.x - this.x);
+    var dy = 0.1 * (targetPos.y - this.y);
 
-    // keep following the player (or other desired object)
-    if (this.followed != null) {
-      if (this.axis == AXIS.HORIZONTAL || this.axis == AXIS.BOTH) {
-        // moves camera on horizontal axis based on followed object position
-        if (this.followed.right + xDeadZone > this.right) {
-          this.x = this.followed.right + xDeadZone - this.width;
-        } else if (this.followed.left - xDeadZone < this.left) {
-          this.x = this.followed.left - xDeadZone;
-        }
-      }
-      if (this.axis == AXIS.VERTICAL || this.axis == AXIS.BOTH) {
-        // moves camera on vertical axis based on followed object position
-        if (this.followed.bottom + yDeadZone > this.bottom) {
-          this.y = this.followed.bottom + yDeadZone - this.height;
-        } else if (this.followed.top - yDeadZone < this.top) {
-          this.y = this.followed.top - yDeadZone;
-        }
-      }
-    }
-
-    // don't let camera leave the world's boundaries
-    if (
-      this.shouldStayWithinWorldBounds &&
-      !new AABB({
-        x: this.x,
-        y: this.y,
-        width: this.width,
-        height: this.height
-      }).within(this.worldRect)
-    ) {
-      if (this.x < this.worldRect.left) {
-        this.x = this.worldRect.left;
-      }
-      if (this.y < this.worldRect.top) {
-        this.y = this.worldRect.top;
-      }
-      if (this.x + this.width > this.worldRect.right) {
-        this.x = this.worldRect.right - this.width;
-      }
-      if (this.y + this.height > this.worldRect.bottom) {
-        this.y = this.worldRect.bottom - this.height;
-      }
-    }
+    this.x = Math.abs(dx) < 0.001 ? targetPos.x : this.x + dx;
+    this.y = Math.abs(dy) < 0.001 ? targetPos.y : this.y + dy;
   }
 
   updateDimensions() {
