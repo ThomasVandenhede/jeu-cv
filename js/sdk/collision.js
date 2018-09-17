@@ -1,5 +1,3 @@
-class Physics {}
-
 var physics = {
   collision: {
     AABBWithAABB: function(r1, r2) {

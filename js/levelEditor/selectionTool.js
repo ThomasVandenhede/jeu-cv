@@ -1,5 +1,5 @@
-class SelectionTool {
-  constructor(props) {
+var SelectionTool = (function() {
+  function SelectionTool(props) {
     this.gameObjects = props.gameObjects;
     this.camera = props.camera;
     this.mouse = props.mouse;
@@ -32,7 +32,7 @@ class SelectionTool {
     };
   }
 
-  getSelectionBoundingRect() {
+  SelectionTool.prototype.getSelectionBoundingRect = function() {
     var selectedObjects = this.selection.map(function(item) {
       return item.object;
     });
@@ -63,9 +63,9 @@ class SelectionTool {
         })
       ) - top;
     return new AABB({ x: left, y: top, width: width, height: height });
-  }
+  };
 
-  handleMouseDown(e) {
+  SelectionTool.prototype.handleMouseDown = function handleMouseDown(e) {
     var mouseGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.x,
       this.mouse.y
@@ -129,9 +129,9 @@ class SelectionTool {
       default:
         break;
     }
-  }
+  };
 
-  isMouseInsideResizeHandle() {
+  SelectionTool.prototype.isMouseInsideResizeHandle = function() {
     if (this.selection) {
       var selectionRectangle = this.getSelectionBoundingRect();
       var resizeHandlePos = this.camera.apply(
@@ -147,9 +147,9 @@ class SelectionTool {
 
       return resizeHandleRectangle.contains(this.mouse.x, this.mouse.y);
     }
-  }
+  };
 
-  getClickedObject(x, y) {
+  SelectionTool.prototype.getClickedObject = function(x, y) {
     var clickedObject = null;
     for (var i = 0; i < this.gameObjects.length; i++) {
       var gameObject = this.gameObjects[i];
@@ -158,9 +158,9 @@ class SelectionTool {
       }
     }
     return clickedObject;
-  }
+  };
 
-  handleMouseMove(e) {
+  SelectionTool.prototype.handleMouseMove = function handleMouseMove(e) {
     var clickGamePosSnappedToGrid = this.grid.getMouseGamePosSnappedToGrid(
       this.mouse.clickX,
       this.mouse.clickY
@@ -211,16 +211,16 @@ class SelectionTool {
           this.clickedObject.yStart + mouseGameDisplacement.y;
       }
     }
-  }
+  };
 
-  resizeSelectedObjects(dx, dy) {
+  SelectionTool.prototype.resizeSelectedObjects = function(dx, dy) {
     this.selection.forEach(function(item) {
       item.object.width = item.objectStart.width + dx;
       item.object.height = item.objectStart.height + dy;
     });
-  }
+  };
 
-  moveSelectedObjects(dx, dy) {
+  SelectionTool.prototype.moveSelectedObjects = function(dx, dy) {
     this.selection.forEach(function(item) {
       item.object.x = item.objectStart.x + dx;
       item.object.y = item.objectStart.y + dy;
@@ -229,9 +229,9 @@ class SelectionTool {
       item.object.xEnd = item.objectStart.xEnd + dx;
       item.object.yEnd = item.objectStart.yEnd + dy;
     });
-  }
+  };
 
-  handleMouseUp(e) {
+  SelectionTool.prototype.handleMouseUp = function handleMouseUp(e) {
     switch (e.button) {
       case 0: // left button up
         if (this.resizeHandleClicked) {
@@ -289,5 +289,7 @@ class SelectionTool {
       default:
         break;
     }
-  }
-}
+  };
+
+  return SelectionTool;
+})();

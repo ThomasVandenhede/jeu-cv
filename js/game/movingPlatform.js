@@ -1,6 +1,6 @@
-class MovingPlatform extends Platform {
-  constructor(props) {
-    super(props);
+var MovingPlatform = (function() {
+  function MovingPlatform(props) {
+    Platform.call(this, props);
 
     this.xStart = props.x !== undefined ? props.x : 0;
     this.yStart = props.x !== undefined ? props.y : 0;
@@ -16,7 +16,10 @@ class MovingPlatform extends Platform {
     this.color = "darkorange";
   }
 
-  updateVelocity() {
+  MovingPlatform.prototype = Object.create(Platform.prototype);
+  MovingPlatform.prototype.constructor = MovingPlatform;
+
+  MovingPlatform.prototype.updateVelocity = function() {
     // // horizontal velocity
     // if (
     //   this.v.x > 0 &&
@@ -45,9 +48,9 @@ class MovingPlatform extends Platform {
     // ) {
     //   this.v.y = Math.abs(this.v.y);
     // }
-  }
+  };
 
-  update() {
+  MovingPlatform.prototype.update = function() {
     var dx = this.v.x * dt;
     var dy = this.v.y * dt;
     if (this.x + dx > this.xEnd || this.y + dy > this.yEnd) {
@@ -61,5 +64,7 @@ class MovingPlatform extends Platform {
 
     this.x = toFixedPrecision(this.x + dx, 2);
     this.y = toFixedPrecision(this.y + dy, 2);
-  }
-}
+  };
+
+  return MovingPlatform;
+})();

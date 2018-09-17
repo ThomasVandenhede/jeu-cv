@@ -1,15 +1,15 @@
-window.states = {
-  PAUSED: "paused",
-  RUNNING: "running",
-  GAME_OVER: "game over",
-  VICTORY: "victory",
-  EXIT: 0
-};
+var Game = (function() {
+  function Game() {}
 
-class Game {
-  constructor() {}
+  window.states = {
+    PAUSED: "paused",
+    RUNNING: "running",
+    GAME_OVER: "game over",
+    VICTORY: "victory",
+    EXIT: 0
+  };
 
-  init(config) {
+  Game.prototype.init = function(config) {
     // config
     if (config) {
       this.shouldDisplayDebug = config.shouldDisplayDebug || false;
@@ -28,11 +28,14 @@ class Game {
     this.attachMenuEventHandlers();
 
     // initialize keyboard & sound
-    this.keyboard = new KeyboardManager({ app: this });
-    this.soundManager = new SoundManager({ gameData });
+    this.keyboard = keyboardManager.getInstance();
+    this.keyboard.init(this);
+    this.soundManager = soundManager.getInstance();
+    this.soundManager.init(gameData);
 
     // initialize level manager
-    this.levelManager = new LevelManager();
+    this.levelManager = levelManager.getInstance();
+    this.levelManager.init(this);
     this.currentLevelName = "level 1";
 
     // camera
@@ -51,17 +54,15 @@ class Game {
     this.ghost = new Ghost();
 
     // game timer
-    this.timer = new Timer();
-    this.clock = new Clock({
-      timer: this.timer,
+    this.timer = new GameTimer({
       x: canvas.width - 170,
       y: 35,
       width: 80,
       height: 30
     });
-  }
+  };
 
-  attachMenuEventHandlers() {
+  Game.prototype.attachMenuEventHandlers = function() {
     this.handleMenuResumeClick = function(e) {
       e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       this.unpause();
@@ -101,16 +102,16 @@ class Game {
     this.gameMenu.backButton.onclick = this.handleBackButtonClick.bind(this);
     this.gameMenu.loadButton.onclick = this.handleLoadMenuClick.bind(this);
     this.gameMenu.exitButton.onclick = this.handleMenuExitClick.bind(this);
-  }
+  };
 
-  loadGameDataFromLocalStorage() {
+  Game.prototype.loadGameDataFromLocalStorage = function() {
     var savedData = localStorage.getItem("gameData");
     if (savedData) {
       gameData = JSON.parse(savedData);
     }
-  }
+  };
 
-  handleKeyboard() {
+  Game.prototype.handleKeyboard = function() {
     var keyboard = this.keyboard;
     var player = this.level.player;
 
@@ -155,13 +156,12 @@ class Game {
         player.shield.isOpen ? player.shield.close() : player.shield.open();
       }
     }
-  }
+  };
 
-  updateScene() {
+  Game.prototype.updateScene = function() {
     var player = this.level.player;
 
     // update objects to be rendered
-    this.clock.update();
     !player.isDead &&
       this.level.ennemies.forEach(
         function(ennemy) {
@@ -206,24 +206,24 @@ class Game {
       player.die();
     }
     this.camera.update();
-  }
+  };
 
-  render(ctx, camera) {
+  Game.prototype.render = function(ctx, camera) {
     this.clearCanvas(ctx);
     this.renderBackground(ctx, camera);
     this.renderScene(ctx, camera);
-  }
+  };
 
-  clearCanvas(ctx) {
+  Game.prototype.clearCanvas = function(ctx) {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
+  };
 
-  renderBackground(ctx, camera) {
+  Game.prototype.renderBackground = function(ctx, camera) {
     this.canvas.style.backgroundPosition =
       -camera.x * 0.502 + "px " + -camera.y * 0.502 + "px";
-  }
+  };
 
-  renderScene(ctx, camera) {
+  Game.prototype.renderScene = function(ctx, camera) {
     this.levelManager.buildEntities();
 
     // only draw objects in the viewport
@@ -238,33 +238,33 @@ class Game {
       particle.draw(ctx, camera);
     });
     this.lifeBar.draw(ctx);
-    this.clock.draw(ctx);
+    this.timer.draw(ctx);
     this.shouldDisplayRulers &&
       this.grid.draw(ctx, camera, { isGame: true, shouldDisplayRulers: true });
     this.skillBar.draw(ctx, camera);
-  }
+  };
 
-  setBackground(path) {
+  Game.prototype.setBackground = function(path) {
     this.canvas.style.backgroundImage = "url(" + path + ")";
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
-  }
+  };
 
-  restartGame() {
+  Game.prototype.restartGame = function() {
     cancelAnimationFrame(this.rAF);
     this.gameMenu.close();
     this.unpause();
     this.startGame();
-  }
+  };
 
-  startGame() {
+  Game.prototype.startGame = function() {
     this.rAF && cancelAnimationFrame(this.rAF);
     this.loadGameDataFromLocalStorage();
     this.level = this.levelManager.buildLevel(this.currentLevelName);
-    this.clock.reset(this.level.countdownStart);
+    this.timer.reset.call(this.timer, this.level.countdownStart);
     this.levelManager.buildEntities();
     this.collisionManager = new CollisionManager({
       level: this.level,
-      clock: this.clock,
+      timer: this.timer,
       camera: this.camera
     });
     this.ghost.init({
@@ -289,17 +289,17 @@ class Game {
       skills: this.level.skills
     });
     requestAnimationFrame(this.pauseMenuLoop.bind(this));
-  }
+  };
 
-  exit() {
+  Game.prototype.exit = function() {
     show(this.gameMenu.gameIntroEl);
     this.gameMenu.close();
     hide(this.gameMenu.gameContainerEl);
     this.state = states.EXIT;
-    delete window.game;
-  }
+    delete game;
+  };
 
-  checkVictory() {
+  Game.prototype.checkVictory = function() {
     if (this.level.skills.length <= 0 && !(this.state === states.GAME_OVER)) {
       this.state = states.VICTORY;
       setTimeout(
@@ -309,9 +309,9 @@ class Game {
         1000
       );
     }
-  }
+  };
 
-  checkDefeat() {
+  Game.prototype.checkDefeat = function() {
     if (this.level.player.isDead && !(this.state === states.GAME_OVER)) {
       this.state = states.GAME_OVER;
       setTimeout(
@@ -321,27 +321,27 @@ class Game {
         1000
       );
     }
-  }
+  };
 
-  pause() {
+  Game.prototype.pause = function() {
     if (this.state !== states.GAME_OVER && this.state !== states.VICTORY) {
       !this.gameMenuEl && this.gameMenu.showPauseMenu();
-      this.clock.pause();
+      this.timer.pause();
       this.soundManager.pauseAll();
       this.state = states.PAUSED;
     }
-  }
+  };
 
-  unpause() {
+  Game.prototype.unpause = function() {
     this.state !== states.GAME_OVER &&
       this.state !== states.VICTORY &&
       this.gameMenu.close();
-    this.clock.play();
+    this.timer.play();
     this.soundManager.playPaused();
     this.state = states.RUNNING;
-  }
+  };
 
-  requestLoop() {
+  Game.prototype.requestLoop = function() {
     switch (this.state) {
       case states.RUNNING:
         this.rAF = requestAnimationFrame(this.mainLoop.bind(this));
@@ -355,14 +355,14 @@ class Game {
       default:
         break;
     }
-  }
+  };
 
-  mainLoop() {
+  Game.prototype.mainLoop = function() {
     this.timer.update();
-    window.dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
+    dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 2);
     this.ghost.update();
     !this.level.player.isDead &&
-      this.clock.countdownStart - this.clock.totalTime < 1000 &&
+      this.timer.countdownStart - this.timer.totalTime < 1000 &&
       this.level.player.die();
     this.handleKeyboard();
     this.level.entities.forEach(function(entity) {
@@ -374,23 +374,21 @@ class Game {
     this.checkDefeat();
     this.render(this.ctx, this.camera);
     this.requestLoop();
-  }
+  };
 
-  pauseMenuLoop() {
-    this.timer.update();
+  Game.prototype.pauseMenuLoop = function() {
     this.camera.updateDimensions(); // keep updating camera in case window is resized
     this.render(this.ctx, this.camera);
     this.requestLoop();
-  }
+  };
 
-  gameOverLoop() {
-    this.timer.update();
+  Game.prototype.gameOverLoop = function() {
     this.updateScene();
     this.render(this.ctx, this.camera);
     this.requestLoop();
-  }
+  };
 
-  updateDebugInfo() {
+  Game.prototype.updateDebugInfo = function() {
     var player = this.level.player;
     var camera = this.camera;
 
@@ -438,5 +436,7 @@ class Game {
         e("p", null, [e("strong", null, "camY: "), this.camera.y])
       ])
     ]);
-  }
-}
+  };
+
+  return Game;
+})();

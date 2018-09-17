@@ -1,11 +1,7 @@
-class Toolbar {
-  constructor(props) {
-    if (!Toolbar.instance) {
-      Toolbar.instance = this;
-    }
-    this.tools = props.tools;
-    this.app = props.app;
+var toolbarFactory = (function() {
+  var instance = null;
 
+  function Toolbar() {
     this.el = document.getElementById("toolbar");
     this.loadLevelSelect = document.getElementById("load");
     this.levelNameInput = document.getElementById("level-name");
@@ -19,7 +15,6 @@ class Toolbar {
     this.objectTypeDropDown = document.getElementById("object-type");
     this.saveButton = document.getElementById("save-button");
     this.deleteButton = document.getElementById("delete-button");
-    this.getGameObjectType();
 
     this.deleteButton.addEventListener(
       "click",
@@ -133,10 +128,16 @@ class Toolbar {
         }
       }.bind(this)
     );
-    return Toolbar.instance;
   }
 
-  getGameObjectType() {
+  Toolbar.prototype.init = function(props) {
+    this.tools = props.tools;
+    this.app = props.app;
+    this.getGameObjectType();
+  };
+
+  Toolbar.prototype.getGameObjectType = function() {
+    var app = this.app;
     var type = this.objectTypeDropDown.value;
     var objectTypeMap = {
       player: Player,
@@ -155,5 +156,14 @@ class Toolbar {
       skillMeteor: SkillMeteor
     };
     this.tools[1].gameObjectConstructor = objectTypeMap[type];
-  }
-}
+  };
+
+  return {
+    getInstance: function() {
+      if (!instance) {
+        instance = new Toolbar();
+      }
+      return instance;
+    }
+  };
+})();

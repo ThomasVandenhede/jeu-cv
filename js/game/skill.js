@@ -1,6 +1,6 @@
-class Skill extends AABB {
-  constructor(props) {
-    super(props);
+var Skill = (function() {
+  function Skill(props) {
+    AABB.call(this, props);
 
     this.v = new Vector();
     this.solid = false;
@@ -8,9 +8,12 @@ class Skill extends AABB {
     this.image.src = props.src;
   }
 
-  update() {}
+  Skill.prototype = Object.create(AABB.prototype);
+  Skill.prototype.constructor = Skill;
 
-  draw(ctx, camera) {
+  Skill.prototype.update = function() {};
+
+  Skill.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -19,8 +22,10 @@ class Skill extends AABB {
       ctx,
       [this.image]
         .concat(applyCamToArr(this.x, this.y))
-        .concat([camera.scale(this.width), camera.scale(this.height)])
+        .concat([this.width * camera.zoomLevel, this.height * camera.zoomLevel])
     );
     ctx.restore();
-  }
-}
+  };
+
+  return Skill;
+})();

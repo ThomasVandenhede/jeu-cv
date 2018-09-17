@@ -1,10 +1,13 @@
-class LifeBar extends AABB {
-  constructor(props) {
-    super(props);
+var LifeBar = (function() {
+  function LifeBar(props) {
+    AABB.call(this, props);
     this.gameObject = props.gameObject;
   }
 
-  draw(ctx) {
+  LifeBar.prototype = Object.create(AABB.prototype);
+  LifeBar.prototype.constructor = LifeBar;
+
+  LifeBar.prototype.draw = function(ctx) {
     var hitPointsRation = this.gameObject.getHitPointsRatio();
     var lineWidth = 1;
 
@@ -38,5 +41,7 @@ class LifeBar extends AABB {
       this.y + this.height + 20
     );
     ctx.restore();
-  }
-}
+  };
+
+  return LifeBar;
+})();

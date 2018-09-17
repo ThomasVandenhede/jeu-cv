@@ -1,5 +1,5 @@
-class Grid {
-  constructor(props) {
+var Grid = (function() {
+  function Grid(props) {
     this.camera = props.camera;
     this.canvas = props.canvas;
     this.mouse = props.mouse;
@@ -13,7 +13,7 @@ class Grid {
     this.isPrecisionAreaRound = false; // otherwise square
   }
 
-  getMousePosSnappedToGrid(mouseX, mouseY) {
+  Grid.prototype.getMousePosSnappedToGrid = function(mouseX, mouseY) {
     var camera = this.camera;
     var precisionGridSize = this.precisionGridSize;
 
@@ -23,15 +23,15 @@ class Grid {
       Math.round(mouseGamePos.y / precisionGridSize) * precisionGridSize
     );
     return camera.apply(snappedMouseGamePos.x, snappedMouseGamePos.y);
-  }
+  };
 
-  getMouseGamePosSnappedToGrid(mouseX, mouseY) {
+  Grid.prototype.getMouseGamePosSnappedToGrid = function(mouseX, mouseY) {
     var camera = this.camera;
     var mousePosSnappedToGrid = this.getMousePosSnappedToGrid(mouseX, mouseY);
     return camera.unapply(mousePosSnappedToGrid.x, mousePosSnappedToGrid.y);
-  }
+  };
 
-  _drawRulers(ctx, camera) {
+  Grid.prototype._drawRulers = function(ctx, camera) {
     var applyCam = camera.apply.bind(camera);
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
@@ -118,9 +118,9 @@ class Grid {
       }
     }
     ctx.restore();
-  }
+  };
 
-  _drawInnerGrid(ctx, camera) {
+  Grid.prototype._drawInnerGrid = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -152,12 +152,12 @@ class Grid {
       ctx.lineTo.apply(ctx, applyCamToArr(camera.right, j));
       ctx.stroke();
     }
-  }
+  };
 
-  _drawPrecisionArea(ctx, camera) {
+  Grid.prototype._drawPrecisionArea = function(ctx, camera) {
     var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
-    var precisionAreaGameSize = camera.scale(this.precisionAreaSize);
-    var precisionGridSize = camera.scale(this.precisionGridSize);
+    var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
+    var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
     var minX = mousePos.x - precisionAreaGameSize / 2;
     var maxX = mousePos.x + precisionAreaGameSize / 2;
     var minY = mousePos.y - precisionAreaGameSize / 2;
@@ -175,9 +175,9 @@ class Grid {
       ctx.lineTo(maxX, j);
       ctx.stroke();
     }
-  }
+  };
 
-  _drawCursor(ctx, camera) {
+  Grid.prototype._drawCursor = function(ctx, camera) {
     var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     var cursorSize = this.cursorSize;
     ctx.strokeStyle = this.cursorColor;
@@ -189,9 +189,9 @@ class Grid {
     ctx.lineTo(mousePos.x, mousePos.y + cursorSize / 2);
     ctx.stroke();
     ctx.restore();
-  }
+  };
 
-  _displayCoordinates(ctx, camera) {
+  Grid.prototype._displayCoordinates = function(ctx, camera) {
     var unapplyCam = camera.unapply.bind(camera);
     var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     ctx.font = "bold 14px Arial";
@@ -202,9 +202,9 @@ class Grid {
       mousePos.x + 20,
       mousePos.y - 20
     );
-  }
+  };
 
-  draw(ctx, camera, options) {
+  Grid.prototype.draw = function(ctx, camera, options) {
     var camera = this.camera;
 
     // update mouse precision for performance
@@ -228,5 +228,7 @@ class Grid {
     !options.isGame &&
       options.shouldDisplayRulers &&
       this._drawRulers(ctx, camera);
-  }
-}
+  };
+
+  return Grid;
+})();

@@ -1,8 +1,8 @@
-var MAX_SPEED = 100;
+var Platform = (function() {
+  var MAX_SPEED = 100;
 
-class Platform extends AABB {
-  constructor(props) {
-    super(props);
+  function Platform(props) {
+    AABB.call(this, props);
 
     this.v = new Vector();
     this.solid = props && props.solid !== undefined ? props.solid : true; // can collide with other solid objects
@@ -12,15 +12,18 @@ class Platform extends AABB {
     this.color = "#5e4c4c";
   }
 
-  update() {}
+  Platform.prototype = Object.create(AABB.prototype);
+  Platform.prototype.constructor = Platform;
 
-  draw(ctx, camera) {
+  Platform.prototype.update = function() {};
+
+  Platform.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
     var lineWidth = 3;
     ctx.save();
-    ctx.lineWidth = camera.scale(lineWidth);
+    ctx.lineWidth = lineWidth * camera.zoomLevel;
     if (this.touched || !this.passthrough) {
       ctx.strokeStyle = "#db0000";
       ctx.fillStyle = this.color;
@@ -28,8 +31,8 @@ class Platform extends AABB {
       ctx.rect.apply(
         ctx,
         applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
-          camera.scale(this.width - lineWidth),
-          camera.scale(this.height - lineWidth)
+          (this.width - lineWidth) * camera.zoomLevel,
+          (this.height - lineWidth) * camera.zoomLevel
         ])
       );
       ctx.fill();
@@ -37,16 +40,18 @@ class Platform extends AABB {
     } else {
       lineWidth = 3;
       ctx.strokeStyle = this.color;
-      ctx.lineWidth = camera.scale(lineWidth);
+      ctx.lineWidth = lineWidth * camera.zoomLevel;
       ctx.beginPath();
       ctx.strokeRect.apply(
         ctx,
         applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
-          camera.scale(this.width - lineWidth),
-          camera.scale(this.height - lineWidth)
+          (this.width - lineWidth) * camera.zoomLevel,
+          (this.height - lineWidth) * camera.zoomLevel
         ])
       );
     }
     ctx.restore();
-  }
-}
+  };
+
+  return Platform;
+})();

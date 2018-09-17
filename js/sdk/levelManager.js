@@ -1,31 +1,33 @@
-var level = {};
-var gameEntityConstructors = {
-  Player: Player,
-  Ennemy: Ennemy,
-  Platform: Platform,
-  MovingPlatform: MovingPlatform,
-  SkillHtml: SkillHtml,
-  SkillCss: SkillCss,
-  SkillSass: SkillSass,
-  SkillBootstrap: SkillBootstrap,
-  SkillReact: SkillReact,
-  SkillAngular: SkillAngular,
-  SkillJquery: SkillJquery,
-  SkillNode: SkillNode,
-  SkillMongo: SkillMongo,
-  SkillMeteor: SkillMeteor
-};
+var levelManager = (function() {
+  var instance;
+  var level = {};
 
-class LevelManager {
-  constructor() {
-    if (!LevelManager.instance) {
-      LevelManager.instance = this;
-    }
-    this.data = gameData;
-    return LevelManager.instance;
+  var gameEntityConstructors = {
+    Player: Player,
+    Ennemy: Ennemy,
+    Platform: Platform,
+    MovingPlatform: MovingPlatform,
+    SkillHtml: SkillHtml,
+    SkillCss: SkillCss,
+    SkillSass: SkillSass,
+    SkillBootstrap: SkillBootstrap,
+    SkillReact: SkillReact,
+    SkillAngular: SkillAngular,
+    SkillJquery: SkillJquery,
+    SkillNode: SkillNode,
+    SkillMongo: SkillMongo,
+    SkillMeteor: SkillMeteor
+  };
+
+  function LevelManager(props) {
+    this.data = props.data;
   }
 
-  buildLevel(name) {
+  LevelManager.prototype.init = function(app) {
+    this.app = app;
+  };
+
+  LevelManager.prototype.buildLevel = function(name) {
     if (!gameData.levels[name]) {
       return null;
     }
@@ -70,18 +72,27 @@ class LevelManager {
     level.particles = [];
 
     return level;
-  }
+  };
 
-  buildEntities() {
+  LevelManager.prototype.buildEntities = function() {
     level.entities = []
       .concat(level.platforms)
       .concat(level.skills)
       .concat(level.ennemies)
       .concat(level.lasers)
       .concat([level.player]);
-  }
+  };
 
-  deleteLevel(name) {
+  LevelManager.prototype.deleteLevel = function(name) {
     delete gameData.levels[name];
-  }
-}
+  };
+
+  return {
+    getInstance: function() {
+      if (!instance) {
+        instance = new LevelManager({ data: gameData });
+      }
+      return instance;
+    }
+  };
+})();

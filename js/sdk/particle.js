@@ -1,6 +1,6 @@
-class Particle extends Vector {
-  constructor(props) {
-    super(props.x, props.y);
+var Particle = (function() {
+  function Particle(props) {
+    Vector.call(this, props.x, props.y);
 
     this.size = props.size;
     this.color = props.color;
@@ -12,12 +12,15 @@ class Particle extends Vector {
     //   hasTransparency !== undefined ? hasTransparency : false;
   }
 
-  update() {
+  Particle.prototype = Object.create(Vector.prototype);
+  Particle.prototype.constructor = Particle;
+
+  Particle.prototype.update = function() {
     this.x += this.v.x * dt;
     this.y += this.v.y * dt;
-  }
+  };
 
-  draw(ctx, camera) {
+  Particle.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -32,9 +35,11 @@ class Particle extends Vector {
     ctx.fillRect.apply(
       ctx,
       applyCamToArr(this.x, this.y).concat([
-        camera.scale(size),
-        camera.scale(size)
+        size * camera.zoomLevel,
+        size * camera.zoomLevel
       ])
     );
-  }
-}
+  };
+
+  return Particle;
+})();

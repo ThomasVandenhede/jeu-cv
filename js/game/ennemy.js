@@ -1,6 +1,6 @@
-class Ennemy extends AABB {
-  constructor(props) {
-    super({
+var Ennemy = (function() {
+  function Ennemy(props) {
+    AABB.call(this, {
       x: props.x,
       y: props.y,
       width: props.width || 20,
@@ -17,7 +17,10 @@ class Ennemy extends AABB {
     this.lastFiredAt = Number.NEGATIVE_INFINITY;
   }
 
-  attack(direction) {
+  Ennemy.prototype = Object.create(AABB.prototype);
+  Ennemy.prototype.constructor = Ennemy;
+
+  Ennemy.prototype.attack = function(direction) {
     var center = this.center;
     this.lastFiredAt = Date.now();
     return new Laser({
@@ -28,13 +31,13 @@ class Ennemy extends AABB {
       range: this.attackRange,
       color: "lightgrey"
     });
-  }
+  };
 
-  update() {}
+  Ennemy.prototype.update = function() {};
 
-  updateVelocity() {}
+  Ennemy.prototype.updateVelocity = function() {};
 
-  draw(ctx, camera) {
+  Ennemy.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -46,12 +49,14 @@ class Ennemy extends AABB {
     ctx.arc.apply(
       ctx,
       applyCamToArr(center.x, center.y).concat([
-        camera.scale(r),
+        r * camera.zoomLevel,
         0,
         Math.PI * 2
       ])
     );
     ctx.fill();
     ctx.restore();
-  }
-}
+  };
+
+  return Ennemy;
+})();

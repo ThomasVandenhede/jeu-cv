@@ -1,35 +1,35 @@
-class Segment {
-  constructor(A, B, color) {
+var Segment = (function() {
+  function Segment(A, B, color) {
     this.A = A;
     this.B = B;
     this.color = color;
   }
 
-  getBoundingRect() {
+  Segment.prototype.getBoundingRect = function() {
     return new AABB({
       x: Math.min(this.A.x, this.B.x),
       y: Math.min(this.A.y, this.B.y),
       width: Math.abs(this.B.x - this.A.x),
       height: Math.abs(this.B.y - this.A.y)
     });
-  }
+  };
 
-  isOrthogonalProjectedPointOnSegment(P) {
+  Segment.prototype.isOrthogonalProjectedPointOnSegment = function(P) {
     var AB = Vector.subtract(this.B, this.A);
     var AP = Vector.subtract(P, this.A);
     var BP = Vector.subtract(P, this.B);
     return Vector.dotProduct(AB, AP) * Vector.dotProduct(AB, BP) <= 0;
-  }
+  };
 
-  getOrthogonalProjectionOfPoint(P) {
+  Segment.prototype.getOrthogonalProjectionOfPoint = function(P) {
     var u = Vector.subtract(this.B, this.A).getUnitVector();
     var AP = Vector.subtract(P, this.A);
     var AH = Vector.dotProduct(AP, u);
 
     return Vector.sum(this.A, u.multiplyByScalar(AH));
-  }
+  };
 
-  getDistanceFromPoint(P) {
+  Segment.prototype.getDistanceFromPoint = function(P) {
     // return Vector.subtract(this.getOrthogonalProjectionOfPoint(P), P).norm;
     var AB = Vector.subtract(this.B, this.A);
     var t = Vector.dotProduct(Vector.subtract(P, this.A), AB) / AB.norm;
@@ -39,17 +39,17 @@ class Segment {
       return Vector.subtract(B, P).norm;
     } else {
     }
-  }
+  };
 
-  getDistanceFromPointToLine(P) {
+  Segment.prototype.getDistanceFromPointToLine = function(P) {
     var n = Vector.subtract(this.B, this.A)
       .getUnitVector()
       .getNormalVector();
     var d = Math.abs(Vector.dotProduct(Vector.subtract(P, this.A), n));
     return d;
-  }
+  };
 
-  getClosestPointOnSegment(P) {
+  Segment.prototype.getClosestPointOnSegment = function(P) {
     var AP = Vector.subtract(P, this.A);
     var AB = Vector.subtract(this.B, this.A);
     var normAB = AB.norm;
@@ -64,18 +64,18 @@ class Segment {
       var AH = Vector.dotProduct(AP, u);
       return Vector.sum(this.A, u.multiplyByScalar(AH));
     }
-  }
+  };
 
-  getPointOfIntersectionWithCircle(c) {
+  Segment.prototype.getPointOfIntersectionWithCircle = function(c) {
     var C = new Vector(c.x, c.y);
     var H = this.getClosestPointOnSegment(C);
     if ((CH = Vector.subtract(H, C).normSquared < Math.pow(c.r, 2))) {
       return H;
     }
     return false;
-  }
+  };
 
-  // intersectSegment(O, P) {
+  // Segment.prototype.intersectSegment = function(O, P) {
   //   var AB = Vector.subtract(this.B, this.A);
   //   var OP = Vector.subtract(P, O);
   //   if (!CollisionDroiteSeg(A, B, O, P)) {
@@ -87,12 +87,14 @@ class Segment {
   //   return !(k < 0 || k > 1);
   // };
 
-  draw(ctx) {
+  Segment.prototype.draw = function(ctx) {
     ctx.save();
     ctx.strokeStyle = this.color;
     ctx.moveTo(this.A.x, this.A.y);
     ctx.lineTo(this.B.x, this.B.y);
     ctx.stroke();
     ctx.restore();
-  }
-}
+  };
+
+  return Segment;
+})();

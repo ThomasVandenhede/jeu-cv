@@ -1,13 +1,13 @@
-var ABS_JUMP_SPEED = 700;
-var MAX_FALL_SPEED = 1000;
-var animationID;
-var INITIAL_WIDTH = 30;
-var INITIAL_HEIGHT = 30;
-var CROUCH_STAND_ANIMATION_DURATION = 0.2;
+var Player = (function() {
+  var ABS_JUMP_SPEED = 700;
+  var MAX_FALL_SPEED = 1000;
+  var animationID;
+  var INITIAL_WIDTH = 30;
+  var INITIAL_HEIGHT = 30;
+  var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
-class Player extends AABB {
-  constructor(props) {
-    super({
+  function Player(props) {
+    AABB.call(this, {
       x: props.x,
       y: props.y,
       width: INITIAL_WIDTH,
@@ -61,57 +61,60 @@ class Player extends AABB {
     this.GRAVITY_ACCELERATION = gameData.constants.GRAVITY_ACCELERATION;
   }
 
-  moveLeft() {
+  Player.prototype = Object.create(AABB.prototype);
+  Player.prototype.constructor = Player;
+
+  Player.prototype.moveLeft = function() {
     this.v.x = -250;
-  }
+  };
 
-  moveRight() {
+  Player.prototype.moveRight = function() {
     this.v.x = 250;
-  }
+  };
 
-  crouch() {
+  Player.prototype.crouch = function() {
     this.isCrouching = true;
-  }
+  };
 
-  stand() {
+  Player.prototype.stand = function() {
     this.isCrouching = false;
-  }
+  };
 
-  jump() {
+  Player.prototype.jump = function() {
     if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
       this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
       this.isColliding[1] = 0;
       this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
     }
-  }
+  };
 
-  reverseGravity() {
+  Player.prototype.reverseGravity = function() {
     this.GRAVITY_ACCELERATION = -this.GRAVITY_ACCELERATION;
-  }
+  };
 
-  zeroGravity() {
+  Player.prototype.zeroGravity = function() {
     if (this.GRAVITY_ACCELERATION) {
       this.GRAVITY_ACCELERATION = 0;
     } else {
       this.GRAVITY_ACCELERATION = gameData.constants.GRAVITY_ACCELERATION;
     }
-  }
+  };
 
-  applyDamage(damage) {
+  Player.prototype.applyDamage = function(damage) {
     this.sounds.hurt.replay();
     this.hitPoints = toFixedPrecision(this.hitPoints - damage);
-  }
+  };
 
-  die() {
+  Player.prototype.die = function() {
     this.isDead = true;
     this.hitPoints = 0;
     this.color = this.getColorFromHP();
     this.sounds.still.stop();
     this.sounds.die.play();
     this.explosion = explosionParticles(this);
-  }
+  };
 
-  getDeltaWidth() {
+  Player.prototype.getDeltaWidth = function() {
     var deltaWidth;
     var computedDelta =
       (dt / CROUCH_STAND_ANIMATION_DURATION) * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
@@ -127,9 +130,9 @@ class Player extends AABB {
           : -computedDelta;
     }
     return deltaWidth;
-  }
+  };
 
-  updatePlayerSize(deltaWidth) {
+  Player.prototype.updatePlayerSize = function(deltaWidth) {
     this.width = toFixedPrecision(this.width + deltaWidth, 3);
     this.height = toFixedPrecision(this.height - deltaWidth, 3);
     this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
@@ -137,9 +140,9 @@ class Player extends AABB {
       this.GRAVITY_ACCELERATION < 0
         ? toFixedPrecision(this.y, 3)
         : toFixedPrecision(this.y + deltaWidth, 3);
-  }
+  };
 
-  applyGravity() {
+  Player.prototype.applyGravity = function() {
     // apply gravity if player is free falling
     this.acceleration.y = this.GRAVITY_ACCELERATION;
 
@@ -149,9 +152,9 @@ class Player extends AABB {
       Math.abs(this.v.y) > MAX_FALL_SPEED
         ? Math.sign(this.v.y) * MAX_FALL_SPEED
         : this.v.y;
-  }
+  };
 
-  update() {
+  Player.prototype.update = function() {
     if (this.isDead) {
       this.explosion.update();
       return;
@@ -171,19 +174,19 @@ class Player extends AABB {
     if (!this.isColliding[0]) {
       this.x = toFixedPrecision(this.x + dx, 2);
     }
-  }
+  };
 
-  getHitPointsRatio() {
+  Player.prototype.getHitPointsRatio = function() {
     return this.hitPoints / this.maxHitPoints;
-  }
+  };
 
-  getColorFromHP() {
+  Player.prototype.getColorFromHP = function() {
     var hitPointsRatio = this.getHitPointsRatio();
     var color = "hsl(" + hitPointsRatio * 120 + ", 100%, 50%)";
     return color;
-  }
+  };
 
-  draw(ctx, camera) {
+  Player.prototype.draw = function(ctx, camera) {
     var applyCamToArr = function() {
       return Object.values(camera.apply.apply(camera, arguments));
     };
@@ -207,12 +210,12 @@ class Player extends AABB {
       ctx.save();
       ctx.strokeStyle = this.color;
       ctx.fillStyle = this.color;
-      ctx.lineWidth = camera.scale(lineWidth);
+      ctx.lineWidth = lineWidth * camera.zoomLevel;
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.x, this.y).concat(
-          camera.scale(this.width),
-          camera.scale(this.height)
+          this.width * camera.zoomLevel,
+          this.height * camera.zoomLevel
         )
       );
 
@@ -221,8 +224,8 @@ class Player extends AABB {
       ctx.fillRect.apply(
         ctx,
         applyCamToArr(this.left, this.top + 10).concat([
-          camera.scale(this.width),
-          camera.scale(10)
+          this.width * camera.zoomLevel,
+          10 * camera.zoomLevel
         ])
       );
 
@@ -267,5 +270,7 @@ class Player extends AABB {
         this.shield.draw(ctx, camera);
       }
     }
-  }
-}
+  };
+
+  return Player;
+})();
