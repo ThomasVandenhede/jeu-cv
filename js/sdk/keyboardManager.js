@@ -12,6 +12,7 @@ var keyboardManager = (function() {
       KeyA: "LEFT",
       KeyS: "DOWN",
       KeyD: "RIGHT",
+      KeyG: 'G',
       Enter: "ENTER",
       Space: "SPACE",
       Escape: "ESCAPE"
@@ -57,11 +58,11 @@ var keyboardManager = (function() {
           case 187:
             this.app.camera.zoomIn();
             break;
-          // case 71:
-          //   this.app.player.reverseGravity();
-          //   break;
+          case 71:
+            this.app.level.player.reverseGravity();
+            break;
           // case 72:
-          //   this.app.player.zeroGravity();
+          //   this.app.level.player.zeroGravity();
           //   break;
           default:
         }
