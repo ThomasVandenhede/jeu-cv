@@ -16,7 +16,7 @@ window.addEventListener("DOMContentLoaded", function() {
   }
 
   startGameButton.addEventListener("click", function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);;
+    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
     // instantiate game
     show(gameContainer);
     hide(gameIntroEl);

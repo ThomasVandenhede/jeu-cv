@@ -134,18 +134,36 @@ var Camera = (function() {
     }
   };
 
+  Camera.prototype.applyToX = function(x) {
+    return Math.round((x - this.x) * this.zoomLevel);
+  };
+
+  Camera.prototype.applyToY = function(y) {
+    return Math.round((y - this.y) * this.zoomLevel);
+  };
+
   Camera.prototype.apply = function(x, y) {
-    var screenX, screenY;
-    screenX = toFixedPrecision((x - this.x) * this.zoomLevel, 4);
-    screenY = toFixedPrecision((y - this.y) * this.zoomLevel, 4);
-    return new Vector(screenX, screenY);
+    return new Vector(this.applyToX(x), this.applyToY(y));
+  };
+
+  Camera.prototype.unapplyToX = function(x) {
+    return Math.round(x / this.zoomLevel + this.x);
+  };
+
+  Camera.prototype.unapplyToY = function(y) {
+    return Math.round(y / this.zoomLevel + this.y);
   };
 
   Camera.prototype.unapply = function(x, y) {
-    var gameX, gameY;
-    gameX = toFixedPrecision(x / this.zoomLevel + this.x, 2);
-    gameY = toFixedPrecision(y / this.zoomLevel + this.y, 2);
-    return new Vector(gameX, gameY);
+    return new Vector(this.unapplyToX(x), this.unapplyToY(y));
+  };
+
+  Camera.prototype.applyToDistance = function(distance) {
+    return Math.round(distance * this.zoomLevel);
+  };
+
+  Camera.prototype.unapplyToDistance = function(distance) {
+    return Math.round(distance / this.zoomLevel);
   };
 
   return Camera;

@@ -33,7 +33,6 @@ CollisionManager.prototype.handleCollisionsWithLasers = function() {
                   "red"
                 )
               );
-              this.level.player.hitParticles = hitParticles;
               this.destroyLaser(index);
             }
           }

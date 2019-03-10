@@ -1,6 +1,5 @@
 function toFixedPrecision(number, precision) {
-  var precision = precision || 0;
-  return +number.toFixed(precision);
+  return +number.toFixed(precision || 0);
 }
 
 function noop() {}
@@ -38,7 +37,7 @@ function e(type, props, children) {
   }
   for (var i = 0; i < nodes.length; i++) {
     if (typeof nodes[i] === "string") {
-      node = document.createTextNode(nodes[i])
+      node = document.createTextNode(nodes[i]);
     } else {
       node = nodes[i];
     }

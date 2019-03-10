@@ -155,29 +155,21 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.drawSelectionRectangle = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     var selectionArea = this.selectionTool.selectionArea;
     if (selectionArea) {
       ctx.save();
       ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-      ctx.fillRect.apply(
-        ctx,
-        applyCamToArr(selectionArea.x, selectionArea.y).concat([
-          selectionArea.width * camera.zoomLevel,
-          selectionArea.height * camera.zoomLevel
-        ])
+      ctx.fillRect(
+        camera.applyToX(selectionArea.x),
+        camera.applyToY(selectionArea.y),
+        camera.applyToDistance(selectionArea.width),
+        camera.applyToDistance(selectionArea.height)
       );
       ctx.restore();
     }
   };
 
   LevelEditor.prototype.drawSelectionOutlines = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-    var applyCam = camera.apply.bind(camera);
     var selectedObjects = this.selectionTool.selection.map(function(item) {
       return item.object;
     });
@@ -191,28 +183,21 @@ var LevelEditor = (function() {
     ctx.strokeStyle = "white";
     ctx.lineWidth = lineWidth; // do not scale line width for visibility reasons
     ctx.beginPath();
-    ctx.rect.apply(
-      ctx,
-      applyCamToArr(selectionRectangle.x, selectionRectangle.y).concat([
-        selectionRectangle.width * camera.zoomLevel,
-        selectionRectangle.height * camera.zoomLevel
-      ])
+    ctx.rect(
+      camera.applyToX(selectionRectangle.x),
+      camera.applyToY(selectionRectangle.y),
+      camera.applyToDistance(selectionRectangle.width),
+      camera.applyToDistance(selectionRectangle.height)
     );
     ctx.stroke();
 
     selectedObjects.forEach(function(selectedObject) {
       ctx.beginPath();
-      ctx.rect.apply(
-        ctx,
-        Object.values(
-          Vector.subtract(
-            applyCam(selectedObject.x, selectedObject.y),
-            new Vector(lineWidth / 2, lineWidth / 2)
-          )
-        ).concat([
-          selectedObject.width * camera.zoomLevel + lineWidth,
-          selectedObject.height * camera.zoomLevel + lineWidth
-        ])
+      ctx.rect(
+        camera.applyToX(selectedObject.x) - lineWidth / 2,
+        camera.applyToY(selectedObject.y) - lineWidth / 2,
+        camera.applyToDistance(selectedObject.width) + lineWidth,
+        camera.applyToDistance(selectedObject.height) + lineWidth
       );
       ctx.stroke();
     });
@@ -220,10 +205,6 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.drawResizeHandles = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-
     if (!this.selectionTool.selection.length) {
       return;
     }
@@ -232,20 +213,16 @@ var LevelEditor = (function() {
 
     ctx.save();
     ctx.fillStyle = this.tools[0].resizeHandleHovered ? "cyan" : "blue";
-    ctx.fillRect.apply(
-      ctx,
-      applyCamToArr(selectionRectangle.right, selectionRectangle.bottom).concat(
-        [20, 20]
-      )
+    ctx.fillRect(
+      camera.applyToX(selectionRectangle.right),
+      camera.applyToY(selectionRectangle.bottom),
+      20,
+      20
     );
     ctx.restore();
   };
 
   LevelEditor.prototype.renderScene = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-
     // optimize rendering by only drawing objects that are on screen
     this.drawGrid(ctx, camera);
 
@@ -263,17 +240,11 @@ var LevelEditor = (function() {
         ctx.fillStyle = "rgb(255, 255, 255)";
         ctx.lineWidth = lineWidth;
         ctx.beginPath();
-        ctx.rect.apply(
-          ctx,
-          Object.values(
-            Vector.sum(
-              camera.apply(gameObject.xEnd, gameObject.yEnd),
-              new Vector(lineWidth / 2, lineWidth / 2)
-            )
-          ).concat([
-            gameObject.width * camera.zoomLevel - lineWidth,
-            gameObject.height * camera.zoomLevel - lineWidth
-          ])
+        ctx.rect(
+          camera.applyToX(gameObject.xEnd) + lineWidth / 2,
+          camera.applyToY(gameObject.yEnd) + lineWidth / 2,
+          camera.applyToDistance(gameObject.width) - lineWidth,
+          camera.applyToDistance(gameObject.height) - lineWidth
         );
         ctx.stroke();
         ctx.fill();
@@ -281,16 +252,13 @@ var LevelEditor = (function() {
         ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo.apply(
-          ctx,
-          applyCamToArr(gameObject.center.x, gameObject.center.y)
+        ctx.moveTo(
+          camera.applyToX(gameObject.center.x),
+          camera.applyToY(gameObject.center.y)
         );
-        ctx.lineTo.apply(
-          ctx,
-          applyCamToArr(
-            gameObject.xEnd + gameObject.width / 2,
-            gameObject.yEnd + gameObject.height / 2
-          )
+        ctx.lineTo(
+          camera.applyToX(gameObject.xEnd + gameObject.width / 2),
+          camera.applyToY(gameObject.yEnd + gameObject.height / 2)
         );
         ctx.stroke();
         ctx.restore();
@@ -306,12 +274,11 @@ var LevelEditor = (function() {
     ctx.save();
     ctx.strokeStyle = "red";
     ctx.beginPath();
-    ctx.strokeRect.apply(
-      ctx,
-      applyCamToArr(this.worldRect.x, this.worldRect.y).concat([
-        this.worldRect.width * camera.zoomLevel,
-        this.worldRect.height * camera.zoomLevel
-      ])
+    ctx.strokeRect(
+      camera.applyToX(this.worldRect.x),
+      camera.applyToY(this.worldRect.y),
+      camera.applyToDistance(this.worldRect.width),
+      camera.applyToDistance(this.worldRect.height)
     );
     ctx.stroke();
 

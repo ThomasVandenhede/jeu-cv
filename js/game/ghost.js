@@ -60,36 +60,29 @@ Ghost.prototype.update = function() {
 
 Ghost.prototype.draw = function(ctx, camera) {
   if (this.ghost) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     ctx.save();
     ctx.fillStyle = "rgba(180, 180, 180, 0.7)";
-    ctx.fillRect.apply(
-      ctx,
-      applyCamToArr(this.ghost.x, this.ghost.y).concat([
-        this.player.width * camera.zoomLevel,
-        this.player.height * camera.zoomLevel
-      ])
+    ctx.fillRect(
+      camera.applyToX(this.ghost.x),
+      camera.applyToY(this.ghost.y),
+      camera.applyToDistance(this.player.width),
+      camera.applyToDistance(this.player.height)
     );
     if (!this.ghostPositions[this.ghostIndex + 1]) {
       ctx.strokeStyle = "black";
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(this.ghost.x, this.ghost.y));
-      ctx.lineTo.apply(
-        ctx,
-        applyCamToArr(
-          this.ghost.x + this.player.width,
-          this.ghost.y + this.player.height
-        )
+      ctx.moveTo(camera.applyToX(this.ghost.x), camera.applyToY(this.ghost.y));
+      ctx.lineTo(
+        camera.applyToX(this.ghost.x + this.player.width),
+        camera.applyToY(this.ghost.y + this.player.height)
       );
-      ctx.moveTo.apply(
-        ctx,
-        applyCamToArr(this.ghost.x + this.player.width, this.ghost.y)
+      ctx.moveTo(
+        camera.applyToX(this.ghost.x + this.player.width),
+        camera.applyToY(this.ghost.y)
       );
-      ctx.lineTo.apply(
-        ctx,
-        applyCamToArr(this.ghost.x, this.ghost.y + this.player.height)
+      ctx.lineTo(
+        camera.applyToX(this.ghost.x),
+        camera.applyToY(this.ghost.y + this.player.height)
       );
       ctx.stroke();
     }

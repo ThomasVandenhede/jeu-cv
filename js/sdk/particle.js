@@ -21,23 +21,13 @@ var Particle = (function() {
   };
 
   Particle.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-    var color = this.color;
-    var size = this.size;
-    // var alpha = this.hasTransparency
-    //   ? Math.max(0, 1 - (Date.now() - this.createdAt) / this.maxLife)
-    //   : 1;
-    // ctx.globalAlpha = alpha;
-    ctx.fillStyle = color;
+    ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.fillRect.apply(
-      ctx,
-      applyCamToArr(this.x, this.y).concat([
-        size * camera.zoomLevel,
-        size * camera.zoomLevel
-      ])
+    ctx.fillRect(
+      camera.applyToX(this.x),
+      camera.applyToY(this.y),
+      camera.applyToDistance(this.size),
+      camera.applyToDistance(this.size)
     );
   };
 

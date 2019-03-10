@@ -38,18 +38,13 @@ var Laser = (function() {
   };
 
   Laser.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-    var A = this.A;
-    var B = this.B;
     var lineWidth = 3;
     ctx.save();
     ctx.strokeStyle = this.color;
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.applyToDistance(lineWidth);
     ctx.beginPath();
-    ctx.moveTo.apply(ctx, applyCamToArr(A.x, A.y));
-    ctx.lineTo.apply(ctx, applyCamToArr(B.x, B.y));
+    ctx.moveTo(camera.applyToX(this.A.x), camera.applyToY(this.A.y));
+    ctx.lineTo(camera.applyToX(this.B.x), camera.applyToY(this.B.y));
     ctx.stroke();
     ctx.restore();
   };

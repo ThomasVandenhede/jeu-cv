@@ -187,79 +187,68 @@ var Player = (function() {
   };
 
   Player.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-
     // draw particles
     this.color = this.getColorFromHP();
-    !this.isDead
-      ? this.sparks.draw(ctx, camera)
-      : this.explosion.draw(ctx, camera);
+    this.isDead
+      ? this.explosion.draw(ctx, camera)
+      : this.sparks.draw(ctx, camera);
 
     // draw player
     if (!this.isDead) {
-      var r = 5;
-      var left = this.x;
-      var top = this.y;
-      var right = left + this.width;
-      var bottom = top + this.height;
       var center = this.center;
       var lineWidth = 5;
 
       ctx.save();
       ctx.strokeStyle = this.color;
       ctx.fillStyle = this.color;
-      ctx.lineWidth = lineWidth * camera.zoomLevel;
-      ctx.fillRect.apply(
-        ctx,
-        applyCamToArr(this.x, this.y).concat(
-          this.width * camera.zoomLevel,
-          this.height * camera.zoomLevel
-        )
+      ctx.lineWidth = camera.applyToDistance(lineWidth);
+      ctx.fillRect(
+        camera.applyToX(this.x),
+        camera.applyToY(this.y),
+        camera.applyToDistance(this.width),
+        camera.applyToDistance(this.height)
       );
 
       // draw mask
       ctx.fillStyle = "black";
-      ctx.fillRect.apply(
-        ctx,
-        applyCamToArr(this.left, this.top + 10).concat([
-          this.width * camera.zoomLevel,
-          10 * camera.zoomLevel
-        ])
+      ctx.fillRect(
+        camera.applyToX(this.left),
+        camera.applyToY(this.top + 10),
+        camera.applyToDistance(this.width),
+        camera.applyToDistance(10)
       );
 
       // draw eyes
       ctx.fillStyle = this.color;
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(center.x - 10, this.top + 12));
-      ctx.quadraticCurveTo.apply(
-        ctx,
-        applyCamToArr(center.x - 4, this.top + 14).concat(
-          applyCamToArr(center.x - 4, this.top + 16)
-        )
+      ctx.moveTo(camera.applyToX(center.x - 10), camera.applyToY(this.top + 12));
+      ctx.quadraticCurveTo(
+        camera.applyToX(center.x - 4),
+        camera.applyToY(this.top + 14),
+        camera.applyToX(center.x - 4),
+        camera.applyToY(this.top + 16)
       );
-      ctx.quadraticCurveTo.apply(
-        ctx,
-        applyCamToArr(center.x - 10, this.top + 16).concat(
-          applyCamToArr(center.x - 10, this.top + 14)
-        )
+      ctx.quadraticCurveTo(
+        camera.applyToX(center.x - 10),
+        camera.applyToY(this.top + 16),
+        camera.applyToX(center.x - 10),
+        camera.applyToY(this.top + 14)
       );
       ctx.closePath();
       ctx.fill();
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(center.x + 10, this.top + 12));
-      ctx.quadraticCurveTo.apply(
-        ctx,
-        applyCamToArr(center.x + 4, this.top + 14).concat(
-          applyCamToArr(center.x + 4, this.top + 16)
-        )
+      ctx.moveTo(camera.applyToX(center.x + 10), camera.applyToY(this.top + 12));
+      ctx.quadraticCurveTo(
+        camera.applyToX(center.x + 4),
+        camera.applyToY(this.top + 14),
+        camera.applyToX(center.x + 4),
+        camera.applyToY(this.top + 16)
       );
-      ctx.quadraticCurveTo.apply(
-        ctx,
-        applyCamToArr(center.x + 10, this.top + 16).concat(
-          applyCamToArr(center.x + 10, this.top + 14)
-        )
+      ctx.quadraticCurveTo(
+        camera.applyToX(center.x + 10),
+        camera.applyToY(this.top + 16),
+        camera.applyToX(center.x + 10),
+        camera.applyToY(this.top + 14)
       );
       ctx.closePath();
       ctx.fill();

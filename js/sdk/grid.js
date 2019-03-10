@@ -32,10 +32,6 @@ var Grid = (function() {
   };
 
   Grid.prototype._drawRulers = function(ctx, camera) {
-    var applyCam = camera.apply.bind(camera);
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     var innerGridSize = this.innerGridSize;
     var minX = Math.floor(camera.left / innerGridSize, 2) * innerGridSize;
     var maxX = Math.ceil(camera.right / innerGridSize, 2) * innerGridSize;
@@ -48,72 +44,46 @@ var Grid = (function() {
     ctx.strokeStyle = "white";
     for (var i = minX; i <= maxX; i += innerGridSize) {
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.top));
-      ctx.lineTo.apply(
-        ctx,
-        Object.values(Vector.sum(applyCam(i, camera.top), new Vector(0, 10)))
-      );
+      ctx.moveTo(camera.applyToX(i), camera.applyToY(camera.top));
+      ctx.lineTo(camera.applyToX(i), camera.applyToY(camera.top) + 10);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.bottom));
-      ctx.lineTo.apply(
-        ctx,
-        Object.values(
-          Vector.sum(applyCam(i, camera.bottom), new Vector(0, -10))
-        )
-      );
+      ctx.moveTo(camera.applyToX(i), camera.applyToY(camera.bottom));
+      ctx.lineTo(camera.applyToX(i), camera.applyToY(camera.bottom) - 10);
       ctx.stroke();
       if (i % (innerGridSize * 5) === 0) {
-        ctx.fillText.apply(
-          ctx,
-          [i].concat(
-            Object.values(
-              Vector.sum(applyCam(i, camera.top), new Vector(10, 20))
-            )
-          )
+        ctx.fillText(
+          i,
+          camera.applyToX(i) + 10,
+          camera.applyToY(camera.top) + 20
         );
-        ctx.fillText.apply(
-          ctx,
-          [i].concat(
-            Object.values(
-              Vector.sum(applyCam(i, camera.bottom), new Vector(10, -10))
-            )
-          )
+        ctx.fillText(
+          i,
+          camera.applyToX(i) + 10,
+          camera.applyToY(camera.bottom) - 10
         );
       }
     }
     for (var i = minY; i <= maxY; i += innerGridSize) {
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(camera.left, i));
-      ctx.lineTo.apply(
-        ctx,
-        Object.values(Vector.sum(applyCam(camera.left, i), new Vector(10, 0)))
-      );
+      ctx.moveTo(camera.applyToX(camera.left), camera.applyToY(i));
+      ctx.lineTo(camera.applyToX(camera.left) + 10, camera.applyToY(i));
       ctx.stroke();
-      ctx.moveTo.apply(ctx, applyCamToArr(camera.right, i));
-      ctx.lineTo.apply(
-        ctx,
-        Object.values(Vector.sum(applyCam(camera.right, i), new Vector(-10, 0)))
-      );
+      ctx.moveTo(camera.applyToX(camera.right), camera.applyToY(i));
+      ctx.lineTo(camera.applyToX(camera.right) - 10, camera.applyToY(i));
       ctx.stroke();
       if (i % (innerGridSize * 5) === 0) {
         ctx.textAlign = "left";
-        ctx.fillText.apply(
-          ctx,
-          [-i].concat(
-            Object.values(
-              Vector.sum(applyCam(camera.left, i), new Vector(10, -10))
-            )
-          )
+        ctx.fillText(
+          -i,
+          camera.applyToX(camera.left) + 10,
+          camera.applyToY(i) - 10
         );
         ctx.textAlign = "right";
-        ctx.fillText.apply(
-          ctx,
-          [-i].concat(
-            Object.values(
-              Vector.sum(applyCam(camera.right, i), new Vector(-10, -10))
-            )
-          )
+        ctx.fillText(
+          -i,
+          camera.applyToX(camera.right) - 10,
+          camera.applyToY(i) - 10
         );
       }
     }
@@ -121,9 +91,6 @@ var Grid = (function() {
   };
 
   Grid.prototype._drawInnerGrid = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     var innerGridSize = this.innerGridSize;
     var minX = Math.floor(camera.left / innerGridSize, 2) * innerGridSize;
     var maxX = Math.ceil(camera.right / innerGridSize, 2) * innerGridSize;
@@ -137,8 +104,8 @@ var Grid = (function() {
         ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
       }
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(i, camera.top));
-      ctx.lineTo.apply(ctx, applyCamToArr(i, camera.bottom));
+      ctx.moveTo(camera.applyToX(i), camera.applyToY(camera.top));
+      ctx.lineTo(camera.applyToX(i), camera.applyToY(camera.bottom));
       ctx.stroke();
     }
     for (var j = minY; j <= maxY; j += innerGridSize) {
@@ -148,8 +115,8 @@ var Grid = (function() {
         ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
       }
       ctx.beginPath();
-      ctx.moveTo.apply(ctx, applyCamToArr(camera.left, j));
-      ctx.lineTo.apply(ctx, applyCamToArr(camera.right, j));
+      ctx.moveTo(camera.applyToX(camera.left), camera.applyToY(j));
+      ctx.lineTo(camera.applyToX(camera.right), camera.applyToY(j));
       ctx.stroke();
     }
   };
@@ -158,10 +125,10 @@ var Grid = (function() {
     var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     var precisionAreaGameSize = this.precisionAreaSize * camera.zoomLevel;
     var precisionGridSize = this.precisionGridSize * camera.zoomLevel;
-    var minX = mousePos.x - precisionAreaGameSize / 2;
-    var maxX = mousePos.x + precisionAreaGameSize / 2;
-    var minY = mousePos.y - precisionAreaGameSize / 2;
-    var maxY = mousePos.y + precisionAreaGameSize / 2;
+    var minX = Math.floor(mousePos.x - precisionAreaGameSize / 2);
+    var maxX = Math.ceil(mousePos.x + precisionAreaGameSize / 2);
+    var minY = Math.floor(mousePos.y - precisionAreaGameSize / 2);
+    var maxY = Math.ceil(mousePos.y + precisionAreaGameSize / 2);
     ctx.strokeStyle = "grey";
     for (var i = minX; i <= maxX; i += precisionGridSize) {
       ctx.beginPath();
@@ -192,11 +159,10 @@ var Grid = (function() {
   };
 
   Grid.prototype._displayCoordinates = function(ctx, camera) {
-    var unapplyCam = camera.unapply.bind(camera);
     var mousePos = this.getMousePosSnappedToGrid(this.mouse.x, this.mouse.y);
     ctx.font = "bold 14px Arial";
     ctx.fillStyle = "#ccc";
-    var mouseGamePos = unapplyCam(mousePos.x, mousePos.y);
+    var mouseGamePos = camera.unapply(mousePos.x, mousePos.y);
     ctx.fillText(
       mouseGamePos.x + ", " + mouseGamePos.y,
       mousePos.x + 20,

@@ -10,15 +10,13 @@ class Tile {
   }
 
   draw(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     ctx.save();
-    ctx.drawImage.apply(
-      ctx,
-      [this.image]
-        .concat(applyCamToArr(this.x, this.y))
-        .concat([this.size * camera.zoomLevel, this.size * camera.zoomLevel])
+    ctx.drawImage(
+      this.image,
+      camera.applyToX(this.x),
+      camera.applyToY(this.y),
+      camera.applyToDistance(this.size),
+      camera.applyToDistance(this.size)
     );
     ctx.restore();
   }

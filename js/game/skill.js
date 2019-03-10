@@ -14,15 +14,13 @@ var Skill = (function() {
   Skill.prototype.update = function() {};
 
   Skill.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     ctx.save();
-    ctx.drawImage.apply(
-      ctx,
-      [this.image]
-        .concat(applyCamToArr(this.x, this.y))
-        .concat([this.width * camera.zoomLevel, this.height * camera.zoomLevel])
+    ctx.drawImage(
+      this.image,
+      camera.applyToX(this.x),
+      camera.applyToY(this.y),
+      camera.applyToDistance(this.width),
+      camera.applyToDistance(this.height)
     );
     ctx.restore();
   };

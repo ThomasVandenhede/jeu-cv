@@ -18,36 +18,31 @@ var Platform = (function() {
   Platform.prototype.update = function() {};
 
   Platform.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
     var lineWidth = 3;
     ctx.save();
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.applyToDistance(lineWidth);
     if (this.touched || !this.passthrough) {
       ctx.strokeStyle = "#db0000";
       ctx.fillStyle = this.color;
       ctx.beginPath();
-      ctx.rect.apply(
-        ctx,
-        applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
-          (this.width - lineWidth) * camera.zoomLevel,
-          (this.height - lineWidth) * camera.zoomLevel
-        ])
+      ctx.rect(
+        camera.applyToX(this.x + lineWidth / 2),
+        camera.applyToY(this.y + lineWidth / 2),
+        camera.applyToDistance(this.width - lineWidth),
+        camera.applyToDistance(this.height - lineWidth)
       );
       ctx.fill();
       ctx.stroke();
     } else {
       lineWidth = 3;
       ctx.strokeStyle = this.color;
-      ctx.lineWidth = lineWidth * camera.zoomLevel;
+      ctx.lineWidth = camera.applyToDistance(lineWidth);
       ctx.beginPath();
-      ctx.strokeRect.apply(
-        ctx,
-        applyCamToArr(this.x + lineWidth / 2, this.y + lineWidth / 2).concat([
-          (this.width - lineWidth) * camera.zoomLevel,
-          (this.height - lineWidth) * camera.zoomLevel
-        ])
+      ctx.strokeRect(
+        camera.applyToX(this.x + lineWidth / 2),
+        camera.applyToY(this.y + lineWidth / 2),
+        camera.applyToDistance(this.width - lineWidth),
+        camera.applyToDistance(this.height - lineWidth)
       );
     }
     ctx.restore();

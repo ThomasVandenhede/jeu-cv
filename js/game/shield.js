@@ -115,10 +115,6 @@ var Shield = (function() {
   };
 
   Shield.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-    var r = this.r;
     var left = this.shielded.x - this.r;
     var top = this.shielded.y - this.r;
     var right = left + 2 * this.r + this.shielded.width;
@@ -128,35 +124,39 @@ var Shield = (function() {
     ctx.save();
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     ctx.strokeStyle = this.shielded.color;
-    ctx.lineWidth = lineWidth * camera.zoomLevel;
+    ctx.lineWidth = camera.applyToDistance(lineWidth);
     ctx.beginPath();
-    ctx.moveTo.apply(ctx, applyCamToArr(left, top + r));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(left, top)
-        .concat(applyCamToArr(left + r, top))
-        .concat([r * camera.zoomLevel])
+    ctx.moveTo(camera.applyToX(left), camera.applyToY(top + this.r));
+    ctx.arcTo(
+      camera.applyToX(left),
+      camera.applyToY(top),
+      camera.applyToX(left + this.r),
+      camera.applyToY(top),
+      camera.applyToDistance(this.r)
     );
-    ctx.lineTo.apply(ctx, applyCamToArr(right - r, top));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(right, top)
-        .concat(applyCamToArr(right, top + r))
-        .concat([r * camera.zoomLevel])
+    ctx.lineTo(camera.applyToX(right - this.r), camera.applyToY(top));
+    ctx.arcTo(
+      camera.applyToX(right),
+      camera.applyToY(top),
+      camera.applyToX(right),
+      camera.applyToY(top + this.r),
+      camera.applyToDistance(this.r)
     );
-    ctx.lineTo.apply(ctx, applyCamToArr(right, bottom - r));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(right, bottom)
-        .concat(applyCamToArr(right - r, bottom))
-        .concat([r * camera.zoomLevel])
+    ctx.lineTo(camera.applyToX(right), camera.applyToY(bottom - this.r));
+    ctx.arcTo(
+      camera.applyToX(right),
+      camera.applyToY(bottom),
+      camera.applyToX(right - this.r),
+      camera.applyToY(bottom),
+      camera.applyToDistance(this.r)
     );
-    ctx.lineTo.apply(ctx, applyCamToArr(left + r, bottom));
-    ctx.arcTo.apply(
-      ctx,
-      applyCamToArr(left, bottom)
-        .concat(applyCamToArr(left, bottom - r))
-        .concat([r * camera.zoomLevel])
+    ctx.lineTo(camera.applyToX(left + this.r), camera.applyToY(bottom));
+    ctx.arcTo(
+      camera.applyToX(left),
+      camera.applyToY(bottom),
+      camera.applyToX(left),
+      camera.applyToY(bottom - this.r),
+      camera.applyToDistance(this.r)
     );
     ctx.closePath();
     ctx.fill();

@@ -38,21 +38,16 @@ var Ennemy = (function() {
   Ennemy.prototype.updateVelocity = function() {};
 
   Ennemy.prototype.draw = function(ctx, camera) {
-    var applyCamToArr = function() {
-      return Object.values(camera.apply.apply(camera, arguments));
-    };
-    var center = this.center;
     var r = this.width / 2;
     ctx.save();
     ctx.fillStyle = "red";
     ctx.beginPath();
-    ctx.arc.apply(
-      ctx,
-      applyCamToArr(center.x, center.y).concat([
-        r * camera.zoomLevel,
-        0,
-        Math.PI * 2
-      ])
+    ctx.arc(
+      camera.applyToX(this.center.x),
+      camera.applyToY(this.center.y),
+      camera.applyToDistance(r),
+      0,
+      Math.PI * 2
     );
     ctx.fill();
     ctx.restore();
