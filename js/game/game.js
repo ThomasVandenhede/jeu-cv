@@ -10,6 +10,9 @@ var Game = (function() {
   };
 
   Game.prototype.init = function(config) {
+    // go Fullscreen
+    document.documentElement.requestFullscreen();
+
     // config
     if (config) {
       this.shouldDisplayDebug = config.shouldDisplayDebug || false;
@@ -297,6 +300,7 @@ var Game = (function() {
     hide(this.gameMenu.gameContainerEl);
     this.state = states.EXIT;
     delete game;
+    document.exitFullscreen();
   };
 
   Game.prototype.checkVictory = function() {

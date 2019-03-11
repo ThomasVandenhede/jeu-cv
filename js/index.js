@@ -25,6 +25,7 @@ window.addEventListener("DOMContentLoaded", function() {
       shouldDisplayDebug: false,
       shouldDisplayRulers: true
     });
+
     game.startGame();
     game.pause();
   });
