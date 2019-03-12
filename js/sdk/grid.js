@@ -3,6 +3,7 @@ var Grid = (function() {
     this.camera = props.camera;
     this.canvas = props.canvas;
     this.mouse = props.mouse;
+    this.options = props.options;
 
     // grid config
     this.cursorSize = 10;
@@ -186,13 +187,13 @@ var Grid = (function() {
     this.precisionAreaSize = this.innerGridSize;
     this.precisionGridSize = this.precisionAreaSize / 10;
 
-    options.shouldDisplayRulers && this._drawRulers(ctx, camera);
-    !options.isGame && this._drawInnerGrid(ctx, camera);
+    this.options.shouldDisplayRulers && this._drawRulers(ctx, camera);
+    !this.options.isGame && this._drawInnerGrid(ctx, camera);
     // this._drawPrecisionArea(ctx, camera);
-    !options.isGame && this._drawCursor(ctx, camera);
-    !options.isGame && this._displayCoordinates(ctx, camera);
-    !options.isGame &&
-      options.shouldDisplayRulers &&
+    !this.options.isGame && this._drawCursor(ctx, camera);
+    !this.options.isGame && this._displayCoordinates(ctx, camera);
+    !this.options.isGame &&
+      this.options.shouldDisplayRulers &&
       this._drawRulers(ctx, camera);
   };
 

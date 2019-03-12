@@ -1,278 +1,456 @@
-function GameMenu() {
+function GameMenu(props) {
+  this.game = props.game;
+
   this.gameContainerEl = document.getElementById("game-container");
   this.uiContainerEl = document.getElementById("ui-container");
   this.gameIntroEl = document.getElementById("game-intro");
 
-  this.controlsTableEl = e("table", { class: "controls" }, [
-    e("tr", null, [
-      e("th", null, [
-        e("span", { class: "kbd" }, "\u2190"),
-        " / ",
-        e("span", { class: "kbd" }, "\u2192"),
-        " ou ",
-        e("span", { class: "kbd" }, "Q"),
-        " / ",
-        e("span", { class: "kbd" }, "D")
-      ]),
-      e("td", null, "Se déplacer horizontalement")
-    ]),
-    e("tr", null, [
-      e("th", null, [
-        e("span", { class: "kbd" }, "\u2191"),
-        " ou ",
-        e("span", { class: "kbd" }, "Espace"),
-        " ou ",
-        e("span", { class: "kbd" }, "Z")
-      ]),
-      e("td", null, "Sauter")
-    ]),
-    e("tr", null, [
-      e("th", null, e("span", { class: "kbd" }, "\u21b2")),
-      e("td", null, "Ouvrir le bouclier")
-    ]),
-    e("tr", null, [
-      e("th", null, e("span", { class: "kbd" }, "Échap")),
-      e("td", null, "Afficher cet écran")
-    ]),
-    e("tr", null, [
-      e("th", null, e("span", { class: "kbd" }, "F11")),
-      e("td", null, "Plein écran")
-    ]),
-    e("tr", null, [
-      e("th", null, [
-        e("span", { class: "kbd" }, "+"),
-        " / ",
-        e("span", { class: "kbd" }, ")")
-      ]),
-      e("td", null, "Zoomer / Dézoomer")
-    ])
-  ]);
-  this.controlsEl = e(
-    "div",
-    { class: "controls-container" },
-    this.controlsTableEl
+  // MENU BUTTONS
+  this.resumeButtonVNode = h(
+    "li",
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          fullscreen();
+          this.game.unpause();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "REPRENDRE"
+    )
   );
 
-  // MENU BUTTONS
-  this.resumeButton = e(
+  this.restartButtonVNode = h(
     "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "REPRENDRE")
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          fullscreen();
+          this.game.restartGame();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "RECOMMENCER"
+    )
   );
-  this.restartButton = e(
+
+  this.controlsButtonVNode = h(
     "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "RECOMMENCER")
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          this.showControlsMenu();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "CONTRÔLES"
+    )
   );
-  this.controlsButton = e(
+
+  this.aboutButtonVNode = h(
     "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "CONTRÔLES")
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          this.showAboutMenu();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "À PROPOS"
+    )
   );
-  this.loadButton = e(
+
+  this.backButtonVNode = h(
     "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "CHARGER UN NIVEAU")
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          this.game.state === Game.states.PAUSED && this.showPauseMenu();
+          this.game.state === Game.states.VICTORY && this.showVictoryMenu();
+          this.game.state === Game.states.GAME_OVER && this.showGameOverMenu();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "RETOUR"
+    )
   );
-  this.editorButton = e(
+
+  this.loadButtonVNode = h(
+    "li",
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          this.showLoadMenu();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "CHARGER UN NIVEAU"
+    )
+  );
+
+  this.editorButtonVNode = h(
     "li",
     { class: "game-menu__item" },
-    e(
+    h(
       "a",
       { href: "./level-editor.html", class: "game-menu__link" },
       "OUVRIR L'ÉDITEUR"
     )
   );
-  this.aboutButton = e(
+
+  this.exitButtonVNode = h(
     "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "À PROPOS")
-  );
-  this.exitButton = e(
-    "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "QUITTER LE JEU")
-  );
-  this.backButton = e(
-    "li",
-    { class: "game-menu__item" },
-    e("a", { href: "", class: "game-menu__link" }, "RETOUR")
+    {
+      class: "game-menu__item"
+    },
+    h(
+      "a",
+      {
+        href: "",
+        class: "game-menu__link",
+        onclick: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          document.exitFullscreen =
+            document.exitFullscreen ||
+            document.webkitExitFullscreen ||
+            document.mozCancelFullScreen ||
+            document.msExitFullscreen;
+
+          document.exitFullscreen && document.exitFullscreen();
+
+          this.game.exit();
+        }.bind(this),
+        onkeyup: function(event) {
+          event.preventDefault
+            ? event.preventDefault()
+            : (event.returnValue = false);
+          if (event.keyCode === 13) {
+            event.target.click();
+          }
+        }
+      },
+      "QUITTER LE JEU"
+    )
   );
 }
 
-GameMenu.prototype.showGameOverMenu = function() {
+GameMenu.prototype.showMenu = function(vNode) {
   this.close();
-  this.gameMenuEl = e("div", { class: "game-menu" }, [
-    e("h2", null, "PERDU !"),
-    e("ul", { class: "game-menu__list" }, [
-      this.restartButton,
-      this.loadButton,
-      this.editorButton,
-      this.exitButton
-    ])
-  ]);
-  this.uiContainerEl.appendChild(this.gameMenuEl);
+  this.uiContainerEl.appendChild(render(vNode));
+};
+
+GameMenu.prototype.showGameOverMenu = function() {
+  this.showMenu(
+    h(
+      "div",
+      { class: "game-menu" },
+      h("h2", null, "PERDU !"),
+      h(
+        "ul",
+        { class: "game-menu__list" },
+        this.restartButtonVNode,
+        this.loadButtonVNode,
+        this.editorButtonVNode,
+        this.exitButtonVNode
+      )
+    )
+  );
 };
 
 GameMenu.prototype.showVictoryMenu = function() {
-  this.close();
-  this.gameMenuEl = e("div", { class: "game-menu" }, [
-    e("h2", null, "VICTOIRE !"),
-    e("p", null, [
-      "Vous avez retrouvé toutes mes principales compétences, vous pouvez avoir plus d'infos en consultant mon cv détaillé ",
-      e("a", { href: "./assets/files/CV Thomas Vandenhede.pdf" }, "ici"),
-      ". Ou bien essayez de battre votre score."
-    ]),
-    e("ul", { class: "game-menu__list" }, [
-      this.restartButton,
-      this.loadButton,
-      this.editorButton,
-      this.exitButton
-    ])
-  ]);
-  this.uiContainerEl.appendChild(this.gameMenuEl);
+  this.showMenu(
+    h(
+      "div",
+      { class: "game-menu" },
+      h("h2", null, "VICTOIRE !"),
+      h(
+        "p",
+        null,
+        "Vous avez retrouvé toutes mes principales compétences, vous pouvez avoir plus d'infos en consultant mon cv détaillé ",
+        h("a", { href: "./assets/files/CV Thomas Vandenhede.pdf" }, "ici"),
+        ". Ou bien essayez de battre votre score."
+      ),
+      h(
+        "ul",
+        { class: "game-menu__list" },
+        this.restartButtonVNode,
+        this.loadButtonVNode,
+        this.editorButtonVNode,
+        this.exitButtonVNode
+      )
+    )
+  );
 };
 
 GameMenu.prototype.showPauseMenu = function() {
-  this.close();
-  this.gameMenuEl = e("div", { class: "game-menu" }, [
-    e("h2", null, "JEU EN PAUSE"),
-    e("ul", { class: "game-menu__list" }, [
-      this.resumeButton,
-      this.restartButton,
-      this.controlsButton,
-      this.loadButton,
-      this.editorButton,
-      this.aboutButton,
-      this.exitButton
-    ])
-  ]);
-  this.uiContainerEl.appendChild(this.gameMenuEl);
+  this.showMenu(
+    h(
+      "div",
+      { class: "game-menu" },
+      h("h2", null, "JEU EN PAUSE"),
+      h(
+        "ul",
+        { class: "game-menu__list" },
+        this.resumeButtonVNode,
+        this.restartButtonVNode,
+        this.controlsButtonVNode,
+        this.loadButtonVNode,
+        this.editorButtonVNode,
+        this.aboutButtonVNode,
+        this.exitButtonVNode
+      )
+    )
+  );
 };
 
 GameMenu.prototype.showControlsMenu = function() {
-  this.close();
-  this.gameMenuEl = e("div", { class: "game-menu" }, [
-    e("h2", null, "CONTRÔLES"),
-    e("ul", { class: "game-menu__list" }, [this.controlsEl, this.backButton])
-  ]);
-  this.uiContainerEl.appendChild(this.gameMenuEl);
+  this.showMenu(
+    h(
+      "div",
+      { class: "game-menu" },
+      h("h2", null, "CONTRÔLES"),
+      h(
+        "ul",
+        { class: "game-menu__list" },
+        h(
+          "div",
+          { class: "controls-container" },
+          h(
+            "table",
+            { class: "controls" },
+            h(
+              "tr",
+              null,
+              h(
+                "th",
+                null,
+                h("span", { class: "kbd" }, "\u2190"),
+                " / ",
+                h("span", { class: "kbd" }, "\u2192"),
+                " ou ",
+                h("span", { class: "kbd" }, "Q"),
+                " / ",
+                h("span", { class: "kbd" }, "D")
+              ),
+              h("td", null, "Se déplacer horizontalement")
+            ),
+            h(
+              "tr",
+              null,
+              h(
+                "th",
+                null,
+                h("span", { class: "kbd" }, "\u2191"),
+                " ou ",
+                h("span", { class: "kbd" }, "Espace"),
+                " ou ",
+                h("span", { class: "kbd" }, "Z")
+              ),
+              h("td", null, "Sauter")
+            ),
+            h(
+              "tr",
+              null,
+              h("th", null, h("span", { class: "kbd" }, "\u21b2")),
+              h("td", null, "Ouvrir le bouclier")
+            ),
+            h(
+              "tr",
+              null,
+              h("th", null, h("span", { class: "kbd" }, "Échap")),
+              h("td", null, "Afficher cet écran")
+            ),
+            h(
+              "tr",
+              null,
+              h("th", null, h("span", { class: "kbd" }, "F11")),
+              h("td", null, "Plein écran")
+            ),
+            h(
+              "tr",
+              null,
+              h(
+                "th",
+                null,
+                h("span", { class: "kbd" }, "+"),
+                " / ",
+                h("span", { class: "kbd" }, ")")
+              ),
+              h("td", null, "Zoomer / Dézoomer")
+            )
+          )
+        ),
+        this.backButtonVNode
+      )
+    )
+  );
 };
 
 GameMenu.prototype.showAboutMenu = function() {
-  this.close();
-  this.gameMenuEl = e("div", { class: "game-menu" }, [
-    e("h2", null, "À PROPOS"),
-    e("p", null, [
-      e(
+  this.showMenu(
+    h(
+      "div",
+      { class: "game-menu" },
+      h("h2", null, "À PROPOS"),
+      h(
         "p",
         null,
-        "Ce jeu est un projet que j'ai réalisé pour ma formation de Dev JS à l'Ifocop de Paris. Il a nécessité un bon mois de travail et pas mal de nuits blanches."
+        h(
+          "p",
+          null,
+          "Ce jeu est un projet que j'ai réalisé pour ma formation de Dev JS à l'Ifocop de Paris. Il a nécessité un bon mois de travail et pas mal de nuits blanches."
+        ),
+        h(
+          "p",
+          null,
+          "Le code est entièrement écrit en JavaScript, HTML et CSS et n'utilise aucun framework (hormis une touche de Bootstrap pour l'éditeur de niveaux)."
+        )
       ),
-      e(
-        "p",
-        null,
-        "Le code est entièrement écrit en JavaScript, HTML et CSS et n'utilise aucun framework (hormis une touche de Bootstrap pour l'éditeur de niveaux)."
-      )
-    ]),
-    e("ul", { class: "game-menu__list" }, [this.backButton])
-  ]);
-  this.uiContainerEl.appendChild(this.gameMenuEl);
+      h("ul", { class: "game-menu__list" }, this.backButtonVNode)
+    )
+  );
 };
 
 GameMenu.prototype.showLoadMenu = function() {
-  this.close();
-  this.gameMenuEl = e("div", { class: "game-menu" }, [
-    e("h2", null, "CHARGER UN NIVEAU"),
-    e(
-      "ul",
-      { class: "game-menu__list" },
-      Object.keys(gameData.levels).map(
-        function(key) {
-          return e(
-            "li",
-            null,
-            e(
-              "a",
-              {
-                href: "",
-                onclick:
-                  "event.preventDefault ? event.preventDefault() : (event.returnValue = false);" +
-                  "game.currentLevelName = '" +
-                  gameData.levels[key].name +
-                  "';" +
-                  "game.state = '" +
-                  states.PAUSED +
-                  "';" +
-                  "game.startGame();"
-                // "game.buildGameLevel(game.currentLevelName);" +
-                // "game.camera.follow(game.player, (game.canvas.width - game.player.width) / 2 - 10, " +
-                // "(game.canvas.height - game.player.height) / 2 - 10)"
-              },
-              gameData.levels[key].name
-            )
-          );
-        }.bind(this)
-      )
-    ),
-    e("ul", { class: "game-menu__list" }, [this.backButton])
-  ]);
-  this.uiContainerEl.appendChild(this.gameMenuEl);
-};
-
-GameMenu.prototype.attachEventHandlers = function() {
-  this.handleMenuResumeClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.unpause();
-  };
-  this.handleMenuLevelClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-  };
-  this.handleMenuAboutClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-  };
-  this.handleMenuExitClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.exit();
-  };
-  this.handleRestartClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.restartGame();
-  };
-  this.handleControlsButtonClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.showControlsMenu();
-  };
-  this.handleAboutButtonClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.showAboutMenu();
-  };
-  this.handleBackButtonClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.state === states.PAUSED && this.showPauseMenu();
-    this.state === states.VICTORY && this.showVictoryMenu();
-    this.state === states.GAME_OVER && this.showGameOverMenu();
-  };
-  this.handleLoadMenuClick = function(e) {
-    e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-    this.showLoadMenu();
-  };
-  this.resumeButton.onclick = this.handleMenuResumeClick.bind(this);
-  this.restartButton.onclick = this.handleRestartClick.bind(this);
-  this.loadButton.onclick = this.handleMenuLevelClick.bind(this);
-  this.aboutButton.onclick = this.handleMenuAboutClick.bind(this);
-  this.exitButton.onclick = this.handleMenuExitClick.bind(this);
-  this.controlsButton.onclick = this.handleControlsButtonClick.bind(this);
-  this.aboutButton.onclick = this.handleAboutButtonClick.bind(this);
-  this.backButton.onclick = this.handleBackButtonClick.bind(this);
-  this.loadButton.onclick = this.handleLoadMenuClick.bind(this);
+  this.showMenu(
+    h(
+      "div",
+      { class: "game-menu" },
+      h("h2", null, "CHARGER UN NIVEAU"),
+      h(
+        "ul",
+        { class: "game-menu__list" },
+        Object.keys(gameData.levels).map(
+          function(key) {
+            return h(
+              "li",
+              null,
+              h(
+                "a",
+                {
+                  href: "",
+                  onclick: function(event) {
+                    event.preventDefault
+                      ? event.preventDefault()
+                      : (event.returnValue = false);
+                    this.game.currentLevelName = gameData.levels[key].name;
+                    this.game.state = Game.states.PAUSED;
+                    this.game.startGame();
+                  }.bind(this)
+                },
+                gameData.levels[key].name
+              )
+            );
+          }.bind(this)
+        )
+      ),
+      h("ul", { class: "game-menu__list" }, this.backButtonVNode)
+    )
+  );
 };
 
 GameMenu.prototype.close = function() {
-  var el = this.gameMenuEl;
-  if (el) {
-    emptyElement(this.gameMenuEl);
-    this.uiContainerEl.removeChild(this.gameMenuEl);
+  var gameMenuEl = document.querySelector(".game-menu");
+  if (gameMenuEl) {
+    emptyElement(gameMenuEl);
+    this.uiContainerEl.removeChild(gameMenuEl);
   }
-  this.gameMenuEl = null;
 };

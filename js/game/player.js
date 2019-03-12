@@ -1,7 +1,6 @@
 var Player = (function() {
   var ABS_JUMP_SPEED = 700;
   var MAX_FALL_SPEED = 1000;
-  var animationID;
   var INITIAL_WIDTH = 30;
   var INITIAL_HEIGHT = 30;
   var CROUCH_STAND_ANIMATION_DURATION = 0.2;
@@ -14,7 +13,6 @@ var Player = (function() {
       height: INITIAL_HEIGHT
     });
 
-    var that = this;
     this.v = new Vector(0, 0);
     this.acceleration = new Vector();
     this.COEFFICIENT_OF_RESTITUTION = 0.4;
@@ -22,8 +20,6 @@ var Player = (function() {
     this.maxHitPoints = 100;
     this.hitPoints = this.maxHitPoints;
     this.skills = []; // the player must harvest these
-    // this.color = "#22dd00";
-    // this.color = "#37e018";
     this.color = this.getColorFromHP();
 
     this.sparks = sparksParticles(this);
@@ -169,10 +165,10 @@ var Player = (function() {
 
     // apply natural position increments if no collision detected
     if (!this.isColliding[1]) {
-      this.y = toFixedPrecision(this.y + dy, 2);
+      this.y = toFixedPrecision(this.y + dy, 4);
     }
     if (!this.isColliding[0]) {
-      this.x = toFixedPrecision(this.x + dx, 2);
+      this.x = toFixedPrecision(this.x + dx, 4);
     }
   };
 
@@ -221,7 +217,10 @@ var Player = (function() {
       // draw eyes
       ctx.fillStyle = this.color;
       ctx.beginPath();
-      ctx.moveTo(camera.applyToX(center.x - 10), camera.applyToY(this.top + 12));
+      ctx.moveTo(
+        camera.applyToX(center.x - 10),
+        camera.applyToY(this.top + 12)
+      );
       ctx.quadraticCurveTo(
         camera.applyToX(center.x - 4),
         camera.applyToY(this.top + 14),
@@ -237,7 +236,10 @@ var Player = (function() {
       ctx.closePath();
       ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(camera.applyToX(center.x + 10), camera.applyToY(this.top + 12));
+      ctx.moveTo(
+        camera.applyToX(center.x + 10),
+        camera.applyToY(this.top + 12)
+      );
       ctx.quadraticCurveTo(
         camera.applyToX(center.x + 4),
         camera.applyToY(this.top + 14),

@@ -1,108 +1,160 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Page Title</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/main.css">
-</head>
-
-<body>
-  <div class="page">
-    <h1 class="main-title">Thomas Vandenhede</h1>
-    <div id="game-intro" class="game-intro">
-      <h2>Description</h2>
-      <p>
-        Je suis (ou je croyais être) un développeur web full stack JavaScript, sauf que...
-        j'ai malencontreusement égaré certaines de mes compétences les plus précieuses
-        ! Aide-moi à retrouver toutes mes compétences afin que je puisse continuer
-        à créer des jeux tels que celui-ci.
-      </p>
-      <h2>Instructions</h2>
-      <p>Le but du jeu est de retrouver chacune de mes compétences</p>
-      <ul>
-        <li>Ne reste pas bloqué entre deux plateformes sous peine de finir en charpie.</li>
-        <li>Le temps à ta disposition est compté, n'attends pas qu'il soit écoulé (à
-          moins que tu n'aies envie d'assister à une mort particulièrement gore).
-        </li>
-        <li>Des ennemis tenteront de te barrer la route, esquive leurs tirs ou bien
-          protége-toi en activant ton bouclier.</li>
-      </ul>
-      <p>Bonne chance !</p>
-      <div class="game-thumbnail__wrapper">
-        <img src="./assets/images/thumbnail.png" class="game-thumbnail__img" />
+  <body>
+    <div class="page">
+      <h1 class="main-title">Thomas Vandenhede</h1>
+      <div id="game-intro" class="game-intro">
+        <h2>Description</h2>
+        <p>
+          Je suis (ou je croyais être) un développeur web full stack JavaScript,
+          sauf que... j'ai malencontreusement égaré certaines de mes compétences
+          les plus précieuses ! Aide-moi à retrouver toutes mes compétences afin
+          que je puisse continuer à créer des jeux tels que celui-ci.
+        </p>
+        <h2>Instructions</h2>
+        <p>Le but du jeu est de retrouver chacune de mes compétences</p>
+        <ul>
+          <li>
+            Ne reste pas bloqué entre deux plateformes sous peine de finir en
+            charpie.
+          </li>
+          <li>
+            Le temps à ta disposition est compté, n'attends pas qu'il soit
+            écoulé (à moins que tu n'aies envie d'assister à une mort
+            particulièrement gore).
+          </li>
+          <li>
+            Des ennemis tenteront de te barrer la route, esquive leurs tirs ou
+            bien protége-toi en activant ton bouclier.
+          </li>
+        </ul>
+        <p>Bonne chance !</p>
+        <div class="game-thumbnail__wrapper">
+          <img
+            src="./assets/images/thumbnail.png"
+            class="game-thumbnail__img"
+          />
+        </div>
+        <div class="buttons">
+          <p>
+            <a href="" id="start-game" class="btn btn-success"
+              >JOUER À MON JEU CV</a
+            >
+          </p>
+          <p>
+            <a
+              href="./assets/files/CV Thomas Vandenhede.pdf"
+              id="download-resume"
+              target="blank"
+              class="btn btn-primary"
+              >Consulter mon CV</a
+            >
+          </p>
+        </div>
       </div>
-      <div class="buttons">
-        <p>
-          <a href="" id="start-game" class="btn btn-success">JOUER À MON JEU CV</a>
-        </p>
-        <p>
-          <a href="./assets/files/CV Thomas Vandenhede.pdf" id="download-resume" target="blank"
-            class="btn btn-primary">Consulter mon CV</a>
-        </p>
+
+      <div id="game-container" class="game-container hidden">
+        <canvas id="background" height="480" width="640"></canvas>
+        <canvas id="canvas" height="480" width="640"></canvas>
+
+        <div id="gamecontrols__container" class="gamecontrols__container">
+          <div class="gamecontrols__arrows">
+            <div
+              id="button-left-clickable-area"
+              class="button-clickable-area button-clickable-area--left"
+            >
+              <button
+                id="button-left"
+                class="gamecontrols__button gamecontrols__button--left"
+              ></button>
+            </div>
+            <div
+              id="button-right-clickable-area"
+              class="button-clickable-area button-clickable-area--right"
+            >
+              <button
+                id="button-right"
+                class="gamecontrols__button gamecontrols__button--right"
+              ></button>
+            </div>
+          </div>
+          <div class="gamecontrols__buttons">
+            <button
+              id="button-b"
+              class="gamecontrols__button gamecontrols__button--b"
+            >
+              B
+            </button>
+            <button
+              id="button-a"
+              class="gamecontrols__button gamecontrols__button--a"
+            >
+              A
+            </button>
+          </div>
+        </div>
+
+        <div id="ui-container" class="ui-container"></div>
       </div>
     </div>
 
-    <div id="game-container" class="game-container hidden">
-      <canvas id="background" height=480 width=640></canvas>
-      <canvas id="canvas" height=480 width=640></canvas>
-
-      <div id="ui-container" class="ui-container"></div>
-    </div>
-
-  </div>
-
-  <!-- polyfills & helpers -->
-  <script src="./js/polyfills.js"></script>
-  <script src="./js/utils.js"></script>
-  <!-- basic shapes -->
-  <script src="./js/sdk/vector.js"></script>
-  <script src="./js/sdk/AABB.js"></script>
-  <script src="./js/sdk/circle.js"></script>
-  <script src="./js/sdk/particle.js"></script>
-  <script src="./js/sdk/particles.js"></script>
-  <script src="./js/sdk/smokeParticle.js"></script>
-  <script src="./js/sdk/segment.js"></script>
-  <!-- collisions -->
-  <script src="./js/sdk/collision.js"></script>
-  <!-- timer -->
-  <script src="./js/sdk/gameTimer.js"></script>
-  <!-- user input -->
-  <script src="./js/sdk/keyboardManager.js"></script>
-  <!-- sound -->
-  <script src="./js/sdk/sound.js"></script>
-  <script src="./js/sdk/soundManager.js"></script>
-  <!-- camera -->
-  <script src="./js/sdk/camera.js"></script>
-  <!-- grid -->
-  <script src="./js/sdk/grid.js "></script>
-  <!-- tiles -->
-  <script src="./js/sdk/tile.js"></script>
-  <script src="./js/sdk/tilemap.js"></script>
-  <!-- game specific -->
-  <script src="./js/game/gameMenu.js"></script>
-  <script src="./js/game/collisionManager.js"></script>
-  <script src="./js/game/skill.js"></script>
-  <script src="./js/game/skills.js"></script>
-  <script src="./js/game/platform.js"></script>
-  <script src="./js/game/movingPlatform.js"></script>
-  <script src="./js/game/crumblingPlatform.js"></script>
-  <script src="./js/game/shield.js"></script>
-  <script src="./js/game/laser.js"></script>
-  <script src="./js/game/ennemy.js"></script>
-  <script src="./js/game/player.js"></script>
-  <script src="./js/game/ghost.js"></script>
-  <script src="./js/game/lifebar.js"></script>
-  <script src="./js/game/skillBar.js"></script>
-  <script src="./js/game/game.js"></script>
-  <script src="./js/game/gameData.js"></script>
-  <!-- levels -->
-  <script src="./js/sdk/levelManager.js"></script>
-  <!-- entry point -->
-  <script src="./js/index.js"></script>
-</body>
-
+    <!-- polyfills & helpers -->
+    <script src="./js/polyfills.js"></script>
+    <script src="./js/utils.js"></script>
+    <!-- basic shapes -->
+    <script src="./js/sdk/vector.js"></script>
+    <script src="./js/sdk/AABB.js"></script>
+    <script src="./js/sdk/circle.js"></script>
+    <script src="./js/sdk/particle.js"></script>
+    <script src="./js/sdk/particles.js"></script>
+    <script src="./js/sdk/smokeParticle.js"></script>
+    <script src="./js/sdk/segment.js"></script>
+    <!-- collisions -->
+    <script src="./js/sdk/collision.js"></script>
+    <!-- timer -->
+    <script src="./js/sdk/gameTimer.js"></script>
+    <!-- user input -->
+    <script src="./js/sdk/keyboardManager.js"></script>
+    <!-- sound -->
+    <script src="./js/sdk/sound.js"></script>
+    <script src="./js/sdk/soundManager.js"></script>
+    <!-- camera -->
+    <script src="./js/sdk/camera.js"></script>
+    <!-- grid -->
+    <script src="./js/sdk/grid.js "></script>
+    <!-- tiles -->
+    <script src="./js/sdk/tile.js"></script>
+    <script src="./js/sdk/tilemap.js"></script>
+    <!-- game specific -->
+    <script src="./js/game/gameMenu.js"></script>
+    <!-- <script src="./js/game/gameClock.js"></script> -->
+    <script src="./js/game/collisionManager.js"></script>
+    <script src="./js/game/skill.js"></script>
+    <script src="./js/game/skills.js"></script>
+    <script src="./js/game/platform.js"></script>
+    <script src="./js/game/movingPlatform.js"></script>
+    <script src="./js/game/crumblingPlatform.js"></script>
+    <script src="./js/game/shield.js"></script>
+    <script src="./js/game/laser.js"></script>
+    <script src="./js/game/ennemy.js"></script>
+    <script src="./js/game/player.js"></script>
+    <script src="./js/game/ghost.js"></script>
+    <script src="./js/game/lifebar.js"></script>
+    <script src="./js/game/skillBar.js"></script>
+    <script src="./js/game/game.js"></script>
+    <script src="./js/game/gameData.js"></script>
+    <!-- levels -->
+    <script src="./js/sdk/levelManager.js"></script>
+    <!-- entry point -->
+    <script src="./js/index.js"></script>
+  </body>
 </html>

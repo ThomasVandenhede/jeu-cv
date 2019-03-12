@@ -74,13 +74,21 @@ var levelManager = (function() {
     return level;
   };
 
-  LevelManager.prototype.buildEntities = function() {
+  /**
+   * Put all level entities inside a single array.
+   * @param {Array} extra
+   */
+  LevelManager.prototype.buildEntities = function(extra) {
     level.entities = []
       .concat(level.platforms)
       .concat(level.skills)
       .concat(level.ennemies)
       .concat(level.lasers)
       .concat([level.player]);
+
+    if (extra) {
+      level.entities = level.entities.concat(extra);
+    }
   };
 
   LevelManager.prototype.deleteLevel = function(name) {

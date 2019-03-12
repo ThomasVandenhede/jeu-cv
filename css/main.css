@@ -33,9 +33,92 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #000;
   background-color: #303030;
   overflow: hidden;
+  user-select: none; /* disable text highlighting */
+}
+
+.gamecontrols__container {
+  display: none;
+}
+
+.gamecontrols__arrows {
+  margin-left: 10px;
+  line-height: 0;
+  font-size: 1.4rem;
+}
+
+.gamecontrols__buttons {
+  margin-right: 10px;
+  font-size: 1.4rem;
+}
+
+.gamecontrols__button {
+  position: relative;
+  transition: all 0.05s ease-in-out;
+  box-shadow: inset 0 6px 6px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 6px 0 rgba(0, 0, 0, 0.5), 0 5px 15px 0 rgba(0, 0, 0, 0.8);
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+.button-clickable-area.touched .gamecontrols__button {
+  box-shadow: inset 0 6px 6px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 6px 0 rgba(0, 0, 0, 0.5), 0 3px 12px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* buttons left & right */
+.gamecontrols__button--left {
+  border-radius: 30px 5px 5px 30px;
+  margin-right: 10px;
+}
+
+.gamecontrols__button--right {
+  border-radius: 5px 30px 30px 5px;
+}
+
+.gamecontrols__button--left,
+.gamecontrols__button--right {
+  width: 60px;
+  height: 60px;
+  background-color: #808080;
+}
+
+.gamecontrols__button.touched {
+  transform: translateY(4px);
+}
+
+.gamecontrols__button--left.touched,
+.gamecontrols__button--right.touched {
+  background-color: #696969;
+  color: grey;
+}
+
+.gamecontrols__button--b {
+  top: 15px;
+}
+
+.gamecontrols__button--a {
+  top: -30px;
+  margin-right: 10px;
+}
+
+/* button touched state (press down motion) */
+.button-clickable-area.touched .gamecontrols__button {
+  transform: translateY(3px);
+}
+
+/* buttons left & right touched state */
+.button-clickable-area--left.touched .gamecontrols__button,
+.button-clickable-area--right.touched .gamecontrols__button {
+  background-color: #606060;
+}
+
+/* buttons A & B touched state */
+.button-clickable-area--a.touched .gamecontrols__button,
+.button-clickable-area--b.touched .gamecontrols__button {
+  background-color: #aa0000;
 }
 
 canvas {
@@ -74,6 +157,7 @@ canvas {
 }
 
 .game-menu__item {
+  color: white;
 }
 
 .game-menu__link {
@@ -81,13 +165,17 @@ canvas {
   font-weight: bold;
   margin-top: 0.3rem;
   padding: 0.5rem 0.8rem;
-  color: rgba(250, 130, 0, 0.9);
   background-color: #db0000;
+  color: inherit;
   text-decoration: none;
 }
 
-.controls-container {
-  padding: 1rem;
+.game-menu__link:hover,
+.game-menu__link:focus {
+  color: inherit;
+  background-color: darkred;
+  text-decoration: none;
+  outline: none;
 }
 
 .controls {
@@ -144,4 +232,49 @@ td {
 
 .hidden {
   display: none;
+}
+
+@media (max-width: 768px), (max-height: 768px) {
+  .gamecontrols__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    width: 100vw;
+  }
+
+  .game-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    padding: 1rem;
+    transform: initial;
+    font-size: 20px;
+  }
+
+  .game-menu__link {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gamecontrols__arrows {
+    margin-left: 10px;
+  }
+
+  .gamecontrols__buttons {
+    margin-right: 10px;
+  }
+
+  .gamecontrols__arrows,
+  .gamecontrols__buttons {
+    font-size: 1.1rem;
+  }
 }

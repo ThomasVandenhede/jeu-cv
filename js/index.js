@@ -15,14 +15,29 @@ window.addEventListener("DOMContentLoaded", function() {
     }
   }
 
+  window.fullscreen = function() {
+    // go fullscreen
+    document.documentElement.requestFullscreen =
+      document.documentElement.requestFullscreen ||
+      document.documentElement.webkitRequestFullScreen ||
+      document.documentElement.mozRequestFullScreen ||
+      document.documentElement.msRequestFullscreen;
+
+    document.documentElement.requestFullscreen &&
+      document.documentElement.requestFullscreen();
+  };
+
   startGameButton.addEventListener("click", function(e) {
     e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+
+    // go fullscreen
+    fullscreen();
+
     // instantiate game
     show(gameContainer);
     hide(gameIntroEl);
-    window.game = new Game();
-    game.init({
-      shouldDisplayDebug: false,
+    window.game = new Game({
+      shouldDisplayDebug: true,
       shouldDisplayRulers: true
     });
 
@@ -40,13 +55,8 @@ window.addEventListener("DOMContentLoaded", function() {
   // update debug info
   var debugEl = document.querySelector(".debug");
   if (window.hasOwnProperty("game")) {
-    if (game.shouldDisplayDebug) {
-      show(debugEl);
-      setInterval(function() {
-        game.updateDebugInfo();
-      }, 50);
-    } else {
-      hide(debugEl);
-    }
+    setInterval(function() {
+      game.updateDebugInfo();
+    }, 50);
   }
 });
