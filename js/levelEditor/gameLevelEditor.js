@@ -9,9 +9,6 @@ var LevelEditor = (function() {
         ? config.shouldDisplayRulers
         : true;
     this.canvas = document.getElementById("canvas");
-    this.backgroundCanvas = document.getElementById("background");
-    this.ctx = this.canvas.getContext("2d");
-    this.bgCtx = this.backgroundCanvas.getContext("2d");
     this.keyboard = keyboardManager.getInstance();
     this.keyboard.init(this);
     this.mouse = mouseManager.getInstance();
