@@ -1,37 +1,35 @@
-var codeMappings = {
-  ArrowLeft: "LEFT",
-  ArrowUp: "UP",
-  ArrowRight: "RIGHT",
-  ArrowDown: "DOWN",
-  KeyW: "UP",
-  KeyA: "LEFT",
-  KeyS: "DOWN",
-  KeyD: "RIGHT",
-  KeyG: "G",
-  Enter: "ENTER",
-  Space: "SPACE",
-  Escape: "ESCAPE",
-  Equal: "EQUAL",
-  Minus: "MINUS"
-};
-var keyCodeMappings = {
-  37: "LEFT",
-  38: "UP",
-  39: "RIGHT",
-  40: "DOWN",
-  90: "UP",
-  81: "LEFT",
-  93: "DOWN",
-  68: "RIGHT",
-  13: "ENTER",
-  32: "SPACE",
-  27: "ESCAPE",
-  187: "EQUAL",
-  219: "MINUS"
-};
-
-// Singleton pattern
 var keyboardManager = (function() {
+  var codeMappings = {
+    ArrowLeft: "LEFT",
+    ArrowUp: "UP",
+    ArrowRight: "RIGHT",
+    ArrowDown: "DOWN",
+    KeyW: "UP",
+    KeyA: "LEFT",
+    KeyS: "DOWN",
+    KeyD: "RIGHT",
+    KeyG: "G",
+    Enter: "ENTER",
+    Space: "SPACE",
+    Escape: "ESCAPE",
+    Equal: "EQUAL",
+    Minus: "MINUS"
+  };
+  var keyCodeMappings = {
+    37: "LEFT",
+    38: "UP",
+    39: "RIGHT",
+    40: "DOWN",
+    90: "UP",
+    81: "LEFT",
+    93: "DOWN",
+    68: "RIGHT",
+    13: "ENTER",
+    32: "SPACE",
+    27: "ESCAPE",
+    187: "EQUAL",
+    219: "MINUS"
+  };
   var instance;
 
   function KeyboardManager() {
@@ -84,6 +82,7 @@ var keyboardManager = (function() {
     buttonLeft.addEventListener(
       "touchstart",
       function(event) {
+        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonLeft.classList.add("touched");
         this.LEFT = true;
@@ -100,6 +99,7 @@ var keyboardManager = (function() {
     buttonRight.addEventListener(
       "touchstart",
       function(event) {
+        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonRight.classList.add("touched");
         this.RIGHT = true;
@@ -116,6 +116,7 @@ var keyboardManager = (function() {
     buttonA.addEventListener(
       "touchstart",
       function(event) {
+        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonA.classList.add("touched");
         this.SPACE = true;
@@ -132,6 +133,7 @@ var keyboardManager = (function() {
     buttonB.addEventListener(
       "touchstart",
       function(event) {
+        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonB.classList.add("touched");
         this.ENTER = true;

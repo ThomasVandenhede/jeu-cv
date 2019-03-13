@@ -20,7 +20,8 @@ function GameMenu(props) {
           event.preventDefault
             ? event.preventDefault()
             : (event.returnValue = false);
-          fullscreen();
+          document.documentElement.requestFullscreen &&
+            document.documentElement.requestFullscreen();
           this.game.unpause();
         }.bind(this),
         onkeyup: function(event) {
@@ -50,7 +51,8 @@ function GameMenu(props) {
           event.preventDefault
             ? event.preventDefault()
             : (event.returnValue = false);
-          fullscreen();
+          document.documentElement.requestFullscreen &&
+            document.documentElement.requestFullscreen();
           this.game.restartGame();
         }.bind(this),
         onkeyup: function(event) {

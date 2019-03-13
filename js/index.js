@@ -1,4 +1,18 @@
 window.addEventListener("DOMContentLoaded", function() {
+  // vibration
+  navigator.vibrate =
+    navigator.vibrate ||
+    navigator.webkitVibrate ||
+    navigator.mozVibrate ||
+    navigator.msVibrate;
+
+  // go fullscreen
+  document.documentElement.requestFullscreen =
+    document.documentElement.requestFullscreen ||
+    document.documentElement.webkitRequestFullScreen ||
+    document.documentElement.mozRequestFullScreen ||
+    document.documentElement.msRequestFullscreen;
+
   var gameContainer = document.getElementById("game-container");
   var canvases = document.getElementsByTagName("canvas");
   var startGameButton = document.getElementById("start-game");
@@ -15,23 +29,12 @@ window.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  window.fullscreen = function() {
-    // go fullscreen
-    document.documentElement.requestFullscreen =
-      document.documentElement.requestFullscreen ||
-      document.documentElement.webkitRequestFullScreen ||
-      document.documentElement.mozRequestFullScreen ||
-      document.documentElement.msRequestFullscreen;
-
-    document.documentElement.requestFullscreen &&
-      document.documentElement.requestFullscreen();
-  };
-
   startGameButton.addEventListener("click", function(e) {
     e.preventDefault ? e.preventDefault() : (e.returnValue = false);
 
     // go fullscreen
-    fullscreen();
+    document.documentElement.requestFullscreen &&
+      document.documentElement.requestFullscreen();
 
     // instantiate game
     show(gameContainer);
