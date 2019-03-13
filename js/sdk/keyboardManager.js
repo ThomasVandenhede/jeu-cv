@@ -82,7 +82,6 @@ var keyboardManager = (function() {
     buttonLeft.addEventListener(
       "touchstart",
       function(event) {
-        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonLeft.classList.add("touched");
         this.LEFT = true;
@@ -99,7 +98,6 @@ var keyboardManager = (function() {
     buttonRight.addEventListener(
       "touchstart",
       function(event) {
-        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonRight.classList.add("touched");
         this.RIGHT = true;
@@ -116,7 +114,6 @@ var keyboardManager = (function() {
     buttonA.addEventListener(
       "touchstart",
       function(event) {
-        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonA.classList.add("touched");
         this.SPACE = true;
@@ -133,7 +130,6 @@ var keyboardManager = (function() {
     buttonB.addEventListener(
       "touchstart",
       function(event) {
-        navigator.vibrate && navigator.vibrate(4);
         event.preventDefault();
         buttonB.classList.add("touched");
         this.ENTER = true;

@@ -1,11 +1,4 @@
 window.addEventListener("DOMContentLoaded", function() {
-  // vibration
-  navigator.vibrate =
-    navigator.vibrate ||
-    navigator.webkitVibrate ||
-    navigator.mozVibrate ||
-    navigator.msVibrate;
-
   // go fullscreen
   document.documentElement.requestFullscreen =
     document.documentElement.requestFullscreen ||
