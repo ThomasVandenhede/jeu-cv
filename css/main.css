@@ -42,17 +42,30 @@ body {
   display: none;
 }
 
+.button-clickable-area {
+  display: flex;
+  align-items: center;
+  padding-top: 50px;
+  padding-bottom: 10px;
+}
+
+.gamecontrols__arrows,
+.gamecontrols__buttons {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+
 .gamecontrols__arrows {
-  margin-left: 10px;
   line-height: 0;
   font-size: 1.4rem;
 }
 
 .gamecontrols__buttons {
-  margin-right: 10px;
   font-size: 1.4rem;
 }
 
+/* gamecontrols button base styling */
 .gamecontrols__button {
   position: relative;
   transition: all 0.05s ease-in-out;
@@ -71,11 +84,12 @@ body {
 /* buttons left & right */
 .gamecontrols__button--left {
   border-radius: 30px 5px 5px 30px;
-  margin-right: 10px;
+  margin: 0 5px 0 10px;
 }
 
 .gamecontrols__button--right {
   border-radius: 5px 30px 30px 5px;
+  margin: 0 10px 0 5px;
 }
 
 .gamecontrols__button--left,
@@ -85,18 +99,18 @@ body {
   background-color: #808080;
 }
 
-.gamecontrols__button.touched {
-  transform: translateY(4px);
-}
-
-.gamecontrols__button--left.touched,
-.gamecontrols__button--right.touched {
-  background-color: #696969;
-  color: grey;
+/* buttons A & B */
+.gamecontrols__button--a,
+.gamecontrols__button--b {
+  background-color: #cc0000;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
 }
 
 .gamecontrols__button--b {
   top: 15px;
+  margin-left: 10px;
 }
 
 .gamecontrols__button--a {
@@ -234,15 +248,18 @@ td {
   display: none;
 }
 
+/* media queries */
+
 @media (max-width: 768px), (max-height: 768px) {
   .gamecontrols__container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: fixed;
-    bottom: 40px;
+    bottom: 0;
     left: 0;
     width: 100vw;
+    height: 180px;
   }
 
   .game-menu {
@@ -265,14 +282,6 @@ td {
 }
 
 @media (max-width: 480px) {
-  .gamecontrols__arrows {
-    margin-left: 10px;
-  }
-
-  .gamecontrols__buttons {
-    margin-right: 10px;
-  }
-
   .gamecontrols__arrows,
   .gamecontrols__buttons {
     font-size: 1.1rem;

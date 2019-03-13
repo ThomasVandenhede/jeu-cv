@@ -74,10 +74,10 @@ var keyboardManager = (function() {
     );
 
     // mobile input
-    var buttonLeft = document.getElementById("button-left");
-    var buttonRight = document.getElementById("button-right");
-    var buttonA = document.getElementById("button-a");
-    var buttonB = document.getElementById("button-b");
+    var buttonLeft = document.getElementById("button-left-clickable-area");
+    var buttonRight = document.getElementById("button-right-clickable-area");
+    var buttonA = document.getElementById("button-a-clickable-area");
+    var buttonB = document.getElementById("button-b-clickable-area");
 
     buttonLeft.addEventListener(
       "touchstart",
