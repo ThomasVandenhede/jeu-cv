@@ -1,8 +1,8 @@
-// Singleton pattern
-var keyboardManager = (function() {
-  var instance;
+var KeyboardManager = (function() {
+  function KeyboardManager(game) {
+    // reference to the game object
+    this.game = game;
 
-  function KeyboardManager() {
     var codeMappings = {
       ArrowLeft: "LEFT",
       ArrowUp: "UP",
@@ -33,34 +33,34 @@ var keyboardManager = (function() {
     window.addEventListener(
       "keydown",
       function(event) {
-        var mouseGamePosSnappedToGrid = this.app.grid.getMouseGamePosSnappedToGrid(
-          this.app.mouse.x,
-          this.app.mouse.y
+        var mouseGamePosSnappedToGrid = this.game.grid.getMouseGamePosSnappedToGrid(
+          this.game.mouse.x,
+          this.game.mouse.y
         );
 
         switch (event.keyCode) {
           case 46: // Delete
-            var selection = this.app.tools[0].selection;
+            var selection = this.game.tools[0].selection;
             if (selection.length) {
               while (selection[0]) {
                 var selectedObject = selection[0].object;
-                var gameObjectIndex = this.app.gameObjects.indexOf(
+                var gameObjectIndex = this.game.gameObjects.indexOf(
                   selectedObject
                 );
                 gameObjectIndex >= 0 &&
-                  this.app.gameObjects.splice(gameObjectIndex, 1);
+                  this.game.gameObjects.splice(gameObjectIndex, 1);
                 selection.shift();
               }
             }
             break;
           case 27: // Escape
-            this.app.tools[0].selection = [];
+            this.game.tools[0].selection = [];
             break;
           case 65: // A key
-            this.app.toolManager.tool = 0; // switch to selection context
+            this.game.toolManager.tool = 0; // switch to selection context
             if (event.ctrlKey) {
               event.preventDefault();
-              this.app.tools[0].selection = this.app.gameObjects.map(function(
+              this.game.tools[0].selection = this.game.gameObjects.map(function(
                 obj
               ) {
                 return {
@@ -71,32 +71,32 @@ var keyboardManager = (function() {
             }
             break;
           case 83:
-            this.app.toolManager.tool = 0;
+            this.game.toolManager.tool = 0;
             break;
           case 67:
-            this.app.toolManager.tool = 1;
-            this.app.toolbar.objectTypeDropDown.focus();
+            this.game.toolManager.tool = 1;
+            this.game.toolbar.objectTypeDropDown.focus();
             break;
           case 37:
-            this.app.camera.x -= 20 / this.app.camera.zoomLevel;
+            this.game.camera.x -= 20 / this.game.camera.zoomLevel;
             break;
           case 38:
-            this.app.camera.y -= 20 / this.app.camera.zoomLevel;
+            this.game.camera.y -= 20 / this.game.camera.zoomLevel;
             break;
           case 39:
-            this.app.camera.x += 20 / this.app.camera.zoomLevel;
+            this.game.camera.x += 20 / this.game.camera.zoomLevel;
             break;
           case 40:
-            this.app.camera.y += 20 / this.app.camera.zoomLevel;
+            this.game.camera.y += 20 / this.game.camera.zoomLevel;
             break;
           case 187:
             event.preventDefault();
             event.shiftKey
-              ? this.app.camera.zoomOut(
+              ? this.game.camera.zoomOut(
                   mouseGamePosSnappedToGrid.x,
                   mouseGamePosSnappedToGrid.y
                 )
-              : this.app.camera.zoomIn(
+              : this.game.camera.zoomIn(
                   mouseGamePosSnappedToGrid.x,
                   mouseGamePosSnappedToGrid.y
                 );
@@ -109,16 +109,5 @@ var keyboardManager = (function() {
     this.keyRepeat = {};
   }
 
-  KeyboardManager.prototype.init = function(app) {
-    this.app = app;
-  };
-
-  return {
-    getInstance: function() {
-      if (!instance) {
-        instance = new KeyboardManager();
-      }
-      return instance;
-    }
-  };
+  return KeyboardManager;
 })();

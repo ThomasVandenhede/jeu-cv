@@ -13,7 +13,7 @@ var Player = (function() {
       height: INITIAL_HEIGHT
     });
 
-    this.v = new Vector(0, 0);
+    this.v = new Vector();
     this.acceleration = new Vector();
     this.COEFFICIENT_OF_RESTITUTION = 0.4;
     this.solid = true; // can collide with other solid objects

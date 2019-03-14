@@ -20,8 +20,8 @@ var Game = (function() {
     this.state = Game.states.PAUSED;
 
     // initialize keyboard & sound
-    this.keyboard = keyboardManager.getInstance();
-    this.keyboard.init(this);
+    this.keyboard = new KeyboardManager(this);
+    this.touchInput = new TouchManager(this);
     this.soundManager = soundManager.getInstance();
     this.soundManager.init(gameData);
 
@@ -108,6 +108,7 @@ var Game = (function() {
 
   Game.prototype.handleKeyboard = function() {
     var keyboard = this.keyboard;
+    var touchInput = this.touchInput;
     var player = this.level.player;
 
     // do not handle keyboard if player is dead
@@ -121,9 +122,14 @@ var Game = (function() {
         : player.v.y;
 
     // player controls
-    if (keyboard.RIGHT || keyboard.LEFT) {
-      keyboard.LEFT && player.moveLeft();
-      keyboard.RIGHT && player.moveRight();
+    if (
+      keyboard.RIGHT ||
+      keyboard.LEFT ||
+      touchInput.JOYPAD_RIGHT ||
+      touchInput.JOYPAD_LEFT
+    ) {
+      (keyboard.LEFT || touchInput.JOYPAD_LEFT) && player.moveLeft();
+      (keyboard.RIGHT || touchInput.JOYPAD_RIGHT) && player.moveRight();
     } else {
       player.v.x =
         player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
@@ -134,21 +140,21 @@ var Game = (function() {
         : player.v.x;
     }
 
-    if (keyboard.DOWN) {
+    if (keyboard.DOWN || touchInput.JOYPAD_DOWN) {
       player.GRAVITY_ACCELERATION > 0 ? player.crouch() : player.jump();
     } else {
       player.stand();
     }
 
-    if (keyboard.UP) {
+    if (keyboard.UP || touchInput.JOYPAD_UP) {
       player.GRAVITY_ACCELERATION > 0 ? player.jump() : player.crouch();
     }
 
-    if (keyboard.SPACE) {
+    if (keyboard.SPACE || touchInput.BUTTON_A) {
       player.jump();
     }
 
-    if (keyboard.ENTER) {
+    if (keyboard.ENTER || touchInput.BUTTON_B) {
       if (!player.shield.isAnimating) {
         player.shield.isOpen ? player.shield.close() : player.shield.open();
       }
@@ -386,6 +392,7 @@ var Game = (function() {
       !(this.state === Game.states.GAME_OVER)
     ) {
       this.state = Game.states.VICTORY;
+      this.level.player.v = new Vector(); // stop player
       setTimeout(
         function() {
           this.gameMenu.showVictoryMenu();
