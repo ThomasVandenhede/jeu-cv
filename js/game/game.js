@@ -378,6 +378,7 @@ var Game = (function() {
 
       case Game.states.GAME_OVER:
       case Game.states.VICTORY:
+        this.timer.pause()
         this.updateScene();
         break;
 
