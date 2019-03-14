@@ -300,6 +300,10 @@ var Game = (function() {
             name: "background",
             source: "assets/images/background_2000_stars.png"
           },
+          {
+            name: "smoke",
+            source: "assets/images/smoke2.png"
+          },
           function() {
             this.hideSplash();
             this.pause();
