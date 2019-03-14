@@ -42,13 +42,20 @@ var GameTimer = (function() {
     this.isCountDown
       ? displayTime.setTime(Math.max(0, this.countdownStart - this.totalTime))
       : displayTime.setTime(this.totalTime);
+    var milliseconds = displayTime.getMilliseconds();
     var seconds = displayTime.getSeconds();
     var minutes = displayTime.getMinutes();
 
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-
-    return minutes + ":" + seconds;
+    return (
+      minutes.toString().padStart(2, "0") +
+      ":" +
+      seconds.toString().padStart(2, "0") +
+      ":" +
+      milliseconds
+        .toString()
+        .padStart(3, "0")
+        .substring(0, 2)
+    );
   };
 
   // update html element instead of drawing to the canvas
@@ -56,7 +63,7 @@ var GameTimer = (function() {
     var timerText = this.getTimerText();
 
     if (this.timerEl.textContent !== timerText) {
-      if (this.isCountDown && this.countdownStart - this.totalTime < 16000) {
+      if (this.isCountDown && this.countdownStart - this.totalTime < 15000) {
         this.timerEl.classList.add("danger");
       } else {
         this.timerEl.classList.contains("danger") &&

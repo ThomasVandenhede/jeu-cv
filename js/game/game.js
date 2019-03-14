@@ -198,7 +198,7 @@ var Game = (function() {
     if (!player.isDead) {
       if (
         !player.within(this.level.worldRect) ||
-        this.timer.countdownStart - this.timer.totalTime < 1000
+        this.timer.countdownStart - this.timer.totalTime <= 0
       ) {
         player.die();
       }
