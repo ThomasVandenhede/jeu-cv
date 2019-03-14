@@ -359,7 +359,12 @@ var Game = (function() {
 
   Game.prototype.renderScene = function(ctx, camera) {
     this.levelManager.buildEntities([this.ghost].concat(this.level.particles));
-    this.uiElements = [this.lifeBar, this.timer, this.grid, this.skillBar];
+    this.uiElements = [
+      // this.lifeBar,
+      this.timer,
+      this.grid,
+      this.skillBar
+    ];
 
     // only draw objects in the viewport
     this.level.entities.forEach(function(entity) {

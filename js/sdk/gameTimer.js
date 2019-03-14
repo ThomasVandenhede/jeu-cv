@@ -3,6 +3,7 @@ var GameTimer = (function() {
     AABB.call(this, props);
     this.isPaused = false;
     this.isCountDown = true;
+    this.timerEl = document.getElementById("gametimer");
   }
 
   GameTimer.prototype = Object.create(AABB.prototype);
@@ -36,44 +37,33 @@ var GameTimer = (function() {
     this.countdownStart = timestamp || 0.5 * 60 * 1000; // ms;
   };
 
-  GameTimer.prototype.draw = function(ctx) {
+  GameTimer.prototype.getTimerText = function() {
     var displayTime = new Date();
     this.isCountDown
       ? displayTime.setTime(Math.max(0, this.countdownStart - this.totalTime))
       : displayTime.setTime(this.totalTime);
-    seconds = displayTime.getSeconds();
-    minutes = displayTime.getMinutes();
+    var seconds = displayTime.getSeconds();
+    var minutes = displayTime.getMinutes();
 
     seconds = seconds < 10 ? "0" + seconds : seconds;
     minutes = minutes < 10 ? "0" + minutes : minutes;
 
-    var left = this.left;
-    var right = this.right;
-    var top = this.top;
-    var bottom = this.bottom;
-    var width = this.width;
-    var height = this.height;
-    var center = this.center;
-    var r = height / 2;
-    var color =
-      this.isCountDown && this.countdownStart - this.totalTime < 16000
-        ? "red"
-        : "white";
+    return minutes + ":" + seconds;
+  };
 
-    ctx.save();
-    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.rect(left, top, width, height);
-    ctx.stroke();
-    ctx.fill();
+  // update html element instead of drawing to the canvas
+  GameTimer.prototype.draw = function() {
+    var timerText = this.getTimerText();
 
-    ctx.font = "bold 24px Arial";
-    ctx.textAlign = "center";
-    ctx.fillStyle = color;
-    ctx.fillText(minutes + ":" + seconds, center.x, bottom - 7);
-    ctx.restore();
+    if (this.timerEl.textContent !== timerText) {
+      if (this.isCountDown && this.countdownStart - this.totalTime < 16000) {
+        this.timerEl.classList.add("danger");
+      } else {
+        this.timerEl.classList.contains("danger") &&
+          this.timerEl.classList.remove("danger");
+      }
+      this.timerEl.innerHTML = timerText;
+    }
   };
 
   return GameTimer;
