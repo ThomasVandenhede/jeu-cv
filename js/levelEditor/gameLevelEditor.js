@@ -9,8 +9,8 @@ var LevelEditor = (function() {
         ? config.shouldDisplayRulers
         : true;
     this.canvas = document.getElementById("canvas");
-    this.keyboard = keyboardManager.getInstance();
-    this.keyboard.init(this);
+    this.ctx = canvas.getContext("2d");
+    this.keyboard = new KeyboardManager(this);
     this.mouse = mouseManager.getInstance();
     this.mouse.init(this); // pass the game object to the mouse as its context
     this.soundManager = soundManager.getInstance();
@@ -24,6 +24,10 @@ var LevelEditor = (function() {
       canvas: this.canvas
     });
     this.grid = new Grid({
+      options: {
+        shouldDisplayRulers: config.shouldDisplayRulers,
+        isGame: false
+      },
       camera: this.camera,
       canvas: this.canvas,
       mouse: this.mouse
@@ -83,14 +87,14 @@ var LevelEditor = (function() {
 
   LevelEditor.prototype.updateToolbar = function() {
     emptyElement(this.toolbar.loadLevelSelect);
-    var levelSelectionOptions = [e("option", { value: "" }, "")].concat(
+    var levelSelectionOptions = [h("option", { value: "" }, "")].concat(
       Object.keys(gameData.levels).map(function(item) {
-        return e("option", { id: item, value: item }, item);
+        return h("option", { id: item, value: item }, item);
       })
     );
     levelSelectionOptions.forEach(
       function(option) {
-        this.toolbar.loadLevelSelect.appendChild(option);
+        this.toolbar.loadLevelSelect.appendChild(render(option));
       }.bind(this)
     );
     if (this.level) {
