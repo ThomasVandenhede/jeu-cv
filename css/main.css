@@ -108,16 +108,15 @@ body {
   border-radius: 50%;
   width: 60px;
   height: 60px;
+  margin: 0 10px;
 }
 
 .gamecontrols__button--b {
   top: 15px;
-  margin-left: 10px;
 }
 
 .gamecontrols__button--a {
   top: -30px;
-  margin-right: 10px;
 }
 
 /* button touched state (press down motion) */
