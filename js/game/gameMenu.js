@@ -53,7 +53,7 @@ function GameMenu(props) {
             : (event.returnValue = false);
           document.documentElement.requestFullscreen &&
             document.documentElement.requestFullscreen();
-          this.game.restartGame();
+          this.game.restart();
         }.bind(this),
         onkeyup: function(event) {
           event.preventDefault

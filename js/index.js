@@ -37,8 +37,7 @@ window.addEventListener("DOMContentLoaded", function() {
       shouldDisplayRulers: true
     });
 
-    game.startGame();
-    game.pause();
+    game.start();
   });
   window.addEventListener("blur", function(e) {
     if (window.hasOwnProperty("game")) {

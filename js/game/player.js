@@ -101,13 +101,14 @@ var Player = (function() {
     this.hitPoints = toFixedPrecision(this.hitPoints - damage);
   };
 
-  Player.prototype.die = function() {
+  Player.prototype.die = function(cb) {
     this.isDead = true;
     this.hitPoints = 0;
     this.color = this.getColorFromHP();
     this.sounds.still.stop();
     this.sounds.die.play();
     this.explosion = explosionParticles(this);
+    cb && cb();
   };
 
   Player.prototype.getDeltaWidth = function() {

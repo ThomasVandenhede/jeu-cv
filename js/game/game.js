@@ -56,15 +56,6 @@ var Game = (function() {
       width: 80,
       height: 30
     });
-
-    // game clock (UI)
-    // this.clock = new GameClock({
-    //   x: canvas.width - 170,
-    //   y: 35,
-    //   width: 80,
-    //   height: 30,
-    //   gameTimer: this.timer
-    // });
   }
 
   Game.states = {
@@ -79,6 +70,39 @@ var Game = (function() {
     var savedData = localStorage.getItem("gameData");
     if (savedData) {
       gameData = JSON.parse(savedData);
+    }
+  };
+
+  Game.prototype.preload = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var remainingCount = 0;
+    var images;
+    var lastArgument = args[args.length - 1];
+
+    if (typeof lastArgument === "function") {
+      done = lastArgument;
+      remainingCount = args.length - 1;
+      images = args.slice(0, args.length - 1);
+    } else {
+      remainingCount = args.length;
+      images = args;
+    }
+
+    this.images = {};
+
+    for (var i = 0; i < images.length; i++) {
+      var name = args[i].name;
+      var source = args[i].source;
+
+      this.images[name] = new Image();
+      this.images[name].src = source;
+      this.images[name].onload = function() {
+        remainingCount--;
+
+        if (remainingCount === 0) {
+          done();
+        }
+      };
     }
   };
 
@@ -241,14 +265,57 @@ var Game = (function() {
     this.state = Game.states.RUNNING;
   };
 
-  Game.prototype.restartGame = function() {
-    this.gameMenu.close();
-    this.unpause();
-    this.startGame();
+  Game.prototype.displaySplash = function() {
+    var splash = document.getElementById("splash");
+    splash.classList.remove("hidden");
   };
 
-  Game.prototype.startGame = function() {
-    this.loadGameDataFromLocalStorage();
+  Game.prototype.hideSplash = function() {
+    var splash = document.getElementById("splash");
+    splash.classList.add("hidden");
+  };
+
+  Game.prototype.start = function() {
+    this.displaySplash();
+    setTimeout(
+      function() {
+        this.preload(
+          { name: "htmlLogo", source: "assets/images/html-5-icon.png" },
+          { name: "cssLogo", source: "assets/images/css-3-icon.png" },
+          { name: "bootstrapLogo", source: "assets/images/bootstrap-logo.png" },
+          { name: "jqueryLogo", source: "assets/images/jquery-logo.png" },
+          { name: "sassLogo", source: "assets/images/sass-logo.png" },
+          { name: "nodeLogo", source: "assets/images/nodejs-logo.png" },
+          { name: "angularLogo", source: "assets/images/angular-logo.svg" },
+          { name: "reactLogo", source: "assets/images/react-logo.png" },
+          { name: "mongoLogo", source: "assets/images/mongodb-logo.png" },
+          { name: "meteorLogo", source: "assets/images/meteor-logo.png" },
+          {
+            name: "background",
+            source: "assets/images/background_2000_stars.png"
+          },
+          function() {
+            this.hideSplash();
+            this.pause();
+            this.loadGameDataFromLocalStorage();
+            this.init();
+            this.main();
+          }.bind(this)
+        );
+      }.bind(this),
+      1500
+    );
+  };
+
+  Game.prototype.restart = function() {
+    this.gameMenu.close();
+    this.unpause();
+
+    this.init();
+    this.main();
+  };
+
+  Game.prototype.init = function() {
     this.level = this.levelManager.buildLevel(this.currentLevelName);
     this.timer.reset(this.level.countdownStart);
     this.levelManager.buildEntities();
@@ -280,7 +347,6 @@ var Game = (function() {
     });
 
     this.raf && cancelAnimationFrame(this.raf);
-    this.main();
   };
 
   Game.prototype.main = function() {
