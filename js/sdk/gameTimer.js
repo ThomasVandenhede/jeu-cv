@@ -1,6 +1,7 @@
 var GameTimer = (function() {
   function GameTimer(props) {
     AABB.call(this, props);
+    this.DANGER_COUNTDOWN_TIME = 5000;
     this.isPaused = false;
     this.isCountDown = true;
     this.timerEl = document.getElementById("gametimer");
@@ -63,7 +64,10 @@ var GameTimer = (function() {
     var timerText = this.getTimerText();
 
     if (this.timerEl.textContent !== timerText) {
-      if (this.isCountDown && this.countdownStart - this.totalTime < 15000) {
+      if (
+        this.isCountDown &&
+        this.countdownStart - this.totalTime < this.DANGER_COUNTDOWN_TIME
+      ) {
         this.timerEl.classList.add("danger");
       } else {
         this.timerEl.classList.contains("danger") &&
