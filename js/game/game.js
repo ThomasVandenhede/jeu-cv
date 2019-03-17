@@ -243,6 +243,7 @@ var Game = (function() {
   };
 
   Game.prototype.exit = function() {
+    this.frame && cancelAnimationFrame(this.frame);
     show(this.gameMenu.gameIntroEl);
     this.gameMenu.close();
     hide(this.gameMenu.gameContainerEl);
@@ -356,7 +357,7 @@ var Game = (function() {
       skills: this.level.skills
     });
 
-    this.raf && cancelAnimationFrame(this.raf);
+    this.frame && cancelAnimationFrame(this.frame);
   };
 
   Game.prototype.main = function() {
@@ -378,7 +379,7 @@ var Game = (function() {
 
       case Game.states.GAME_OVER:
       case Game.states.VICTORY:
-        this.timer.pause()
+        this.timer.pause();
         this.updateScene();
         break;
 
@@ -388,7 +389,7 @@ var Game = (function() {
 
     this.render(this.ctx, this.camera);
 
-    this.raf = requestAnimationFrame(this.main.bind(this));
+    this.frame = requestAnimationFrame(this.main.bind(this));
   };
 
   Game.prototype.checkVictory = function() {
