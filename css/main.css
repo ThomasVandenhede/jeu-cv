@@ -167,7 +167,7 @@ body {
   height: 100vh;
 }
 
-.gametimer {
+.gameclock {
   position: absolute;
   text-align: center;
   left: 50%;
@@ -180,7 +180,7 @@ body {
   background-color: rgba(50, 50, 50, 0.25);
 }
 
-.gametimer.danger {
+.gameclock.danger {
   color: red;
 }
 

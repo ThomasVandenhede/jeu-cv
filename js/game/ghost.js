@@ -1,7 +1,7 @@
 function Ghost() {}
 
 Ghost.prototype.init = function(props) {
-  this.timer = props.timer;
+  this.clock = props.clock;
   this.player = props.player;
   this.reset();
 };
@@ -17,7 +17,7 @@ Ghost.prototype.reset = function() {
 };
 
 Ghost.prototype.update = function() {
-  // var totalTime = this.timer.totalTime;
+  // var totalTime = this.clock.totalTime;
   // var ghostTimes = this.ghostPositions.map(function(position) {
   //   return position.time;
   // });
@@ -52,7 +52,7 @@ Ghost.prototype.update = function() {
 
   // store position for next ghost
   this.ghostPositionsTemp.push({
-    time: this.timer.totalTime,
+    time: this.clock.totalTime,
     x: this.player.x,
     y: this.player.y
   });

@@ -56,6 +56,13 @@ var Game = (function() {
       width: 80,
       height: 30
     });
+
+    this.clock = new Clock({
+      x: canvas.width - 170,
+      y: 35,
+      width: 80,
+      height: 30
+    });
   }
 
   Game.states = {
@@ -222,7 +229,7 @@ var Game = (function() {
     if (!player.isDead) {
       if (
         !player.within(this.level.worldRect) ||
-        this.timer.countdownStart - this.timer.totalTime <= 0
+        this.clock.countdownStart - this.clock.totalTime <= 0
       ) {
         player.die();
       }
@@ -257,7 +264,7 @@ var Game = (function() {
       this.state !== Game.states.VICTORY
     ) {
       !this.gameMenuEl && this.gameMenu.showPauseMenu();
-      this.timer.pause();
+      this.clock.pause();
       this.soundManager.pauseAll();
       this.state = Game.states.PAUSED;
     }
@@ -267,7 +274,7 @@ var Game = (function() {
     this.state !== Game.states.GAME_OVER &&
       this.state !== Game.states.VICTORY &&
       this.gameMenu.close();
-    this.timer.play();
+    this.clock.play();
     this.soundManager.playPaused();
     this.state = Game.states.RUNNING;
   };
@@ -328,15 +335,16 @@ var Game = (function() {
 
   Game.prototype.init = function() {
     this.level = this.levelManager.buildLevel(this.currentLevelName);
-    this.timer.reset(this.level.countdownStart);
+    this.clock.reset(this.level.countdownStart);
+    this.timer.reset();
     this.levelManager.buildEntities();
     this.collisionManager = new CollisionManager({
       level: this.level,
-      timer: this.timer,
+      clock: this.clock,
       camera: this.camera
     });
     this.ghost.init({
-      timer: this.timer,
+      clock: this.clock,
       player: this.level.player
     });
     this.setBackground("./assets/images/background_2000_stars.png");
@@ -362,6 +370,7 @@ var Game = (function() {
 
   Game.prototype.main = function() {
     this.timer.update();
+    this.clock.update();
     dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 4);
 
     switch (this.state) {
@@ -396,12 +405,12 @@ var Game = (function() {
       this.level.skills.length <= 0 &&
       !(this.state === Game.states.GAME_OVER)
     ) {
+      this.clock.pause();
       this.state = Game.states.VICTORY;
       this.level.player.v = new Vector(); // stop player
       setTimeout(
         function() {
           this.pauseLoop();
-          this.timer.pause();
           this.gameMenu.showVictoryMenu();
         }.bind(this),
         1000
@@ -411,14 +420,14 @@ var Game = (function() {
 
   Game.prototype.checkDefeat = function() {
     if (this.level.player.isDead && !(this.state === Game.states.GAME_OVER)) {
+      this.clock.pause();
       this.state = Game.states.GAME_OVER;
       setTimeout(
         function() {
           this.pauseLoop();
-          this.timer.pause();
           this.gameMenu.showGameOverMenu();
         }.bind(this),
-        1000
+        1500
       );
     }
   };
@@ -443,7 +452,7 @@ var Game = (function() {
     this.levelManager.buildEntities([this.ghost].concat(this.level.particles));
     this.uiElements = [
       // this.lifeBar,
-      this.timer,
+      this.clock,
       this.grid,
       this.skillBar
     ];

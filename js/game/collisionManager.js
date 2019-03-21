@@ -1,6 +1,6 @@
 function CollisionManager(props) {
   this.level = props.level;
-  this.timer = props.timer;
+  this.clock = props.clock;
   this.camera = props.camera;
 }
 
@@ -54,7 +54,7 @@ CollisionManager.prototype.handleCollisionsWithSkills = function() {
     var skillBox = skill.getBoundingRect();
     if (physics.collision.AABBWithAABB(playerBox, skillBox)) {
       this.level.player.skills.push(skill);
-      this.timer.countdownStart += 5 * 1000; // add 5s to timer
+      this.clock.countdownStart += 5 * 1000; // add 5s to clock
       this.level.skills.splice(index, 1);
     }
   }, this);
