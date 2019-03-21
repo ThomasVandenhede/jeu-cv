@@ -379,7 +379,6 @@ var Game = (function() {
 
       case Game.states.GAME_OVER:
       case Game.states.VICTORY:
-        this.timer.pause();
         this.updateScene();
         break;
 
@@ -402,6 +401,7 @@ var Game = (function() {
       setTimeout(
         function() {
           this.pauseLoop();
+          this.timer.pause();
           this.gameMenu.showVictoryMenu();
         }.bind(this),
         1000
@@ -415,6 +415,7 @@ var Game = (function() {
       setTimeout(
         function() {
           this.pauseLoop();
+          this.timer.pause();
           this.gameMenu.showGameOverMenu();
         }.bind(this),
         1000
