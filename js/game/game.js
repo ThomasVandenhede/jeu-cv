@@ -410,7 +410,6 @@ var Game = (function() {
       this.level.player.v = new Vector(); // stop player
       setTimeout(
         function() {
-          this.pauseLoop();
           this.gameMenu.showVictoryMenu();
         }.bind(this),
         1000
@@ -424,7 +423,6 @@ var Game = (function() {
       this.state = Game.states.GAME_OVER;
       setTimeout(
         function() {
-          this.pauseLoop();
           this.gameMenu.showGameOverMenu();
         }.bind(this),
         1500
