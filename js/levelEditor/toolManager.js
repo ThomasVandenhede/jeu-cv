@@ -9,7 +9,6 @@ var toolManager = (function() {
         return this.toolID;
       },
       set: function(id) {
-        console.log("​ToolManager -> id", id);
         if (id !== this.toolID) {
           this.unsetEventHandlersForTool(this.toolID);
           this.setEventHandlersForTool(id);

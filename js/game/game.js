@@ -178,29 +178,25 @@ var Game = (function() {
 
     // ennemies fire new lasers
     !player.isDead &&
-      this.level.ennemies.forEach(
-        function(ennemy) {
-          var distanceVector = Vector.subtract(player.center, ennemy.center);
-          if (
-            distanceVector.normSquared < Math.pow(ennemy.visionRange, 2) &&
-            Date.now() - ennemy.lastFiredAt > ennemy.fireDelay
-          ) {
-            var direction = distanceVector.getUnitVector();
-            this.level.lasers.push(ennemy.attack(direction));
-          }
-        }.bind(this)
-      );
+      this.level.ennemies.forEach(function(ennemy) {
+        var distanceVector = Vector.subtract(player.center, ennemy.center);
+        if (
+          distanceVector.normSquared < Math.pow(ennemy.visionRange, 2) &&
+          Date.now() - ennemy.lastFiredAt > ennemy.fireDelay
+        ) {
+          var direction = distanceVector.getUnitVector();
+          this.level.lasers.push(ennemy.attack(direction));
+        }
+      }, this);
 
     // lasers
-    this.level.lasers.forEach(
-      function(laser, index) {
-        if (laser.hasReachedMaxRange()) {
-          this.collisionManager.destroyLaser(index);
-        } else {
-          laser.update();
-        }
-      }.bind(this)
-    );
+    this.level.lasers.forEach(function(laser, index) {
+      if (laser.hasReachedMaxRange()) {
+        this.collisionManager.destroyLaser(index);
+      } else {
+        laser.update();
+      }
+    }, this);
 
     // shield
     player.shield.update();
@@ -214,15 +210,13 @@ var Game = (function() {
     player.update();
 
     // particles
-    this.level.particles.forEach(
-      function(particle, index) {
-        if (Date.now() - particle.createdAt > particle.maxLife) {
-          this.level.particles.splice(index, 1);
-        } else {
-          particle.update();
-        }
-      }.bind(this)
-    );
+    this.level.particles.forEach(function(particle, index) {
+      if (Date.now() - particle.createdAt > particle.maxLife) {
+        this.level.particles.splice(index, 1);
+      } else {
+        particle.update();
+      }
+    }, this);
 
     // kill player if they move outside of the world boundaries
     if (!player.isDead) {
@@ -242,12 +236,18 @@ var Game = (function() {
     this.canvas.backgroundSize = canvas.width + "px " + canvas.height + "px";
   };
 
-  Game.prototype.exit = function() {
+  Game.prototype.pauseLoop = function() {
     this.frame && cancelAnimationFrame(this.frame);
+    this.frame = null;
+  };
+
+  Game.prototype.exit = function() {
+    this.pauseLoop();
     show(this.gameMenu.gameIntroEl);
     this.gameMenu.close();
     hide(this.gameMenu.gameContainerEl);
     this.state = Game.states.EXIT;
+    this.keyboard.unbindEventHandlers();
     delete game;
   };
 
@@ -357,7 +357,7 @@ var Game = (function() {
       skills: this.level.skills
     });
 
-    this.frame && cancelAnimationFrame(this.frame);
+    this.pauseLoop();
   };
 
   Game.prototype.main = function() {
@@ -401,6 +401,7 @@ var Game = (function() {
       this.level.player.v = new Vector(); // stop player
       setTimeout(
         function() {
+          this.pauseLoop();
           this.gameMenu.showVictoryMenu();
         }.bind(this),
         1000
@@ -413,6 +414,7 @@ var Game = (function() {
       this.state = Game.states.GAME_OVER;
       setTimeout(
         function() {
+          this.pauseLoop();
           this.gameMenu.showGameOverMenu();
         }.bind(this),
         1000

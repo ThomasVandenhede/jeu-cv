@@ -31,52 +31,57 @@ var KeyboardManager = (function() {
     187: "EQUAL",
     219: "MINUS"
   };
-  var instance;
 
   function KeyboardManager(game) {
-    // reference to the game object
-    this.game = game;
+    this.game = game; // reference to the game object
 
-    window.addEventListener(
-      "keydown",
-      function(event) {
-        var code = event.code || event.keyCode;
-        var mappings = event.code ? codeMappings : keyCodeMappings;
-        if (mappings[code] && !this[mappings[code]]) {
-          event.preventDefault
-            ? event.preventDefault()
-            : (event.returnValue = false);
-          this[mappings[code]] = true;
-        }
+    this.handleKeyup = this.handleKeyup.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
 
-        switch (event.keyCode) {
-          case 27:
-            this.game.state === "running"
-              ? this.game.pause()
-              : this.game.unpause();
-            break;
-          case 71:
-            this.game.level.player.reverseGravity();
-            break;
-          // case 72:
-          //   this.game.level.player.zeroGravity();
-          //   break;
-          default:
-        }
-      }.bind(this)
-    );
-
-    window.addEventListener(
-      "keyup",
-      function(event) {
-        var code = event.code || event.keyCode;
-        var mappings = event.code ? codeMappings : keyCodeMappings;
-        if (mappings[code]) {
-          this[mappings[code]] = false;
-        }
-      }.bind(this)
-    );
+    this.bindEventHandlers();
   }
+
+  KeyboardManager.prototype.handleKeydown = function handleKeydown(event) {
+    var code = event.code || event.keyCode;
+    var mappings = event.code ? codeMappings : keyCodeMappings;
+    if (mappings[code] && !this[mappings[code]]) {
+      event.preventDefault
+        ? event.preventDefault()
+        : (event.returnValue = false);
+      this[mappings[code]] = true;
+    }
+
+    switch (event.keyCode) {
+      case 27:
+        this.game.state === "running" ? this.game.pause() : this.game.unpause();
+        break;
+      case 71:
+        this.game.level.player.reverseGravity();
+        break;
+      // case 72:
+      //   this.game.level.player.zeroGravity();
+      //   break;
+      default:
+    }
+  };
+
+  KeyboardManager.prototype.handleKeyup = function handleKeyup(event) {
+    var code = event.code || event.keyCode;
+    var mappings = event.code ? codeMappings : keyCodeMappings;
+    if (mappings[code]) {
+      this[mappings[code]] = false;
+    }
+  };
+
+  KeyboardManager.prototype.bindEventHandlers = function() {
+    window.addEventListener("keydown", this.handleKeydown);
+    window.addEventListener("keyup", this.handleKeyup);
+  };
+
+  KeyboardManager.prototype.unbindEventHandlers = function() {
+    window.removeEventListener("keydown", this.handleKeydown);
+    window.removeEventListener("keyup", this.handleKeyup);
+  };
 
   return KeyboardManager;
 })();

@@ -323,7 +323,8 @@ td {
 
 /* media queries */
 
-@media (max-width: 768px), (max-height: 768px) {
+@media (orientation: portrait) and (max-width: 768px),
+  (orientation: landscape) and (max-height: 768px) {
   .gamecontrols__container {
     display: flex;
     justify-content: space-between;

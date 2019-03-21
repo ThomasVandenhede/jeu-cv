@@ -92,11 +92,9 @@ var LevelEditor = (function() {
         return h("option", { id: item, value: item }, item);
       })
     );
-    levelSelectionOptions.forEach(
-      function(option) {
-        this.toolbar.loadLevelSelect.appendChild(render(option));
-      }.bind(this)
-    );
+    levelSelectionOptions.forEach(function(option) {
+      this.toolbar.loadLevelSelect.appendChild(render(option));
+    }, this);
     if (this.level) {
       this.toolbar.loadLevelSelect.value = this.level.name;
       this.toolbar.levelNameInput.value = this.level.name;
@@ -364,68 +362,62 @@ var LevelEditor = (function() {
         gameObject.constructor.name === "MovingPlatform"
       );
     });
-    platforms.forEach(
-      function(gameObject) {
-        var constructorName = gameObject.constructor.name;
-        var platformData = {
-          type: constructorName,
-          props: {
-            width: gameObject.width,
-            height: gameObject.height
-          }
-        };
-        platformData.props.x = gameObject.x;
-        platformData.props.y = gameObject.y;
-
-        if (constructorName === "MovingPlatform") {
-          platformData.props.xStart = gameObject.xStart;
-          platformData.props.yStart = gameObject.yStart;
-          platformData.props.xEnd = gameObject.xEnd;
-          platformData.props.yEnd = gameObject.yEnd;
+    platforms.forEach(function(gameObject) {
+      var constructorName = gameObject.constructor.name;
+      var platformData = {
+        type: constructorName,
+        props: {
+          width: gameObject.width,
+          height: gameObject.height
         }
-        this.data.platforms.push(platformData);
-      }.bind(this)
-    );
+      };
+      platformData.props.x = gameObject.x;
+      platformData.props.y = gameObject.y;
+
+      if (constructorName === "MovingPlatform") {
+        platformData.props.xStart = gameObject.xStart;
+        platformData.props.yStart = gameObject.yStart;
+        platformData.props.xEnd = gameObject.xEnd;
+        platformData.props.yEnd = gameObject.yEnd;
+      }
+      this.data.platforms.push(platformData);
+    }, this);
 
     // ennemies
     this.data.ennemies = [];
     var ennemies = gameObjects.filter(function(gameObject) {
       return gameObject.constructor.name === "Ennemy";
     });
-    ennemies.forEach(
-      function(ennemy) {
-        var ennemyData = {
-          type: "Ennemy",
-          props: {
-            x: ennemy.x,
-            y: ennemy.y,
-            width: ennemy.width,
-            height: ennemy.height
-          }
-        };
-        this.data.ennemies.push(ennemyData);
-      }.bind(this)
-    );
+    ennemies.forEach(function(ennemy) {
+      var ennemyData = {
+        type: "Ennemy",
+        props: {
+          x: ennemy.x,
+          y: ennemy.y,
+          width: ennemy.width,
+          height: ennemy.height
+        }
+      };
+      this.data.ennemies.push(ennemyData);
+    }, this);
 
     // skills
     this.data.skills = [];
     var skills = gameObjects.filter(function(gameObject) {
       return gameObject.constructor.name.startsWith("Skill");
     });
-    skills.forEach(
-      function(skill) {
-        var skillData = {
-          type: skill.constructor.name,
-          props: {
-            x: skill.x,
-            y: skill.y,
-            width: skill.width,
-            height: skill.height
-          }
-        };
-        this.data.skills.push(skillData);
-      }.bind(this)
-    );
+    skills.forEach(function(skill) {
+      var skillData = {
+        type: skill.constructor.name,
+        props: {
+          x: skill.x,
+          y: skill.y,
+          width: skill.width,
+          height: skill.height
+        }
+      };
+      this.data.skills.push(skillData);
+    }, this);
 
     return true;
   };

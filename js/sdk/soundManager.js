@@ -16,30 +16,26 @@ var soundManager = (function() {
     location = soundData.location;
     files = soundData.files;
     // load sounds
-    files.forEach(
-      function(file) {
-        var filename = file.filename;
+    files.forEach(function(file) {
+      var filename = file.filename;
 
-        var sound = new Sound(location + filename);
-        sound.volume = file.volume * this.masterVolume;
+      var sound = new Sound(location + filename);
+      sound.volume = file.volume * this.masterVolume;
 
-        this.sounds[filename] = sound;
-      }.bind(this)
-    );
+      this.sounds[filename] = sound;
+    }, this);
 
     location = musicData.location;
     files = musicData.files;
     // load musics
-    files.forEach(
-      function(file) {
-        var filename = file.filename;
+    files.forEach(function(file) {
+      var filename = file.filename;
 
-        var sound = new Sound(location + filename);
-        sound.volume = file.volume * this.masterVolume;
+      var sound = new Sound(location + filename);
+      sound.volume = file.volume * this.masterVolume;
 
-        this.sounds[filename] = sound;
-      }.bind(this)
-    );
+      this.sounds[filename] = sound;
+    }, this);
   };
 
   SoundManager.prototype.stopAll = function() {

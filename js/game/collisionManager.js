@@ -13,66 +13,59 @@ CollisionManager.prototype.handleCollisions = function() {
 CollisionManager.prototype.handleCollisionsWithLasers = function() {
   var playerBox = this.level.player.getBoundingRect();
   !this.level.player.shield.isOpen
-    ? this.level.lasers.forEach(
-        function(laser, index) {
-          var laserBox = laser.getBoundingRect();
-          if (physics.collision.AABBWithAABB(playerBox, laserBox)) {
-            if (
-              playerBox.contains(laser.A.x, laser.A.y) ||
-              playerBox.contains(laser.B.x, laser.B.y) ||
-              physics.collision.segmentAABB(laser.A, laser.B, playerBox) <
-                Number.POSITIVE_INFINITY
-            ) {
-              this.level.player.applyDamage(laser.damage);
-              this.level.player.hitPoints <= 0 && this.level.player.die();
-              this.level.particles.push(
-                hitParticles(
-                  laser.B.x,
-                  laser.B.y,
-                  Vector.subtract(laser.A, laser.B),
-                  "red"
-                )
-              );
-              this.destroyLaser(index);
-            }
-          }
-        }.bind(this)
-      )
-    : this.level.lasers.forEach(
-        function(laser, index) {
-          if (this.level.player.shield.hasCollisionWithLaser(laser)) {
+    ? this.level.lasers.forEach(function(laser, index) {
+        var laserBox = laser.getBoundingRect();
+        if (physics.collision.AABBWithAABB(playerBox, laserBox)) {
+          if (
+            playerBox.contains(laser.A.x, laser.A.y) ||
+            playerBox.contains(laser.B.x, laser.B.y) ||
+            physics.collision.segmentAABB(laser.A, laser.B, playerBox) <
+              Number.POSITIVE_INFINITY
+          ) {
+            this.level.player.applyDamage(laser.damage);
+            this.level.player.hitPoints <= 0 && this.level.player.die();
+            this.level.particles.push(
+              hitParticles(
+                laser.B.x,
+                laser.B.y,
+                Vector.subtract(laser.A, laser.B),
+                "red"
+              )
+            );
             this.destroyLaser(index);
           }
-        }.bind(this)
-      );
+        }
+      }, this)
+    : this.level.lasers.forEach(function(laser, index) {
+        if (this.level.player.shield.hasCollisionWithLaser(laser)) {
+          this.destroyLaser(index);
+        }
+      }, this);
 };
 
 CollisionManager.prototype.destroyLaser = function(index) {
   this.level.lasers.splice(index, 1);
 };
 
+// player acquires skill, no collision to resolve, skills simply disappears
 CollisionManager.prototype.handleCollisionsWithSkills = function() {
   var playerBox = this.level.player.getBoundingRect();
-  this.level.skills.forEach(
-    function(skill, index) {
-      var skillBox = skill.getBoundingRect();
-      if (physics.collision.AABBWithAABB(playerBox, skillBox)) {
-        this.level.player.skills.push(skill);
-        this.timer.countdownStart += 5 * 1000; // add 5s to timer
-        this.level.skills.splice(index, 1);
-      }
-    }.bind(this)
-  );
+  this.level.skills.forEach(function(skill, index) {
+    var skillBox = skill.getBoundingRect();
+    if (physics.collision.AABBWithAABB(playerBox, skillBox)) {
+      this.level.player.skills.push(skill);
+      this.timer.countdownStart += 5 * 1000; // add 5s to timer
+      this.level.skills.splice(index, 1);
+    }
+  }, this);
 };
 
 CollisionManager.prototype.getCollidablePlatformsInViewport = function() {
-  return this.level.platforms.filter(
-    function(platform) {
-      var box = platform.getBoundingRect();
-      box.touched = false;
-      return box.overlaps(this.camera);
-    }.bind(this)
-  );
+  return this.level.platforms.filter(function(platform) {
+    var box = platform.getBoundingRect();
+    box.touched = false;
+    return box.overlaps(this.camera);
+  }, this);
 };
 
 CollisionManager.prototype.getCollisions = function(collidableGameObjects) {
