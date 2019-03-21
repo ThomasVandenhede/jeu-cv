@@ -276,14 +276,14 @@ var TouchManager = (function() {
         joypad.style.top =
           joypadInitialTop + Math.min(maxDeltaY, deltaY) + "px";
         if (Math.abs(deltaY) >= this.JOYPAD_THRESHOLD_Y) {
-          this.JOYPAD_DOWN = true;
+          // this.JOYPAD_DOWN = true;
         }
       }
       if (deltaY < 0) {
         joypad.style.top =
           joypadInitialTop + Math.max(maxDeltaY, deltaY) + "px";
         if (Math.abs(deltaY) >= this.JOYPAD_THRESHOLD_Y) {
-          this.JOYPAD_UP = true;
+          // this.JOYPAD_UP = true;
         }
       }
     }.bind(this);
