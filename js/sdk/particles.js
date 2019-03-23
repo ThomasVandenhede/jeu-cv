@@ -1,87 +1,92 @@
 var sparksParticles = function(gameObj) {
+  var start = Date.now();
+
   return {
     particleIndex: 0,
-    maxCount: 30,
     particles: {},
     minSpeed: 5,
     maxSpeed: 20,
     size: 10,
-    maxLife: 500,
+    maxLife: 1000,
+    duration: 250,
     addNewParticle: function() {
-      if (Object.keys(this.particles).length < this.maxCount) {
-        this.particleIndex++;
-        var particle;
-        var color = !gameObj.hasWon
-          ? gameObj.color
-          : "rgb(" +
-            randInt(0, 255) +
-            ", " +
-            randInt(0, 255) +
-            ", " +
-            randInt(0, 255) +
-            ")";
-        switch (randInt(0, 3)) {
-          case 0:
-            // top edge
-            particle = new SmokeParticle({
-              x: randInt(gameObj.left, gameObj.right),
-              y: gameObj.top - this.size,
-              size: this.size,
-              color: color,
-              vx: randInt(-this.maxSpeed, this.maxSpeed),
-              vy: randInt(-this.maxSpeed, -this.minSpeed),
-              maxLife: this.maxLife
-            });
-            particle.id = this.particleIndex;
-            this.particles[this.particleIndex] = particle;
-            break;
-          case 1:
-            // bottom edge
-            particle = new SmokeParticle({
-              x: randInt(gameObj.left, gameObj.right),
-              y: gameObj.bottom,
-              size: this.size,
-              color: color,
-              vx: randInt(-this.maxSpeed, this.maxSpeed),
-              vy: randInt(this.minSpeed, this.maxSpeed),
-              maxLife: this.maxLife
-            });
-            particle.id = this.particleIndex;
-            this.particles[this.particleIndex] = particle;
-            break;
-          case 2:
-            // left edge
-            particle = new SmokeParticle({
-              x: gameObj.left - this.size,
-              y: randInt(gameObj.top, gameObj.bottom),
-              size: this.size,
-              color: color,
-              vx: randInt(-this.maxSpeed, -this.minSpeed),
-              vy: randInt(-this.maxSpeed, this.maxSpeed),
-              maxLife: this.maxLife
-            });
-            particle.id = this.particleIndex;
-            this.particles[this.particleIndex] = particle;
-            break;
-          case 3:
-            // right edge
-            particle = new SmokeParticle({
-              x: gameObj.right,
-              y: randInt(gameObj.top, gameObj.bottom),
-              size: this.size,
-              color: color,
-              vx: randInt(this.minSpeed, this.maxSpeed),
-              vy: randInt(-this.maxSpeed, this.maxSpeed),
-              maxLife: this.maxLife
-            });
-            particle.id = this.particleIndex;
-            this.particles[this.particleIndex] = particle;
-            break;
-        }
+      this.particleIndex++;
+      var color = !gameObj.hasWon
+        ? gameObj.color
+        : "rgb(" +
+          randInt(0, 255) +
+          ", " +
+          randInt(0, 255) +
+          ", " +
+          randInt(0, 255) +
+          ")";
+      switch (randInt(0, 3)) {
+        case 0:
+          // top edge
+          particle = new SmokeParticle({
+            x: randInt(gameObj.left, gameObj.right),
+            y: gameObj.top - this.size,
+            size: this.size,
+            color: color,
+            vx: randInt(-this.maxSpeed, this.maxSpeed),
+            vy: randInt(-this.maxSpeed, -this.minSpeed),
+            maxLife: this.maxLife
+          });
+          particle.id = this.particleIndex;
+          this.particles[this.particleIndex] = particle;
+          break;
+        case 1:
+          // bottom edge
+          particle = new SmokeParticle({
+            x: randInt(gameObj.left, gameObj.right),
+            y: gameObj.bottom,
+            size: this.size,
+            color: color,
+            vx: randInt(-this.maxSpeed, this.maxSpeed),
+            vy: randInt(this.minSpeed, this.maxSpeed),
+            maxLife: this.maxLife
+          });
+          particle.id = this.particleIndex;
+          this.particles[this.particleIndex] = particle;
+          break;
+        case 2:
+          // left edge
+          particle = new SmokeParticle({
+            x: gameObj.left - this.size,
+            y: randInt(gameObj.top, gameObj.bottom),
+            size: this.size,
+            color: color,
+            vx: randInt(-this.maxSpeed, -this.minSpeed),
+            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            maxLife: this.maxLife
+          });
+          particle.id = this.particleIndex;
+          this.particles[this.particleIndex] = particle;
+          break;
+        case 3:
+          // right edge
+          particle = new SmokeParticle({
+            x: gameObj.right,
+            y: randInt(gameObj.top, gameObj.bottom),
+            size: this.size,
+            color: color,
+            vx: randInt(this.minSpeed, this.maxSpeed),
+            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            maxLife: this.maxLife
+          });
+          particle.id = this.particleIndex;
+          this.particles[this.particleIndex] = particle;
+          break;
       }
     },
     update: function() {
-      this.addNewParticle();
+      // only add particles for a certain duration
+      if (Date.now() <= start + this.duration) {
+        for (var i = 0; i < 2; i++) {
+          this.addNewParticle();
+        }
+      }
+
       for (var id in this.particles) {
         var particle = this.particles[id];
         particle.update();

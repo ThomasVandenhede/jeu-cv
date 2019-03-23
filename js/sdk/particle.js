@@ -8,8 +8,6 @@ var Particle = (function() {
     this.v = new Vector(props.vx, props.vy);
     this.createdAt = Date.now();
     this.maxLife = props.maxLife;
-    // this.hasTransparency =
-    //   hasTransparency !== undefined ? hasTransparency : false;
   }
 
   Particle.prototype = Object.create(Vector.prototype);

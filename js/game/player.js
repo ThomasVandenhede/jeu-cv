@@ -22,8 +22,6 @@ var Player = (function() {
     this.skills = []; // the player must harvest these
     this.color = this.getColorFromHP();
 
-    this.sparks = sparksParticles(this);
-
     // crouching / standing state and animations
     this.isCrouching = false;
     CROUCH_STAND_ANIMATION_DURATION = 0.2;
@@ -78,6 +76,9 @@ var Player = (function() {
 
   Player.prototype.jump = function() {
     if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
+      // emit particles
+      this.sparks = sparksParticles(this);
+
       this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
       this.isColliding[1] = 0;
       this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
@@ -156,7 +157,7 @@ var Player = (function() {
       this.explosion.update();
       return;
     } else {
-      this.sparks.update();
+      this.sparks && this.sparks.update();
     }
 
     var dx = this.v.x * dt,
@@ -186,9 +187,8 @@ var Player = (function() {
   Player.prototype.draw = function(ctx, camera) {
     // draw particles
     this.color = this.getColorFromHP();
-    this.isDead
-      ? this.explosion.draw(ctx, camera)
-      : this.sparks.draw(ctx, camera);
+    this.isDead && this.explosion.draw(ctx, camera);
+    !this.isDead && this.sparks && this.sparks.draw(ctx, camera);
 
     // draw player
     if (!this.isDead) {
