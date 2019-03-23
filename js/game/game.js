@@ -50,12 +50,7 @@ var Game = (function() {
     this.ghost = new Ghost();
 
     // game timer (game inner logic)
-    this.timer = new GameTimer({
-      x: canvas.width - 170,
-      y: 35,
-      width: 80,
-      height: 30
-    });
+    this.timer = new GameTimer();
 
     this.clock = new Clock({
       x: canvas.width - 170,
@@ -177,7 +172,17 @@ var Game = (function() {
     }
   };
 
-  Game.prototype.updateScene = function() {
+  Game.prototype.update = function() {
+    if (this.state === Game.states.RUNNING) {
+      this.handleKeyboard();
+      this.runPhysics();
+    }
+
+    if (this.state === Game.states.PAUSED) {
+      this.camera.updateDimensions();
+      return;
+    }
+
     var player = this.level.player;
 
     // ghost
@@ -236,6 +241,14 @@ var Game = (function() {
     }
 
     this.camera.update();
+    if (
+      this.state !== Game.states.GAME_OVER &&
+      this.state !== Game.states.VICTORY
+    ) {
+      this.clock.update();
+      this.checkVictory();
+      this.checkDefeat();
+    }
   };
 
   Game.prototype.setBackground = function(path) {
@@ -317,7 +330,7 @@ var Game = (function() {
             this.pause();
             this.loadGameDataFromLocalStorage();
             this.init();
-            this.main();
+            this.step();
           }.bind(this)
         );
       }.bind(this),
@@ -330,7 +343,7 @@ var Game = (function() {
     this.unpause();
 
     this.init();
-    this.main();
+    this.step();
   };
 
   Game.prototype.init = function() {
@@ -368,36 +381,18 @@ var Game = (function() {
     this.pauseLoop();
   };
 
-  Game.prototype.main = function() {
+  Game.prototype.step = function() {
     this.timer.update();
-    this.clock.update();
-    dt = toFixedPrecision(this.timer.getEllapsedTime() / 1000, 4);
+    dt = this.timer.dt;
 
-    switch (this.state) {
-      case Game.states.RUNNING:
-        this.handleKeyboard();
-        this.collisionManager.handleCollisions();
-        this.updateScene();
-        this.checkVictory();
-        this.checkDefeat();
-        break;
-
-      case Game.states.PAUSED:
-        this.camera.updateDimensions();
-        break;
-
-      case Game.states.GAME_OVER:
-      case Game.states.VICTORY:
-        this.updateScene();
-        break;
-
-      default:
-        break;
-    }
-
+    this.update();
     this.render(this.ctx, this.camera);
 
-    this.frame = requestAnimationFrame(this.main.bind(this));
+    this.frame = requestAnimationFrame(this.step.bind(this));
+  };
+
+  Game.prototype.runPhysics = function() {
+    this.collisionManager.handleCollisions();
   };
 
   Game.prototype.checkVictory = function() {
@@ -435,6 +430,7 @@ var Game = (function() {
     this.clearCanvas(ctx);
     this.renderBackground(ctx, camera);
     this.renderScene(ctx, camera);
+    this.renderUI(ctx, camera);
   };
 
   Game.prototype.clearCanvas = function(ctx) {
@@ -448,17 +444,20 @@ var Game = (function() {
 
   Game.prototype.renderScene = function(ctx, camera) {
     this.levelManager.buildEntities([this.ghost].concat(this.level.particles));
+
+    // only draw objects in the viewport
+    this.level.entities.forEach(function(entity) {
+      entity.draw(ctx, camera);
+    });
+  };
+
+  Game.prototype.renderUI = function(ctx, camera) {
     this.uiElements = [
       // this.lifeBar,
       this.clock,
       this.grid,
       this.skillBar
     ];
-
-    // only draw objects in the viewport
-    this.level.entities.forEach(function(entity) {
-      entity.draw(ctx, camera);
-    });
 
     // UI
     this.uiElements.forEach(function(uiElement) {
