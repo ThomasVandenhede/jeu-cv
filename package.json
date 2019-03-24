@@ -1,0 +1,26 @@
+{
+  "name": "jeu-cv",
+  "version": "1.0.0",
+  "description": "Projet de CV sous forme de jeu pour la formation de Dev Full Stack JS à l'Ifocop",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.dist.config.js",
+    "watch": "webpack --watch --config webpack.dist.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasVandenhede/jeu-cv.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThomasVandenhede/jeu-cv/issues"
+  },
+  "homepage": "https://github.com/ThomasVandenhede/jeu-cv#readme",
+  "devDependencies": {
+    "uglifyjs-webpack-plugin": "^2.1.2",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  }
+}

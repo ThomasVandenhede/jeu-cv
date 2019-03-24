@@ -1,0 +1,364 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background-color: #303030;
+  color: #ddd;
+}
+
+.page {
+  padding: 4rem 1rem;
+  max-width: 800px;
+  margin: auto;
+}
+
+.game-intro {
+  max-width: 100vw;
+  margin: auto;
+}
+
+.game-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #303030;
+  overflow: hidden;
+  user-select: none; /* disable text highlighting */
+}
+
+.gamecontrols__container {
+  display: none;
+}
+
+.button-clickable-area {
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  padding-top: 50px;
+  padding-bottom: 10px;
+}
+
+.gamecontrols__arrows,
+.gamecontrols__buttons {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+
+.gamecontrols__arrows {
+  display: none;
+  line-height: 0;
+  font-size: 1.4rem;
+}
+
+.gamecontrols__buttons {
+  font-size: 1.4rem;
+}
+
+/* gamecontrols button base styling */
+.gamecontrols__button {
+  position: relative;
+  transition: all 0.05s ease-in-out;
+  box-shadow: inset 0 6px 6px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 6px 0 rgba(0, 0, 0, 0.5), 0 5px 15px 0 rgba(0, 0, 0, 0.8);
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+.button-clickable-area.touched .gamecontrols__button {
+  box-shadow: inset 0 6px 6px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 6px 0 rgba(0, 0, 0, 0.5), 0 3px 12px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* buttons left & right */
+.gamecontrols__button--left {
+  border-radius: 30px 5px 5px 30px;
+  margin: 0 5px 0 10px;
+}
+
+.gamecontrols__button--right {
+  border-radius: 5px 30px 30px 5px;
+  margin: 0 10px 0 5px;
+}
+
+.gamecontrols__button--left,
+.gamecontrols__button--right {
+  width: 60px;
+  height: 60px;
+  background-color: #808080;
+}
+
+/* buttons A & B */
+.gamecontrols__button--a,
+.gamecontrols__button--b {
+  background-color: #cc0000;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin: 0 10px;
+}
+
+.gamecontrols__button--b {
+  top: 15px;
+}
+
+.gamecontrols__button--a {
+  top: -30px;
+}
+
+/* button touched state (press down motion) */
+.button-clickable-area.touched .gamecontrols__button {
+  transform: translateY(3px);
+}
+
+/* buttons left & right touched state */
+.button-clickable-area--left.touched .gamecontrols__button,
+.button-clickable-area--right.touched .gamecontrols__button {
+  background-color: #606060;
+}
+
+/* buttons A & B touched state */
+.button-clickable-area--a.touched .gamecontrols__button,
+.button-clickable-area--b.touched .gamecontrols__button {
+  background-color: #aa0000;
+}
+
+.gamecontrols__joypad-outer {
+  touch-action: none;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: rgba(120, 120, 120, 0.3);
+}
+
+.gamecontrols__joypad {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  position: relative;
+  background-color: #333;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: inset 0 10px 14px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -10px 14px 0 rgba(0, 0, 0, 0.5), 0 5px 15px 0 rgba(0, 0, 0, 0.8);
+}
+
+.game-hud {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.gameclock {
+  position: absolute;
+  text-align: center;
+  left: 50%;
+  top: 25px;
+  padding: 0 0.375em;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  background-color: rgba(50, 50, 50, 0.25);
+}
+
+.gameclock.danger {
+  color: red;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.main-title {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.game-menu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 600px;
+  transform: translate(-50%, -50%);
+  padding: 3rem 4rem;
+  text-align: center;
+  font-family: "arial";
+  font-size: 24px;
+  color: #5d0000;
+  background-color: rgba(250, 130, 0, 0.9);
+  border: 0.4em solid #db0000;
+}
+
+.game-menu__list {
+  list-style: none;
+  padding: 0;
+}
+
+.game-menu__item {
+  color: white;
+}
+
+.game-menu__link {
+  display: inline-block;
+  font-weight: bold;
+  margin-top: 0.3rem;
+  padding: 0.5rem 0.8rem;
+  background-color: #db0000;
+  color: inherit;
+  text-decoration: none;
+}
+
+.game-menu__link:hover,
+.game-menu__link:focus {
+  color: inherit;
+  background-color: darkred;
+  text-decoration: none;
+  outline: none;
+}
+
+.controls {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+th {
+  text-align: right;
+}
+
+td {
+  padding: 0.3rem;
+  text-align: left;
+}
+
+.kbd {
+  border-radius: 0.2em;
+  padding: 0.2em 0.4em;
+  border: 3px inset white;
+  background-color: lightgrey;
+}
+
+.buttons {
+  margin-top: 2rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.debug {
+  position: absolute;
+  padding: 0 1em;
+  top: 1em;
+  right: 1em;
+  width: 400px;
+  background-color: rgba(255, 255, 255, 0.3);
+  font-family: sans;
+  font-size: 0.8em;
+}
+
+.game-thumbnail__img {
+  display: block;
+  width: 80%;
+  margin: auto;
+  object-fit: contain;
+}
+
+.debug h2 {
+  margin: 0;
+  padding: 0;
+}
+
+.splash {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  font-family: Arial, Helvetica, sans-serif;
+  color: hsl(120, 100%, 50%);
+}
+
+.splash__logo {
+  width: 50px;
+  height: 50px;
+}
+
+.splash h3 {
+  margin-top: 2rem;
+}
+
+/* utility classes */
+
+.hidden {
+  display: none;
+}
+
+/* media queries */
+
+@media (orientation: portrait) and (max-width: 768px),
+  (orientation: landscape) and (max-height: 768px) {
+  .gamecontrols__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 180px;
+  }
+
+  .game-menu {
+    transition: all 0.1s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    padding: 1rem;
+    transform: initial;
+    font-size: 20px;
+  }
+
+  .game-menu__link {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gamecontrols__arrows,
+  .gamecontrols__buttons {
+    font-size: 1.1rem;
+  }
+}
