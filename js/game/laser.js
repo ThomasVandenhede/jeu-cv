@@ -2,14 +2,14 @@ var Laser = (function() {
   function Laser(props) {
     this.length = 20;
     var A = new Vector(props.x, props.y);
-    var B = Vector.sum(A, props.direction.multiplyByScalar(this.length));
+    var B = Vector.sum(A, props.direction.scale(this.length));
     Segment.call(this, A, B);
 
     this.origin = new Vector(props.x, props.y);
     this.speed = 250;
     this.v = Vector.subtract(B, A)
       .getUnitVector()
-      .multiplyByScalar(this.speed);
+      .scale(this.speed);
 
     // stats
     this.damage = props.damage;
@@ -32,7 +32,7 @@ var Laser = (function() {
   };
 
   Laser.prototype.update = function() {
-    var dPos = this.v.multiplyByScalar(dt);
+    var dPos = this.v.scale(dt);
     this.A = Vector.sum(this.A, dPos);
     this.B = Vector.sum(this.B, dPos);
   };

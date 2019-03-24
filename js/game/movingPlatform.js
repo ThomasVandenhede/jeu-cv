@@ -10,7 +10,7 @@ var MovingPlatform = (function() {
     this.speed = props.speed || 50;
     this.v = new Vector(this.xEnd - this.x, this.yEnd - this.y);
     var vNorm = this.v.norm;
-    this.v = this.v.multiplyByScalar(this.speed / vNorm);
+    this.v = this.v.scale(this.speed / vNorm);
 
     this.color = "rgb(0, 100, 255)";
     this.color = "darkorange";

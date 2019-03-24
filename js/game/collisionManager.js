@@ -76,7 +76,7 @@ CollisionManager.prototype.getCollisions = function(collidableGameObjects) {
   collidableGameObjects.forEach(function(box) {
     var md = AABB.minkowskiDifference(box, player);
     // window.md = md; // remove this when everything's working
-    var relMotion = Vector.subtract(player.v, box.v).multiplyByScalar(dt);
+    var relMotion = Vector.subtract(player.v, box.v).scale(dt);
     var colInfo = physics.collision.segmentAABB(new Vector(), relMotion, md);
     var t = colInfo.t;
     var side = colInfo.side;

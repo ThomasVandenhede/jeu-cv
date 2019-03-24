@@ -1,11 +1,6 @@
 var Ennemy = (function() {
-  function Ennemy(props) {
-    AABB.call(this, {
-      x: props.x,
-      y: props.y,
-      width: props.width || 20,
-      height: props.height || 20
-    });
+  function Ennemy(x, y) {
+    Circle.call(this, x, y, 10);
 
     this.v = new Vector();
     this.solid = false;
@@ -17,7 +12,7 @@ var Ennemy = (function() {
     this.lastFiredAt = Number.NEGATIVE_INFINITY;
   }
 
-  Ennemy.prototype = Object.create(AABB.prototype);
+  Ennemy.prototype = Object.create(Circle.prototype);
   Ennemy.prototype.constructor = Ennemy;
 
   Ennemy.prototype.attack = function(direction) {
@@ -38,14 +33,13 @@ var Ennemy = (function() {
   Ennemy.prototype.updateVelocity = function() {};
 
   Ennemy.prototype.draw = function(ctx, camera) {
-    var r = this.width / 2;
     ctx.save();
     ctx.fillStyle = "red";
     ctx.beginPath();
     ctx.arc(
-      camera.applyToX(this.center.x),
-      camera.applyToY(this.center.y),
-      camera.applyToDistance(r),
+      camera.applyToX(this.x),
+      camera.applyToY(this.y),
+      camera.applyToDistance(this.r),
       0,
       Math.PI * 2
     );

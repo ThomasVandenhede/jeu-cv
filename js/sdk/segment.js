@@ -26,7 +26,7 @@ var Segment = (function() {
     var AP = Vector.subtract(P, this.A);
     var AH = Vector.dotProduct(AP, u);
 
-    return Vector.sum(this.A, u.multiplyByScalar(AH));
+    return Vector.sum(this.A, u.scale(AH));
   };
 
   Segment.prototype.getDistanceFromPoint = function(P) {
@@ -53,7 +53,7 @@ var Segment = (function() {
     var AP = Vector.subtract(P, this.A);
     var AB = Vector.subtract(this.B, this.A);
     var normAB = AB.norm;
-    var u = AB.multiplyByScalar(1 / normAB); // unit vector of AB
+    var u = AB.scale(1 / normAB); // unit vector of AB
     var t = Vector.dotProduct(AP, u) / normAB;
 
     if (t < 0) {
@@ -62,7 +62,7 @@ var Segment = (function() {
       return this.B;
     } else {
       var AH = Vector.dotProduct(AP, u);
-      return Vector.sum(this.A, u.multiplyByScalar(AH));
+      return Vector.sum(this.A, u.scale(AH));
     }
   };
 

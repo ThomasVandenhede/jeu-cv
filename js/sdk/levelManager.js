@@ -59,7 +59,7 @@ var levelManager = (function() {
     level.ennemies = [];
     ennemiesData.forEach(function(ennemy) {
       level.ennemies.push(
-        new gameEntityConstructors[ennemy.type](ennemy.props)
+        new gameEntityConstructors[ennemy.type](ennemy.props.x, ennemy.props.y)
       );
     });
     level.skills = [];

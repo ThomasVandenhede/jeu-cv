@@ -68,6 +68,20 @@ AABB.minkowskiDifference = function(r1, r2) {
 };
 
 // public methods
+AABB.prototype.inflate = function(dx, dy) {
+  this.x -= dx;
+  this.width += 2 * dx;
+  this.y -= dy;
+  this.height += 2 * dy;
+  return this;
+};
+
+AABB.prototype.resize = function(width, height) {
+  this.width = width;
+  this.height = height;
+  return this;
+};
+
 AABB.prototype.getBoundingRect = function() {
   return this;
 };

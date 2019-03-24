@@ -28,16 +28,15 @@ var Vector = (function() {
   };
 
   // public non static methods
-  Vector.prototype.multiplyByScalar = function(a) {
+  Vector.prototype.scale = function(a) {
     return new Vector(this.x * a, this.y * a);
   };
 
   Vector.prototype.getUnitVector = function() {
-    var norm = this.norm;
-    if (norm === 0) {
+    if (this.normSquared === 0) {
       return new Vector();
     } else {
-      return new Vector(this.x, this.y).multiplyByScalar(1 / norm);
+      return new Vector(this.x, this.y).scale(1 / this.norm);
     }
   };
 
@@ -72,10 +71,13 @@ var Vector = (function() {
       get: function() {
         return Math.sqrt(this.normSquared);
       },
-      set: function(norm) {
-        var ratio = this.x / this.y;
-        this.x = norm * ratio / Math.sqrt(1 + Math.pow(ratio, 2));
-        this.y = norm / Math.sqrt(1 + Math.pow(ratio, 2));
+      set: function(newNorm) {
+        if (this.x === 0 && this.y === 0) {
+          return;
+        }
+        var norm = this.norm;
+        this.x *= newNorm / norm;
+        this.y *= newNorm / norm;
       }
     }
   });
