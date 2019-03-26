@@ -1,3 +1,5 @@
+var utils = require("../utils");
+
 function GameMenu(props) {
   this.game = props.game;
 
@@ -6,12 +8,12 @@ function GameMenu(props) {
   this.gameIntroEl = document.getElementById("game-intro");
 
   // MENU BUTTONS
-  this.resumeButtonVNode = h(
+  this.resumeButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -37,12 +39,12 @@ function GameMenu(props) {
     )
   );
 
-  this.restartButtonVNode = h(
+  this.restartButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -68,12 +70,12 @@ function GameMenu(props) {
     )
   );
 
-  this.controlsButtonVNode = h(
+  this.controlsButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -97,12 +99,12 @@ function GameMenu(props) {
     )
   );
 
-  this.aboutButtonVNode = h(
+  this.aboutButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -126,12 +128,12 @@ function GameMenu(props) {
     )
   );
 
-  this.backButtonVNode = h(
+  this.backButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -160,12 +162,12 @@ function GameMenu(props) {
     )
   );
 
-  this.loadButtonVNode = h(
+  this.loadButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -189,22 +191,22 @@ function GameMenu(props) {
     )
   );
 
-  this.editorButtonVNode = h(
+  this.editorButtonVNode = utils.h(
     "li",
     { class: "game-menu__item" },
-    h(
+    utils.h(
       "a",
       { href: "./level-editor.html", class: "game-menu__link" },
       "OUVRIR L'ÉDITEUR"
     )
   );
 
-  this.exitButtonVNode = h(
+  this.exitButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -239,16 +241,16 @@ function GameMenu(props) {
 
 GameMenu.prototype.showMenu = function(vNode) {
   this.close();
-  this.uiContainerEl.appendChild(render(vNode));
+  this.uiContainerEl.appendChild(utils.render(vNode));
 };
 
 GameMenu.prototype.showGameOverMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "PERDU !"),
-      h(
+      utils.h("h2", null, "PERDU !"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         this.restartButtonVNode,
@@ -262,18 +264,22 @@ GameMenu.prototype.showGameOverMenu = function() {
 
 GameMenu.prototype.showVictoryMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "VICTOIRE !"),
-      h(
+      utils.h("h2", null, "VICTOIRE !"),
+      utils.h(
         "p",
         null,
         "Vous avez retrouvé toutes mes principales compétences, vous pouvez avoir plus d'infos en consultant mon cv détaillé ",
-        h("a", { href: "./assets/files/CV Thomas Vandenhede.pdf" }, "ici"),
+        utils.h(
+          "a",
+          { href: "./assets/files/CV Thomas Vandenhede.pdf" },
+          "ici"
+        ),
         ". Ou bien essayez de battre votre score."
       ),
-      h(
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         this.restartButtonVNode,
@@ -287,11 +293,11 @@ GameMenu.prototype.showVictoryMenu = function() {
 
 GameMenu.prototype.showPauseMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "JEU EN PAUSE"),
-      h(
+      utils.h("h2", null, "JEU EN PAUSE"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         this.resumeButtonVNode,
@@ -308,78 +314,78 @@ GameMenu.prototype.showPauseMenu = function() {
 
 GameMenu.prototype.showControlsMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "CONTRÔLES"),
-      h(
+      utils.h("h2", null, "CONTRÔLES"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
-        h(
+        utils.h(
           "div",
           { class: "controls-container" },
-          h(
+          utils.h(
             "table",
             { class: "controls" },
-            h(
+            utils.h(
               "tr",
               null,
-              h(
+              utils.h(
                 "th",
                 null,
-                h("span", { class: "kbd" }, "\u2190"),
+                utils.h("span", { class: "kbd" }, "\u2190"),
                 " / ",
-                h("span", { class: "kbd" }, "\u2192"),
+                utils.h("span", { class: "kbd" }, "\u2192"),
                 " ou ",
-                h("span", { class: "kbd" }, "Q"),
+                utils.h("span", { class: "kbd" }, "Q"),
                 " / ",
-                h("span", { class: "kbd" }, "D")
+                utils.h("span", { class: "kbd" }, "D")
               ),
-              h("td", null, "Se déplacer horizontalement")
+              utils.h("td", null, "Se déplacer horizontalement")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h(
+              utils.h(
                 "th",
                 null,
-                h("span", { class: "kbd" }, "\u2191"),
+                utils.h("span", { class: "kbd" }, "\u2191"),
                 " ou ",
-                h("span", { class: "kbd" }, "Espace"),
+                utils.h("span", { class: "kbd" }, "Espace"),
                 " ou ",
-                h("span", { class: "kbd" }, "Z")
+                utils.h("span", { class: "kbd" }, "Z")
               ),
-              h("td", null, "Sauter")
+              utils.h("td", null, "Sauter")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h("th", null, h("span", { class: "kbd" }, "\u21b2")),
-              h("td", null, "Ouvrir le bouclier")
+              utils.h("th", null, utils.h("span", { class: "kbd" }, "\u21b2")),
+              utils.h("td", null, "Ouvrir le bouclier")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h("th", null, h("span", { class: "kbd" }, "Échap")),
-              h("td", null, "Afficher cet écran")
+              utils.h("th", null, utils.h("span", { class: "kbd" }, "Échap")),
+              utils.h("td", null, "Afficher cet écran")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h("th", null, h("span", { class: "kbd" }, "F11")),
-              h("td", null, "Plein écran")
+              utils.h("th", null, utils.h("span", { class: "kbd" }, "F11")),
+              utils.h("td", null, "Plein écran")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h(
+              utils.h(
                 "th",
                 null,
-                h("span", { class: "kbd" }, "+"),
+                utils.h("span", { class: "kbd" }, "+"),
                 " / ",
-                h("span", { class: "kbd" }, ")")
+                utils.h("span", { class: "kbd" }, ")")
               ),
-              h("td", null, "Zoomer / Dézoomer")
+              utils.h("td", null, "Zoomer / Dézoomer")
             )
           )
         ),
@@ -391,44 +397,44 @@ GameMenu.prototype.showControlsMenu = function() {
 
 GameMenu.prototype.showAboutMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "À PROPOS"),
-      h(
+      utils.h("h2", null, "À PROPOS"),
+      utils.h(
         "p",
         null,
-        h(
+        utils.h(
           "p",
           null,
           "Ce jeu est un projet que j'ai réalisé pour ma formation de Dev JS à l'Ifocop de Paris. Il a nécessité un bon mois de travail et pas mal de nuits blanches."
         ),
-        h(
+        utils.h(
           "p",
           null,
           "Le code est entièrement écrit en JavaScript, HTML et CSS et n'utilise aucun framework (hormis une touche de Bootstrap pour l'éditeur de niveaux)."
         )
       ),
-      h("ul", { class: "game-menu__list" }, this.backButtonVNode)
+      utils.h("ul", { class: "game-menu__list" }, this.backButtonVNode)
     )
   );
 };
 
 GameMenu.prototype.showLoadMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "CHARGER UN NIVEAU"),
-      h(
+      utils.h("h2", null, "CHARGER UN NIVEAU"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         Object.keys(gameData.levels).map(
           function(key) {
-            return h(
+            return utils.h(
               "li",
               null,
-              h(
+              utils.h(
                 "a",
                 {
                   href: "",
@@ -447,7 +453,7 @@ GameMenu.prototype.showLoadMenu = function() {
           }.bind(this)
         )
       ),
-      h("ul", { class: "game-menu__list" }, this.backButtonVNode)
+      utils.h("ul", { class: "game-menu__list" }, this.backButtonVNode)
     )
   );
 };
@@ -455,7 +461,7 @@ GameMenu.prototype.showLoadMenu = function() {
 GameMenu.prototype.close = function() {
   var gameMenuEl = document.querySelector(".game-menu");
   if (gameMenuEl) {
-    emptyElement(gameMenuEl);
+    utils.emptyElement(gameMenuEl);
     this.uiContainerEl.removeChild(gameMenuEl);
   }
 };

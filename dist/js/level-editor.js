@@ -362,6 +362,7 @@ module.exports = LevelManager;
 /***/ (function(module, exports, __webpack_require__) {
 
 var Platform = __webpack_require__(/*! ./platform */ "./js/game/platform.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var MovingPlatform = (function() {
   function MovingPlatform(props) {
@@ -427,8 +428,8 @@ var MovingPlatform = (function() {
       this.v.y = Math.abs(this.v.y);
     }
 
-    this.x = toFixedPrecision(this.x + dx, 2);
-    this.y = toFixedPrecision(this.y + dy, 2);
+    this.x = utils.toFixedPrecision(this.x + dx, 2);
+    this.y = utils.toFixedPrecision(this.y + dy, 2);
   };
 
   return MovingPlatform;
@@ -447,6 +448,7 @@ module.exports = MovingPlatform;
 /***/ (function(module, exports, __webpack_require__) {
 
 var SmokeParticle = __webpack_require__(/*! ./smokeParticle */ "./js/game/smokeParticle.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var sparksParticles = function(gameObj) {
   var start = Date.now();
@@ -464,22 +466,22 @@ var sparksParticles = function(gameObj) {
       var color = !gameObj.hasWon
         ? gameObj.color
         : "rgb(" +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ", " +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ", " +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ")";
-      switch (randInt(0, 3)) {
+      switch (utils.randInt(0, 3)) {
         case 0:
           // top edge
           particle = new SmokeParticle({
-            x: randInt(gameObj.left, gameObj.right),
+            x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.top - this.size,
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, this.maxSpeed),
-            vy: randInt(-this.maxSpeed, -this.minSpeed),
+            vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
+            vy: utils.randInt(-this.maxSpeed, -this.minSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -488,12 +490,12 @@ var sparksParticles = function(gameObj) {
         case 1:
           // bottom edge
           particle = new SmokeParticle({
-            x: randInt(gameObj.left, gameObj.right),
+            x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.bottom,
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, this.maxSpeed),
-            vy: randInt(this.minSpeed, this.maxSpeed),
+            vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
+            vy: utils.randInt(this.minSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -503,11 +505,11 @@ var sparksParticles = function(gameObj) {
           // left edge
           particle = new SmokeParticle({
             x: gameObj.left - this.size,
-            y: randInt(gameObj.top, gameObj.bottom),
+            y: utils.randInt(gameObj.top, gameObj.bottom),
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, -this.minSpeed),
-            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            vx: utils.randInt(-this.maxSpeed, -this.minSpeed),
+            vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -517,11 +519,11 @@ var sparksParticles = function(gameObj) {
           // right edge
           particle = new SmokeParticle({
             x: gameObj.right,
-            y: randInt(gameObj.top, gameObj.bottom),
+            y: utils.randInt(gameObj.top, gameObj.bottom),
             size: this.size,
             color: color,
-            vx: randInt(this.minSpeed, this.maxSpeed),
-            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            vx: utils.randInt(this.minSpeed, this.maxSpeed),
+            vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -568,8 +570,8 @@ var explosionParticles = function(gameObj) {
     for (var j = gameObj.top; j < gameObj.bottom; j += size) {
       var center = gameObj.center;
       var v = new SDK.Vector(
-        randInt(-maxSpeed * 5, maxSpeed * 5),
-        randInt(
+        utils.randInt(-maxSpeed * 5, maxSpeed * 5),
+        utils.randInt(
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * maxSpeed * 10,
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
@@ -581,13 +583,13 @@ var explosionParticles = function(gameObj) {
         color: gameObj.color,
         vx: v.x,
         vy: v.y,
-        maxLife: randInt(minLife, maxLife)
+        maxLife: utils.randInt(minLife, maxLife)
       });
       particles[particleIndex] = particle;
       particleIndex++;
       var v = new SDK.Vector(
-        randInt(-maxSpeed * 5, maxSpeed * 5),
-        randInt(
+        utils.randInt(-maxSpeed * 5, maxSpeed * 5),
+        utils.randInt(
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * maxSpeed * 10,
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
@@ -599,7 +601,7 @@ var explosionParticles = function(gameObj) {
         color: gameObj.color,
         vx: v.x,
         vy: v.y,
-        maxLife: randInt(minLife, maxLife)
+        maxLife: utils.randInt(minLife, maxLife)
       });
       particles[particleIndex] = particle;
       particleIndex++;
@@ -640,7 +642,7 @@ var hitParticles = function(x, y, direction, color) {
   for (var i = 0; i < maxCount; i++) {
     var v = direction
       .getUnitVector()
-      .scale(randInt(minSpeed, maxSpeed))
+      .scale(utils.randInt(minSpeed, maxSpeed))
       .rotateRadians((Math.random() * Math.PI) / 3 - Math.PI / 6);
     var particle = new SDK.Particle({
       x: x,
@@ -649,7 +651,7 @@ var hitParticles = function(x, y, direction, color) {
       color: color,
       vx: v.x,
       vy: v.y,
-      maxLife: randInt(minLife, maxLife)
+      maxLife: utils.randInt(minLife, maxLife)
     });
     particleIndex++;
     particles[particleIndex] = particle;
@@ -767,6 +769,7 @@ module.exports = Platform;
 
 var Shield = __webpack_require__(/*! ./shield */ "./js/game/shield.js");
 var particleEmitters = __webpack_require__(/*! ./particleEmitters */ "./js/game/particleEmitters.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var ABS_JUMP_SPEED = 700;
 var MAX_FALL_SPEED = 1000;
@@ -848,7 +851,7 @@ Player.prototype.jump = function() {
     // emit particles
     this.sparks = particleEmitters.sparksParticles(this);
 
-    this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
+    this.sounds.jump[utils.randInt(0, this.sounds.jump.length - 1)].replay();
     this.isColliding[1] = 0;
     this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
   }
@@ -868,7 +871,7 @@ Player.prototype.zeroGravity = function() {
 
 Player.prototype.applyDamage = function(damage) {
   this.sounds.hurt.replay();
-  this.hitPoints = toFixedPrecision(this.hitPoints - damage);
+  this.hitPoints = utils.toFixedPrecision(this.hitPoints - damage);
 };
 
 Player.prototype.die = function(cb) {
@@ -900,13 +903,13 @@ Player.prototype.getDeltaWidth = function() {
 };
 
 Player.prototype.updatePlayerSize = function(deltaWidth) {
-  this.width = toFixedPrecision(this.width + deltaWidth, 3);
-  this.height = toFixedPrecision(this.height - deltaWidth, 3);
-  this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
+  this.width = utils.toFixedPrecision(this.width + deltaWidth, 3);
+  this.height = utils.toFixedPrecision(this.height - deltaWidth, 3);
+  this.x = utils.toFixedPrecision(this.x - deltaWidth / 2, 3);
   this.y =
     this.GRAVITY_ACCELERATION < 0
-      ? toFixedPrecision(this.y, 3)
-      : toFixedPrecision(this.y + deltaWidth, 3);
+      ? utils.toFixedPrecision(this.y, 3)
+      : utils.toFixedPrecision(this.y + deltaWidth, 3);
 };
 
 Player.prototype.applyGravity = function() {
@@ -936,10 +939,10 @@ Player.prototype.update = function() {
 
   // apply natural position increments if no collision detected
   if (!this.isColliding[1]) {
-    this.y = toFixedPrecision(this.y + dy, 4);
+    this.y = utils.toFixedPrecision(this.y + dy, 4);
   }
   if (!this.isColliding[0]) {
-    this.x = toFixedPrecision(this.x + dx, 4);
+    this.x = utils.toFixedPrecision(this.x + dx, 4);
   }
 };
 
@@ -1112,12 +1115,14 @@ var Shield = (function() {
 
   Shield.prototype.hasCollisionWithLaser = function(laser) {
     var boundingRect = this.getBoundingRect();
-    var collision = physics.collision;
+    var collision = SDK.physics.collision;
     var shielded = this.shielded;
     var r = this.r;
 
     // return if the two shapes bounding rectangles don't collide
-    if (!collision.AABBWithAABB(boundingRect, laser.getBoundingRect())) {
+    if (
+      !collision.RectangleWithRectangle(boundingRect, laser.getBoundingRect())
+    ) {
       return false;
     }
 
@@ -1140,14 +1145,14 @@ var Shield = (function() {
     });
 
     return (
-      c1.containsPoint(laser.A) ||
-      c1.containsPoint(laser.B) ||
-      c2.containsPoint(laser.A) ||
-      c2.containsPoint(laser.B) ||
-      c3.containsPoint(laser.A) ||
-      c3.containsPoint(laser.B) ||
-      c4.containsPoint(laser.A) ||
-      c4.containsPoint(laser.B) ||
+      c1.containsPoint(laser.A.x, laser.A.y) ||
+      c1.containsPoint(laser.B.x, laser.B.y) ||
+      c2.containsPoint(laser.A.x, laser.A.y) ||
+      c2.containsPoint(laser.B.x, laser.B.y) ||
+      c3.containsPoint(laser.A.x, laser.A.y) ||
+      c3.containsPoint(laser.B.x, laser.B.y) ||
+      c4.containsPoint(laser.A.x, laser.A.y) ||
+      c4.containsPoint(laser.B.x, laser.B.y) ||
       r1.contains(laser.A.x, laser.A.y) ||
       r1.contains(laser.B.x, laser.B.y) ||
       r2.contains(laser.A.x, laser.A.y) ||
@@ -1626,6 +1631,7 @@ var KeyboardManager = __webpack_require__(/*! ./keyboardManager */ "./js/levelEd
 var LevelManager = __webpack_require__(/*! ../game/levelManager */ "./js/game/levelManager.js");
 var Toolbar = __webpack_require__(/*! ./toolbar */ "./js/levelEditor/toolbar.js");
 var ToolManager = __webpack_require__(/*! ./toolManager */ "./js/levelEditor/toolManager.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 window.gameData = __webpack_require__(/*! ../game/gameData.json */ "./js/game/gameData.json");
 
 var LevelEditor = (function() {
@@ -1710,14 +1716,14 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.updateToolbar = function() {
-    emptyElement(this.toolbar.loadLevelSelect);
-    var levelSelectionOptions = [h("option", { value: "" }, "")].concat(
+    utils.emptyElement(this.toolbar.loadLevelSelect);
+    var levelSelectionOptions = [utils.h("option", { value: "" }, "")].concat(
       Object.keys(gameData.levels).map(function(item) {
-        return h("option", { id: item, value: item }, item);
+        return utils.h("option", { id: item, value: item }, item);
       })
     );
     levelSelectionOptions.forEach(function(option) {
-      this.toolbar.loadLevelSelect.appendChild(render(option));
+      this.toolbar.loadLevelSelect.appendChild(utils.render(option));
     }, this);
     if (this.level) {
       this.toolbar.loadLevelSelect.value = this.level.name;
@@ -2731,6 +2737,127 @@ var Toolbar = (function() {
 })();
 
 module.exports = Toolbar;
+
+
+/***/ }),
+
+/***/ "./js/utils.js":
+/*!*********************!*\
+  !*** ./js/utils.js ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = {
+  toFixedPrecision: function(number, precision) {
+    return +number.toFixed(precision || 0);
+  },
+
+  noop: function() {},
+
+  randInt: function(start, end) {
+    return Math.floor(Math.random() * (end - start + 1) + start);
+  },
+
+  lerp: function(v0, v1, t) {
+    return (1 - t) * v0 + t * v1;
+  },
+
+  show: function(el) {
+    el.classList.remove("hidden");
+  },
+
+  hide: function(el) {
+    el.classList.add("hidden");
+  },
+
+  incrementID: (function() {
+    var id = -1;
+    return function() {
+      id = id + 1;
+      return id;
+    };
+  })(),
+
+  h: function(type, props, children) {
+    var el = document.createElement(type);
+    var nodes, node;
+    for (var key in props) {
+      el.setAttribute(key, props[key]);
+    }
+    if (Array.isArray(children)) {
+      nodes = children;
+    } else {
+      nodes = [children];
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      if (typeof nodes[i] === "string") {
+        node = document.createTextNode(nodes[i]);
+      } else {
+        node = nodes[i];
+      }
+      el.appendChild(node);
+    }
+    return el;
+  },
+
+  /**
+   * Build DOM from virtual DOM tree.
+   * @param {Object} dom
+   */
+  render: function(vdom) {
+    return (function renderNode(vdom) {
+      if (vdom.split) return document.createTextNode(vdom);
+
+      const element = document.createElement(vdom.type);
+      const props = vdom.props || {};
+
+      Object.keys(props).forEach(function(key) {
+        // treat events separately
+        if (typeof props[key] !== "function") {
+          element.setAttribute(key, props[key]);
+        }
+
+        // events
+        if (typeof props[key] === "function") {
+          var eventType = key.substring(2); // remove the 'on' part
+          element.addEventListener(eventType, props[key]);
+        }
+      });
+
+      (vdom.children || []).forEach(function(vNode) {
+        return element.appendChild(renderNode(vNode));
+      });
+      return element;
+    })(vdom);
+  },
+
+  h: function() {
+    var vNode = {};
+    var type = arguments[0];
+    var props = arguments[1];
+    var children = Array.prototype.slice.call(arguments, 2);
+
+    vNode.type = type;
+    vNode.props = props;
+
+    if (children.length) {
+      vNode.children = children.reduce((acc, item) => {
+        return Array.isArray(item) ? [...acc, ...item] : [...acc, item];
+      }, []);
+    } else {
+      vNode.children = null;
+    }
+
+    return vNode;
+  },
+
+  emptyElement(el) {
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
+};
 
 
 /***/ })

@@ -1,4 +1,5 @@
 var SmokeParticle = require("./smokeParticle");
+var utils = require('../utils');
 
 var sparksParticles = function(gameObj) {
   var start = Date.now();
@@ -16,22 +17,22 @@ var sparksParticles = function(gameObj) {
       var color = !gameObj.hasWon
         ? gameObj.color
         : "rgb(" +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ", " +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ", " +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ")";
-      switch (randInt(0, 3)) {
+      switch (utils.randInt(0, 3)) {
         case 0:
           // top edge
           particle = new SmokeParticle({
-            x: randInt(gameObj.left, gameObj.right),
+            x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.top - this.size,
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, this.maxSpeed),
-            vy: randInt(-this.maxSpeed, -this.minSpeed),
+            vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
+            vy: utils.randInt(-this.maxSpeed, -this.minSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -40,12 +41,12 @@ var sparksParticles = function(gameObj) {
         case 1:
           // bottom edge
           particle = new SmokeParticle({
-            x: randInt(gameObj.left, gameObj.right),
+            x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.bottom,
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, this.maxSpeed),
-            vy: randInt(this.minSpeed, this.maxSpeed),
+            vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
+            vy: utils.randInt(this.minSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -55,11 +56,11 @@ var sparksParticles = function(gameObj) {
           // left edge
           particle = new SmokeParticle({
             x: gameObj.left - this.size,
-            y: randInt(gameObj.top, gameObj.bottom),
+            y: utils.randInt(gameObj.top, gameObj.bottom),
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, -this.minSpeed),
-            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            vx: utils.randInt(-this.maxSpeed, -this.minSpeed),
+            vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -69,11 +70,11 @@ var sparksParticles = function(gameObj) {
           // right edge
           particle = new SmokeParticle({
             x: gameObj.right,
-            y: randInt(gameObj.top, gameObj.bottom),
+            y: utils.randInt(gameObj.top, gameObj.bottom),
             size: this.size,
             color: color,
-            vx: randInt(this.minSpeed, this.maxSpeed),
-            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            vx: utils.randInt(this.minSpeed, this.maxSpeed),
+            vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -120,8 +121,8 @@ var explosionParticles = function(gameObj) {
     for (var j = gameObj.top; j < gameObj.bottom; j += size) {
       var center = gameObj.center;
       var v = new SDK.Vector(
-        randInt(-maxSpeed * 5, maxSpeed * 5),
-        randInt(
+        utils.randInt(-maxSpeed * 5, maxSpeed * 5),
+        utils.randInt(
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * maxSpeed * 10,
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
@@ -133,13 +134,13 @@ var explosionParticles = function(gameObj) {
         color: gameObj.color,
         vx: v.x,
         vy: v.y,
-        maxLife: randInt(minLife, maxLife)
+        maxLife: utils.randInt(minLife, maxLife)
       });
       particles[particleIndex] = particle;
       particleIndex++;
       var v = new SDK.Vector(
-        randInt(-maxSpeed * 5, maxSpeed * 5),
-        randInt(
+        utils.randInt(-maxSpeed * 5, maxSpeed * 5),
+        utils.randInt(
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * maxSpeed * 10,
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
@@ -151,7 +152,7 @@ var explosionParticles = function(gameObj) {
         color: gameObj.color,
         vx: v.x,
         vy: v.y,
-        maxLife: randInt(minLife, maxLife)
+        maxLife: utils.randInt(minLife, maxLife)
       });
       particles[particleIndex] = particle;
       particleIndex++;
@@ -192,7 +193,7 @@ var hitParticles = function(x, y, direction, color) {
   for (var i = 0; i < maxCount; i++) {
     var v = direction
       .getUnitVector()
-      .scale(randInt(minSpeed, maxSpeed))
+      .scale(utils.randInt(minSpeed, maxSpeed))
       .rotateRadians((Math.random() * Math.PI) / 3 - Math.PI / 6);
     var particle = new SDK.Particle({
       x: x,
@@ -201,7 +202,7 @@ var hitParticles = function(x, y, direction, color) {
       color: color,
       vx: v.x,
       vy: v.y,
-      maxLife: randInt(minLife, maxLife)
+      maxLife: utils.randInt(minLife, maxLife)
     });
     particleIndex++;
     particles[particleIndex] = particle;

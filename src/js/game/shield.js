@@ -71,12 +71,14 @@ var Shield = (function() {
 
   Shield.prototype.hasCollisionWithLaser = function(laser) {
     var boundingRect = this.getBoundingRect();
-    var collision = physics.collision;
+    var collision = SDK.physics.collision;
     var shielded = this.shielded;
     var r = this.r;
 
     // return if the two shapes bounding rectangles don't collide
-    if (!collision.AABBWithAABB(boundingRect, laser.getBoundingRect())) {
+    if (
+      !collision.RectangleWithRectangle(boundingRect, laser.getBoundingRect())
+    ) {
       return false;
     }
 
@@ -99,14 +101,14 @@ var Shield = (function() {
     });
 
     return (
-      c1.containsPoint(laser.A) ||
-      c1.containsPoint(laser.B) ||
-      c2.containsPoint(laser.A) ||
-      c2.containsPoint(laser.B) ||
-      c3.containsPoint(laser.A) ||
-      c3.containsPoint(laser.B) ||
-      c4.containsPoint(laser.A) ||
-      c4.containsPoint(laser.B) ||
+      c1.containsPoint(laser.A.x, laser.A.y) ||
+      c1.containsPoint(laser.B.x, laser.B.y) ||
+      c2.containsPoint(laser.A.x, laser.A.y) ||
+      c2.containsPoint(laser.B.x, laser.B.y) ||
+      c3.containsPoint(laser.A.x, laser.A.y) ||
+      c3.containsPoint(laser.B.x, laser.B.y) ||
+      c4.containsPoint(laser.A.x, laser.A.y) ||
+      c4.containsPoint(laser.B.x, laser.B.y) ||
       r1.contains(laser.A.x, laser.A.y) ||
       r1.contains(laser.B.x, laser.B.y) ||
       r2.contains(laser.A.x, laser.A.y) ||

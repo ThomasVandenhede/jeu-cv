@@ -1,9 +1,10 @@
 var Segment = require("./segment");
 var Vector = require("./vector");
+var utils = require("../utils");
 
 var physics = {
   collision: {
-    AABBWithAABB: function(r1, r2) {
+    RectangleWithRectangle: function(r1, r2) {
       return (
         r1.left <= r2.right &&
         r1.right >= r2.left &&
@@ -34,7 +35,7 @@ var physics = {
       var OP = Vector.subtract(P, O);
       var numerator = -(A.x * OP.y - O.x * OP.y - OP.x * A.y + OP.x * O.y);
       var denominator = Vector.determinant(AB, OP);
-      k = toFixedPrecision(numerator / denominator, 2);
+      k = utils.toFixedPrecision(numerator / denominator, 2);
 
       if (k < 0 || k > 1) {
         return Number.POSITIVE_INFINITY;
@@ -42,7 +43,7 @@ var physics = {
         return k;
       }
     },
-    segmentAABB: function(A, B, box) {
+    segmentRectangle: function(A, B, box) {
       var AB = Vector.subtract(B, A);
       var points = [
         new Vector(box.left, box.top),

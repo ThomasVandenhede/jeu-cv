@@ -5,6 +5,7 @@ var LifeBar = require("./lifebar");
 var SkillBar = require("./skillBar");
 var Ghost = require("./ghost");
 var Clock = require("./clock");
+var utils = require("../utils");
 window.gameData = require("./gameData.json");
 
 var Game = (function() {
@@ -270,9 +271,8 @@ var Game = (function() {
 
   Game.prototype.exit = function() {
     this.pauseLoop();
-    show(this.gameMenu.gameIntroEl);
     this.gameMenu.close();
-    hide(this.gameMenu.gameContainerEl);
+    utils.hide(this.gameMenu.gameContainerEl);
     this.state = Game.states.EXIT;
     this.keyboard.unbindEventHandlers();
     this.touchInput.unbindEventHandlers();
@@ -476,70 +476,70 @@ var Game = (function() {
   // debug display
   Game.prototype.updateDebugInfo = function() {
     var uiContainerEl = document.getElementById("ui-container");
-    var debugEl = h(
+    var debugEl = utils.h(
       "div",
       { class: "debug" },
-      h("h2", null, "debug info"),
-      h(
+      utils.h("h2", null, "debug info"),
+      utils.h(
         "section",
         { class: "player" },
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "x: "),
+          utils.h("strong", null, "x: "),
           this.level.player.x,
-          h("br"),
-          h("strong", null, " y: "),
+          utils.h("br"),
+          utils.h("strong", null, " y: "),
           this.level.player.y
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "width: "),
+          utils.h("strong", null, "width: "),
           this.level.player.width,
-          h("br"),
-          h("strong", null, " height: "),
+          utils.h("br"),
+          utils.h("strong", null, " height: "),
           this.level.player.height
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "crouching: "),
+          utils.h("strong", null, "crouching: "),
           this.level.player.isCrouching
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "speedX: "),
+          utils.h("strong", null, "speedX: "),
           this.level.player.v.x,
-          h("br"),
-          h("strong", null, " speedY: "),
+          utils.h("br"),
+          utils.h("strong", null, " speedY: "),
           this.level.player.v.y
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "accelX: "),
+          utils.h("strong", null, "accelX: "),
           this.level.player.acceleration.x,
-          h("strong", null, " accelY: "),
+          utils.h("strong", null, " accelY: "),
           this.level.player.acceleration.y
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "colliding: "),
+          utils.h("strong", null, "colliding: "),
           this.level.player.isColliding
         )
       ),
-      h(
+      utils.h(
         "section",
         { class: "camera" },
-        h("p", null, [h("strong", null, "camX: "), this.camera.x]),
-        h("p", null, [h("strong", null, "camY: "), this.camera.y])
+        utils.h("p", null, [utils.h("strong", null, "camX: "), this.camera.x]),
+        utils.h("p", null, [utils.h("strong", null, "camY: "), this.camera.y])
       )
     );
 
-    uiContainerEl.appendChild(render(debugEl));
+    uiContainerEl.appendChild(utils.render(debugEl));
   };
 
   return Game;

@@ -4,6 +4,7 @@ var KeyboardManager = require("./keyboardManager");
 var LevelManager = require("../game/levelManager");
 var Toolbar = require("./toolbar");
 var ToolManager = require("./toolManager");
+var utils = require('../utils');
 window.gameData = require("../game/gameData.json");
 
 var LevelEditor = (function() {
@@ -88,14 +89,14 @@ var LevelEditor = (function() {
   };
 
   LevelEditor.prototype.updateToolbar = function() {
-    emptyElement(this.toolbar.loadLevelSelect);
-    var levelSelectionOptions = [h("option", { value: "" }, "")].concat(
+    utils.emptyElement(this.toolbar.loadLevelSelect);
+    var levelSelectionOptions = [utils.h("option", { value: "" }, "")].concat(
       Object.keys(gameData.levels).map(function(item) {
-        return h("option", { id: item, value: item }, item);
+        return utils.h("option", { id: item, value: item }, item);
       })
     );
     levelSelectionOptions.forEach(function(option) {
-      this.toolbar.loadLevelSelect.appendChild(render(option));
+      this.toolbar.loadLevelSelect.appendChild(utils.render(option));
     }, this);
     if (this.level) {
       this.toolbar.loadLevelSelect.value = this.level.name;

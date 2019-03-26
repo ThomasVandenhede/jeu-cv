@@ -1,5 +1,6 @@
 var Shield = require("./shield");
 var particleEmitters = require("./particleEmitters");
+var utils = require("../utils");
 
 var ABS_JUMP_SPEED = 700;
 var MAX_FALL_SPEED = 1000;
@@ -81,7 +82,7 @@ Player.prototype.jump = function() {
     // emit particles
     this.sparks = particleEmitters.sparksParticles(this);
 
-    this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
+    this.sounds.jump[utils.randInt(0, this.sounds.jump.length - 1)].replay();
     this.isColliding[1] = 0;
     this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
   }
@@ -101,7 +102,7 @@ Player.prototype.zeroGravity = function() {
 
 Player.prototype.applyDamage = function(damage) {
   this.sounds.hurt.replay();
-  this.hitPoints = toFixedPrecision(this.hitPoints - damage);
+  this.hitPoints = utils.toFixedPrecision(this.hitPoints - damage);
 };
 
 Player.prototype.die = function(cb) {
@@ -133,13 +134,13 @@ Player.prototype.getDeltaWidth = function() {
 };
 
 Player.prototype.updatePlayerSize = function(deltaWidth) {
-  this.width = toFixedPrecision(this.width + deltaWidth, 3);
-  this.height = toFixedPrecision(this.height - deltaWidth, 3);
-  this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
+  this.width = utils.toFixedPrecision(this.width + deltaWidth, 3);
+  this.height = utils.toFixedPrecision(this.height - deltaWidth, 3);
+  this.x = utils.toFixedPrecision(this.x - deltaWidth / 2, 3);
   this.y =
     this.GRAVITY_ACCELERATION < 0
-      ? toFixedPrecision(this.y, 3)
-      : toFixedPrecision(this.y + deltaWidth, 3);
+      ? utils.toFixedPrecision(this.y, 3)
+      : utils.toFixedPrecision(this.y + deltaWidth, 3);
 };
 
 Player.prototype.applyGravity = function() {
@@ -169,10 +170,10 @@ Player.prototype.update = function() {
 
   // apply natural position increments if no collision detected
   if (!this.isColliding[1]) {
-    this.y = toFixedPrecision(this.y + dy, 4);
+    this.y = utils.toFixedPrecision(this.y + dy, 4);
   }
   if (!this.isColliding[0]) {
-    this.x = toFixedPrecision(this.x + dx, 4);
+    this.x = utils.toFixedPrecision(this.x + dx, 4);
   }
 };
 

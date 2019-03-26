@@ -526,6 +526,11 @@ var Circle = (function() {
     }
   });
 
+  Circle.prototype.moveTo = function(x, y) {
+    this.x = x;
+    this.y = y;
+  };
+
   /**
    * Determines whether the circle contains a point.
    * @param {number} x
@@ -559,7 +564,9 @@ module.exports = Circle;
   !*** ./js/sdk/gameTimer.js ***!
   \*****************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var GameTimer = (function() {
   function GameTimer() {}
@@ -567,7 +574,7 @@ var GameTimer = (function() {
   Object.defineProperties(GameTimer.prototype, {
     dt: {
       get: function() {
-        return toFixedPrecision(
+        return utils.toFixedPrecision(
           (this.currentTime - this.previousTime) / 1000,
           4
         );
@@ -1101,10 +1108,11 @@ module.exports = Particle;
 
 var Segment = __webpack_require__(/*! ./segment */ "./js/sdk/segment.js");
 var Vector = __webpack_require__(/*! ./vector */ "./js/sdk/vector.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var physics = {
   collision: {
-    AABBWithAABB: function(r1, r2) {
+    RectangleWithRectangle: function(r1, r2) {
       return (
         r1.left <= r2.right &&
         r1.right >= r2.left &&
@@ -1135,7 +1143,7 @@ var physics = {
       var OP = Vector.subtract(P, O);
       var numerator = -(A.x * OP.y - O.x * OP.y - OP.x * A.y + OP.x * O.y);
       var denominator = Vector.determinant(AB, OP);
-      k = toFixedPrecision(numerator / denominator, 2);
+      k = utils.toFixedPrecision(numerator / denominator, 2);
 
       if (k < 0 || k > 1) {
         return Number.POSITIVE_INFINITY;
@@ -1143,7 +1151,7 @@ var physics = {
         return k;
       }
     },
-    segmentAABB: function(A, B, box) {
+    segmentRectangle: function(A, B, box) {
       var AB = Vector.subtract(B, A);
       var points = [
         new Vector(box.left, box.top),
@@ -2067,6 +2075,127 @@ var Vector = (function() {
 })();
 
 module.exports = Vector;
+
+
+/***/ }),
+
+/***/ "./js/utils.js":
+/*!*********************!*\
+  !*** ./js/utils.js ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = {
+  toFixedPrecision: function(number, precision) {
+    return +number.toFixed(precision || 0);
+  },
+
+  noop: function() {},
+
+  randInt: function(start, end) {
+    return Math.floor(Math.random() * (end - start + 1) + start);
+  },
+
+  lerp: function(v0, v1, t) {
+    return (1 - t) * v0 + t * v1;
+  },
+
+  show: function(el) {
+    el.classList.remove("hidden");
+  },
+
+  hide: function(el) {
+    el.classList.add("hidden");
+  },
+
+  incrementID: (function() {
+    var id = -1;
+    return function() {
+      id = id + 1;
+      return id;
+    };
+  })(),
+
+  h: function(type, props, children) {
+    var el = document.createElement(type);
+    var nodes, node;
+    for (var key in props) {
+      el.setAttribute(key, props[key]);
+    }
+    if (Array.isArray(children)) {
+      nodes = children;
+    } else {
+      nodes = [children];
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      if (typeof nodes[i] === "string") {
+        node = document.createTextNode(nodes[i]);
+      } else {
+        node = nodes[i];
+      }
+      el.appendChild(node);
+    }
+    return el;
+  },
+
+  /**
+   * Build DOM from virtual DOM tree.
+   * @param {Object} dom
+   */
+  render: function(vdom) {
+    return (function renderNode(vdom) {
+      if (vdom.split) return document.createTextNode(vdom);
+
+      const element = document.createElement(vdom.type);
+      const props = vdom.props || {};
+
+      Object.keys(props).forEach(function(key) {
+        // treat events separately
+        if (typeof props[key] !== "function") {
+          element.setAttribute(key, props[key]);
+        }
+
+        // events
+        if (typeof props[key] === "function") {
+          var eventType = key.substring(2); // remove the 'on' part
+          element.addEventListener(eventType, props[key]);
+        }
+      });
+
+      (vdom.children || []).forEach(function(vNode) {
+        return element.appendChild(renderNode(vNode));
+      });
+      return element;
+    })(vdom);
+  },
+
+  h: function() {
+    var vNode = {};
+    var type = arguments[0];
+    var props = arguments[1];
+    var children = Array.prototype.slice.call(arguments, 2);
+
+    vNode.type = type;
+    vNode.props = props;
+
+    if (children.length) {
+      vNode.children = children.reduce((acc, item) => {
+        return Array.isArray(item) ? [...acc, ...item] : [...acc, item];
+      }, []);
+    } else {
+      vNode.children = null;
+    }
+
+    return vNode;
+  },
+
+  emptyElement(el) {
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
+};
 
 
 /***/ })

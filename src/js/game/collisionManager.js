@@ -1,4 +1,5 @@
 var particleEmitters = require("./particleEmitters");
+var utils = require("../utils");
 
 function CollisionManager(props) {
   this.level = props.level;
@@ -17,12 +18,15 @@ CollisionManager.prototype.handleCollisionsWithLasers = function() {
   !this.level.player.shield.isOpen
     ? this.level.lasers.forEach(function(laser, index) {
         var laserBox = laser.getBoundingRect();
-        if (SDK.physics.collision.AABBWithAABB(playerBox, laserBox)) {
+        if (SDK.physics.collision.RectangleWithRectangle(playerBox, laserBox)) {
           if (
             playerBox.contains(laser.A.x, laser.A.y) ||
             playerBox.contains(laser.B.x, laser.B.y) ||
-            SDK.physics.collision.segmentAABB(laser.A, laser.B, playerBox) <
-              Number.POSITIVE_INFINITY
+            SDK.physics.collision.segmentRectangle(
+              laser.A,
+              laser.B,
+              playerBox
+            ) < Number.POSITIVE_INFINITY
           ) {
             this.level.player.applyDamage(laser.damage);
             this.level.player.hitPoints <= 0 && this.level.player.die();
@@ -54,7 +58,7 @@ CollisionManager.prototype.handleCollisionsWithSkills = function() {
   var playerBox = this.level.player.getBoundingRect();
   this.level.skills.forEach(function(skill, index) {
     var skillBox = skill.getBoundingRect();
-    if (SDK.physics.collision.AABBWithAABB(playerBox, skillBox)) {
+    if (SDK.physics.collision.RectangleWithRectangle(playerBox, skillBox)) {
       this.level.player.skills.push(skill);
       this.clock.countdownStart += 5 * 1000; // add 5s to clock
       this.level.skills.splice(index, 1);
@@ -79,7 +83,7 @@ CollisionManager.prototype.getCollisions = function(collidableGameObjects) {
     var md = SDK.Rectangle.minkowskiDifference(box, player);
     // window.md = md; // remove this when everything's working
     var relMotion = SDK.Vector.subtract(player.v, box.v).scale(dt);
-    var colInfo = SDK.physics.collision.segmentAABB(
+    var colInfo = SDK.physics.collision.segmentRectangle(
       new SDK.Vector(),
       relMotion,
       md
@@ -167,15 +171,15 @@ CollisionManager.prototype.handleCollisionsWithPlatforms = function() {
   if (player.isColliding[0]) {
     player.x =
       player.isColliding[0] > 0
-        ? toFixedPrecision(boxH.left + boxH.v.x * dt - player.width, 2) // snap
-        : toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
+        ? utils.toFixedPrecision(boxH.left + boxH.v.x * dt - player.width, 2) // snap
+        : utils.toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
   }
   // resolve vertical collision
   if (player.isColliding[1]) {
     player.y =
       player.isColliding[1] > 0
-        ? toFixedPrecision(boxV.top + boxV.v.y * dt - player.height, 2)
-        : toFixedPrecision(boxV.bottom + boxV.v.y * dt, 2);
+        ? utils.toFixedPrecision(boxV.top + boxV.v.y * dt - player.height, 2)
+        : utils.toFixedPrecision(boxV.bottom + boxV.v.y * dt, 2);
   }
 
   // inform the player about which objects it's colliding with

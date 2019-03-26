@@ -36,7 +36,7 @@ var LifeBar = (function() {
     ctx.textAlign = "center";
     ctx.fontWeight = "bold";
     ctx.fillText(
-      Math.ceil(toFixedPrecision(hitPointsRation * 100)) + "%",
+      Math.ceil(utils.toFixedPrecision(hitPointsRation * 100)) + "%",
       this.x + this.width / 2,
       this.y + this.height + 20
     );

@@ -185,6 +185,7 @@ module.exports = Clock;
 /***/ (function(module, exports, __webpack_require__) {
 
 var particleEmitters = __webpack_require__(/*! ./particleEmitters */ "./js/game/particleEmitters.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 function CollisionManager(props) {
   this.level = props.level;
@@ -203,12 +204,15 @@ CollisionManager.prototype.handleCollisionsWithLasers = function() {
   !this.level.player.shield.isOpen
     ? this.level.lasers.forEach(function(laser, index) {
         var laserBox = laser.getBoundingRect();
-        if (SDK.physics.collision.AABBWithAABB(playerBox, laserBox)) {
+        if (SDK.physics.collision.RectangleWithRectangle(playerBox, laserBox)) {
           if (
             playerBox.contains(laser.A.x, laser.A.y) ||
             playerBox.contains(laser.B.x, laser.B.y) ||
-            SDK.physics.collision.segmentAABB(laser.A, laser.B, playerBox) <
-              Number.POSITIVE_INFINITY
+            SDK.physics.collision.segmentRectangle(
+              laser.A,
+              laser.B,
+              playerBox
+            ) < Number.POSITIVE_INFINITY
           ) {
             this.level.player.applyDamage(laser.damage);
             this.level.player.hitPoints <= 0 && this.level.player.die();
@@ -240,7 +244,7 @@ CollisionManager.prototype.handleCollisionsWithSkills = function() {
   var playerBox = this.level.player.getBoundingRect();
   this.level.skills.forEach(function(skill, index) {
     var skillBox = skill.getBoundingRect();
-    if (SDK.physics.collision.AABBWithAABB(playerBox, skillBox)) {
+    if (SDK.physics.collision.RectangleWithRectangle(playerBox, skillBox)) {
       this.level.player.skills.push(skill);
       this.clock.countdownStart += 5 * 1000; // add 5s to clock
       this.level.skills.splice(index, 1);
@@ -265,7 +269,7 @@ CollisionManager.prototype.getCollisions = function(collidableGameObjects) {
     var md = SDK.Rectangle.minkowskiDifference(box, player);
     // window.md = md; // remove this when everything's working
     var relMotion = SDK.Vector.subtract(player.v, box.v).scale(dt);
-    var colInfo = SDK.physics.collision.segmentAABB(
+    var colInfo = SDK.physics.collision.segmentRectangle(
       new SDK.Vector(),
       relMotion,
       md
@@ -353,15 +357,15 @@ CollisionManager.prototype.handleCollisionsWithPlatforms = function() {
   if (player.isColliding[0]) {
     player.x =
       player.isColliding[0] > 0
-        ? toFixedPrecision(boxH.left + boxH.v.x * dt - player.width, 2) // snap
-        : toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
+        ? utils.toFixedPrecision(boxH.left + boxH.v.x * dt - player.width, 2) // snap
+        : utils.toFixedPrecision(boxH.right + boxH.v.x * dt, 2);
   }
   // resolve vertical collision
   if (player.isColliding[1]) {
     player.y =
       player.isColliding[1] > 0
-        ? toFixedPrecision(boxV.top + boxV.v.y * dt - player.height, 2)
-        : toFixedPrecision(boxV.bottom + boxV.v.y * dt, 2);
+        ? utils.toFixedPrecision(boxV.top + boxV.v.y * dt - player.height, 2)
+        : utils.toFixedPrecision(boxV.bottom + boxV.v.y * dt, 2);
   }
 
   // inform the player about which objects it's colliding with
@@ -459,6 +463,7 @@ var LifeBar = __webpack_require__(/*! ./lifebar */ "./js/game/lifebar.js");
 var SkillBar = __webpack_require__(/*! ./skillBar */ "./js/game/skillBar.js");
 var Ghost = __webpack_require__(/*! ./ghost */ "./js/game/ghost.js");
 var Clock = __webpack_require__(/*! ./clock */ "./js/game/clock.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 window.gameData = __webpack_require__(/*! ./gameData.json */ "./js/game/gameData.json");
 
 var Game = (function() {
@@ -724,9 +729,8 @@ var Game = (function() {
 
   Game.prototype.exit = function() {
     this.pauseLoop();
-    show(this.gameMenu.gameIntroEl);
     this.gameMenu.close();
-    hide(this.gameMenu.gameContainerEl);
+    utils.hide(this.gameMenu.gameContainerEl);
     this.state = Game.states.EXIT;
     this.keyboard.unbindEventHandlers();
     this.touchInput.unbindEventHandlers();
@@ -930,70 +934,70 @@ var Game = (function() {
   // debug display
   Game.prototype.updateDebugInfo = function() {
     var uiContainerEl = document.getElementById("ui-container");
-    var debugEl = h(
+    var debugEl = utils.h(
       "div",
       { class: "debug" },
-      h("h2", null, "debug info"),
-      h(
+      utils.h("h2", null, "debug info"),
+      utils.h(
         "section",
         { class: "player" },
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "x: "),
+          utils.h("strong", null, "x: "),
           this.level.player.x,
-          h("br"),
-          h("strong", null, " y: "),
+          utils.h("br"),
+          utils.h("strong", null, " y: "),
           this.level.player.y
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "width: "),
+          utils.h("strong", null, "width: "),
           this.level.player.width,
-          h("br"),
-          h("strong", null, " height: "),
+          utils.h("br"),
+          utils.h("strong", null, " height: "),
           this.level.player.height
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "crouching: "),
+          utils.h("strong", null, "crouching: "),
           this.level.player.isCrouching
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "speedX: "),
+          utils.h("strong", null, "speedX: "),
           this.level.player.v.x,
-          h("br"),
-          h("strong", null, " speedY: "),
+          utils.h("br"),
+          utils.h("strong", null, " speedY: "),
           this.level.player.v.y
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "accelX: "),
+          utils.h("strong", null, "accelX: "),
           this.level.player.acceleration.x,
-          h("strong", null, " accelY: "),
+          utils.h("strong", null, " accelY: "),
           this.level.player.acceleration.y
         ),
-        h(
+        utils.h(
           "p",
           null,
-          h("strong", null, "colliding: "),
+          utils.h("strong", null, "colliding: "),
           this.level.player.isColliding
         )
       ),
-      h(
+      utils.h(
         "section",
         { class: "camera" },
-        h("p", null, [h("strong", null, "camX: "), this.camera.x]),
-        h("p", null, [h("strong", null, "camY: "), this.camera.y])
+        utils.h("p", null, [utils.h("strong", null, "camX: "), this.camera.x]),
+        utils.h("p", null, [utils.h("strong", null, "camY: "), this.camera.y])
       )
     );
 
-    uiContainerEl.appendChild(render(debugEl));
+    uiContainerEl.appendChild(utils.render(debugEl));
   };
 
   return Game;
@@ -1020,7 +1024,9 @@ module.exports = {"constants":{"GRAVITY_ACCELERATION":1600},"colors":{"STAR_WARS
   !*** ./js/game/gameMenu.js ***!
   \*****************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 function GameMenu(props) {
   this.game = props.game;
@@ -1030,12 +1036,12 @@ function GameMenu(props) {
   this.gameIntroEl = document.getElementById("game-intro");
 
   // MENU BUTTONS
-  this.resumeButtonVNode = h(
+  this.resumeButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1061,12 +1067,12 @@ function GameMenu(props) {
     )
   );
 
-  this.restartButtonVNode = h(
+  this.restartButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1092,12 +1098,12 @@ function GameMenu(props) {
     )
   );
 
-  this.controlsButtonVNode = h(
+  this.controlsButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1121,12 +1127,12 @@ function GameMenu(props) {
     )
   );
 
-  this.aboutButtonVNode = h(
+  this.aboutButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1150,12 +1156,12 @@ function GameMenu(props) {
     )
   );
 
-  this.backButtonVNode = h(
+  this.backButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1184,12 +1190,12 @@ function GameMenu(props) {
     )
   );
 
-  this.loadButtonVNode = h(
+  this.loadButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1213,22 +1219,22 @@ function GameMenu(props) {
     )
   );
 
-  this.editorButtonVNode = h(
+  this.editorButtonVNode = utils.h(
     "li",
     { class: "game-menu__item" },
-    h(
+    utils.h(
       "a",
       { href: "./level-editor.html", class: "game-menu__link" },
       "OUVRIR L'ÉDITEUR"
     )
   );
 
-  this.exitButtonVNode = h(
+  this.exitButtonVNode = utils.h(
     "li",
     {
       class: "game-menu__item"
     },
-    h(
+    utils.h(
       "a",
       {
         href: "",
@@ -1263,16 +1269,16 @@ function GameMenu(props) {
 
 GameMenu.prototype.showMenu = function(vNode) {
   this.close();
-  this.uiContainerEl.appendChild(render(vNode));
+  this.uiContainerEl.appendChild(utils.render(vNode));
 };
 
 GameMenu.prototype.showGameOverMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "PERDU !"),
-      h(
+      utils.h("h2", null, "PERDU !"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         this.restartButtonVNode,
@@ -1286,18 +1292,22 @@ GameMenu.prototype.showGameOverMenu = function() {
 
 GameMenu.prototype.showVictoryMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "VICTOIRE !"),
-      h(
+      utils.h("h2", null, "VICTOIRE !"),
+      utils.h(
         "p",
         null,
         "Vous avez retrouvé toutes mes principales compétences, vous pouvez avoir plus d'infos en consultant mon cv détaillé ",
-        h("a", { href: "./assets/files/CV Thomas Vandenhede.pdf" }, "ici"),
+        utils.h(
+          "a",
+          { href: "./assets/files/CV Thomas Vandenhede.pdf" },
+          "ici"
+        ),
         ". Ou bien essayez de battre votre score."
       ),
-      h(
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         this.restartButtonVNode,
@@ -1311,11 +1321,11 @@ GameMenu.prototype.showVictoryMenu = function() {
 
 GameMenu.prototype.showPauseMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "JEU EN PAUSE"),
-      h(
+      utils.h("h2", null, "JEU EN PAUSE"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         this.resumeButtonVNode,
@@ -1332,78 +1342,78 @@ GameMenu.prototype.showPauseMenu = function() {
 
 GameMenu.prototype.showControlsMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "CONTRÔLES"),
-      h(
+      utils.h("h2", null, "CONTRÔLES"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
-        h(
+        utils.h(
           "div",
           { class: "controls-container" },
-          h(
+          utils.h(
             "table",
             { class: "controls" },
-            h(
+            utils.h(
               "tr",
               null,
-              h(
+              utils.h(
                 "th",
                 null,
-                h("span", { class: "kbd" }, "\u2190"),
+                utils.h("span", { class: "kbd" }, "\u2190"),
                 " / ",
-                h("span", { class: "kbd" }, "\u2192"),
+                utils.h("span", { class: "kbd" }, "\u2192"),
                 " ou ",
-                h("span", { class: "kbd" }, "Q"),
+                utils.h("span", { class: "kbd" }, "Q"),
                 " / ",
-                h("span", { class: "kbd" }, "D")
+                utils.h("span", { class: "kbd" }, "D")
               ),
-              h("td", null, "Se déplacer horizontalement")
+              utils.h("td", null, "Se déplacer horizontalement")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h(
+              utils.h(
                 "th",
                 null,
-                h("span", { class: "kbd" }, "\u2191"),
+                utils.h("span", { class: "kbd" }, "\u2191"),
                 " ou ",
-                h("span", { class: "kbd" }, "Espace"),
+                utils.h("span", { class: "kbd" }, "Espace"),
                 " ou ",
-                h("span", { class: "kbd" }, "Z")
+                utils.h("span", { class: "kbd" }, "Z")
               ),
-              h("td", null, "Sauter")
+              utils.h("td", null, "Sauter")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h("th", null, h("span", { class: "kbd" }, "\u21b2")),
-              h("td", null, "Ouvrir le bouclier")
+              utils.h("th", null, utils.h("span", { class: "kbd" }, "\u21b2")),
+              utils.h("td", null, "Ouvrir le bouclier")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h("th", null, h("span", { class: "kbd" }, "Échap")),
-              h("td", null, "Afficher cet écran")
+              utils.h("th", null, utils.h("span", { class: "kbd" }, "Échap")),
+              utils.h("td", null, "Afficher cet écran")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h("th", null, h("span", { class: "kbd" }, "F11")),
-              h("td", null, "Plein écran")
+              utils.h("th", null, utils.h("span", { class: "kbd" }, "F11")),
+              utils.h("td", null, "Plein écran")
             ),
-            h(
+            utils.h(
               "tr",
               null,
-              h(
+              utils.h(
                 "th",
                 null,
-                h("span", { class: "kbd" }, "+"),
+                utils.h("span", { class: "kbd" }, "+"),
                 " / ",
-                h("span", { class: "kbd" }, ")")
+                utils.h("span", { class: "kbd" }, ")")
               ),
-              h("td", null, "Zoomer / Dézoomer")
+              utils.h("td", null, "Zoomer / Dézoomer")
             )
           )
         ),
@@ -1415,44 +1425,44 @@ GameMenu.prototype.showControlsMenu = function() {
 
 GameMenu.prototype.showAboutMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "À PROPOS"),
-      h(
+      utils.h("h2", null, "À PROPOS"),
+      utils.h(
         "p",
         null,
-        h(
+        utils.h(
           "p",
           null,
           "Ce jeu est un projet que j'ai réalisé pour ma formation de Dev JS à l'Ifocop de Paris. Il a nécessité un bon mois de travail et pas mal de nuits blanches."
         ),
-        h(
+        utils.h(
           "p",
           null,
           "Le code est entièrement écrit en JavaScript, HTML et CSS et n'utilise aucun framework (hormis une touche de Bootstrap pour l'éditeur de niveaux)."
         )
       ),
-      h("ul", { class: "game-menu__list" }, this.backButtonVNode)
+      utils.h("ul", { class: "game-menu__list" }, this.backButtonVNode)
     )
   );
 };
 
 GameMenu.prototype.showLoadMenu = function() {
   this.showMenu(
-    h(
+    utils.h(
       "div",
       { class: "game-menu" },
-      h("h2", null, "CHARGER UN NIVEAU"),
-      h(
+      utils.h("h2", null, "CHARGER UN NIVEAU"),
+      utils.h(
         "ul",
         { class: "game-menu__list" },
         Object.keys(gameData.levels).map(
           function(key) {
-            return h(
+            return utils.h(
               "li",
               null,
-              h(
+              utils.h(
                 "a",
                 {
                   href: "",
@@ -1471,7 +1481,7 @@ GameMenu.prototype.showLoadMenu = function() {
           }.bind(this)
         )
       ),
-      h("ul", { class: "game-menu__list" }, this.backButtonVNode)
+      utils.h("ul", { class: "game-menu__list" }, this.backButtonVNode)
     )
   );
 };
@@ -1479,7 +1489,7 @@ GameMenu.prototype.showLoadMenu = function() {
 GameMenu.prototype.close = function() {
   var gameMenuEl = document.querySelector(".game-menu");
   if (gameMenuEl) {
-    emptyElement(gameMenuEl);
+    utils.emptyElement(gameMenuEl);
     this.uiContainerEl.removeChild(gameMenuEl);
   }
 };
@@ -1829,7 +1839,7 @@ var LifeBar = (function() {
     ctx.textAlign = "center";
     ctx.fontWeight = "bold";
     ctx.fillText(
-      Math.ceil(toFixedPrecision(hitPointsRation * 100)) + "%",
+      Math.ceil(utils.toFixedPrecision(hitPointsRation * 100)) + "%",
       this.x + this.width / 2,
       this.y + this.height + 20
     );
@@ -1852,6 +1862,7 @@ module.exports = LifeBar;
 /***/ (function(module, exports, __webpack_require__) {
 
 var Platform = __webpack_require__(/*! ./platform */ "./js/game/platform.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var MovingPlatform = (function() {
   function MovingPlatform(props) {
@@ -1917,8 +1928,8 @@ var MovingPlatform = (function() {
       this.v.y = Math.abs(this.v.y);
     }
 
-    this.x = toFixedPrecision(this.x + dx, 2);
-    this.y = toFixedPrecision(this.y + dy, 2);
+    this.x = utils.toFixedPrecision(this.x + dx, 2);
+    this.y = utils.toFixedPrecision(this.y + dy, 2);
   };
 
   return MovingPlatform;
@@ -1937,6 +1948,7 @@ module.exports = MovingPlatform;
 /***/ (function(module, exports, __webpack_require__) {
 
 var SmokeParticle = __webpack_require__(/*! ./smokeParticle */ "./js/game/smokeParticle.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var sparksParticles = function(gameObj) {
   var start = Date.now();
@@ -1954,22 +1966,22 @@ var sparksParticles = function(gameObj) {
       var color = !gameObj.hasWon
         ? gameObj.color
         : "rgb(" +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ", " +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ", " +
-          randInt(0, 255) +
+          utils.randInt(0, 255) +
           ")";
-      switch (randInt(0, 3)) {
+      switch (utils.randInt(0, 3)) {
         case 0:
           // top edge
           particle = new SmokeParticle({
-            x: randInt(gameObj.left, gameObj.right),
+            x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.top - this.size,
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, this.maxSpeed),
-            vy: randInt(-this.maxSpeed, -this.minSpeed),
+            vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
+            vy: utils.randInt(-this.maxSpeed, -this.minSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -1978,12 +1990,12 @@ var sparksParticles = function(gameObj) {
         case 1:
           // bottom edge
           particle = new SmokeParticle({
-            x: randInt(gameObj.left, gameObj.right),
+            x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.bottom,
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, this.maxSpeed),
-            vy: randInt(this.minSpeed, this.maxSpeed),
+            vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
+            vy: utils.randInt(this.minSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -1993,11 +2005,11 @@ var sparksParticles = function(gameObj) {
           // left edge
           particle = new SmokeParticle({
             x: gameObj.left - this.size,
-            y: randInt(gameObj.top, gameObj.bottom),
+            y: utils.randInt(gameObj.top, gameObj.bottom),
             size: this.size,
             color: color,
-            vx: randInt(-this.maxSpeed, -this.minSpeed),
-            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            vx: utils.randInt(-this.maxSpeed, -this.minSpeed),
+            vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -2007,11 +2019,11 @@ var sparksParticles = function(gameObj) {
           // right edge
           particle = new SmokeParticle({
             x: gameObj.right,
-            y: randInt(gameObj.top, gameObj.bottom),
+            y: utils.randInt(gameObj.top, gameObj.bottom),
             size: this.size,
             color: color,
-            vx: randInt(this.minSpeed, this.maxSpeed),
-            vy: randInt(-this.maxSpeed, this.maxSpeed),
+            vx: utils.randInt(this.minSpeed, this.maxSpeed),
+            vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
             maxLife: this.maxLife
           });
           particle.id = this.particleIndex;
@@ -2058,8 +2070,8 @@ var explosionParticles = function(gameObj) {
     for (var j = gameObj.top; j < gameObj.bottom; j += size) {
       var center = gameObj.center;
       var v = new SDK.Vector(
-        randInt(-maxSpeed * 5, maxSpeed * 5),
-        randInt(
+        utils.randInt(-maxSpeed * 5, maxSpeed * 5),
+        utils.randInt(
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * maxSpeed * 10,
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
@@ -2071,13 +2083,13 @@ var explosionParticles = function(gameObj) {
         color: gameObj.color,
         vx: v.x,
         vy: v.y,
-        maxLife: randInt(minLife, maxLife)
+        maxLife: utils.randInt(minLife, maxLife)
       });
       particles[particleIndex] = particle;
       particleIndex++;
       var v = new SDK.Vector(
-        randInt(-maxSpeed * 5, maxSpeed * 5),
-        randInt(
+        utils.randInt(-maxSpeed * 5, maxSpeed * 5),
+        utils.randInt(
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * maxSpeed * 10,
           -Math.sign(gameObj.GRAVITY_ACCELERATION) * minSpeed * 10
         )
@@ -2089,7 +2101,7 @@ var explosionParticles = function(gameObj) {
         color: gameObj.color,
         vx: v.x,
         vy: v.y,
-        maxLife: randInt(minLife, maxLife)
+        maxLife: utils.randInt(minLife, maxLife)
       });
       particles[particleIndex] = particle;
       particleIndex++;
@@ -2130,7 +2142,7 @@ var hitParticles = function(x, y, direction, color) {
   for (var i = 0; i < maxCount; i++) {
     var v = direction
       .getUnitVector()
-      .scale(randInt(minSpeed, maxSpeed))
+      .scale(utils.randInt(minSpeed, maxSpeed))
       .rotateRadians((Math.random() * Math.PI) / 3 - Math.PI / 6);
     var particle = new SDK.Particle({
       x: x,
@@ -2139,7 +2151,7 @@ var hitParticles = function(x, y, direction, color) {
       color: color,
       vx: v.x,
       vy: v.y,
-      maxLife: randInt(minLife, maxLife)
+      maxLife: utils.randInt(minLife, maxLife)
     });
     particleIndex++;
     particles[particleIndex] = particle;
@@ -2257,6 +2269,7 @@ module.exports = Platform;
 
 var Shield = __webpack_require__(/*! ./shield */ "./js/game/shield.js");
 var particleEmitters = __webpack_require__(/*! ./particleEmitters */ "./js/game/particleEmitters.js");
+var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 
 var ABS_JUMP_SPEED = 700;
 var MAX_FALL_SPEED = 1000;
@@ -2338,7 +2351,7 @@ Player.prototype.jump = function() {
     // emit particles
     this.sparks = particleEmitters.sparksParticles(this);
 
-    this.sounds.jump[randInt(0, this.sounds.jump.length - 1)].replay();
+    this.sounds.jump[utils.randInt(0, this.sounds.jump.length - 1)].replay();
     this.isColliding[1] = 0;
     this.v.y = -Math.sign(this.GRAVITY_ACCELERATION) * ABS_JUMP_SPEED;
   }
@@ -2358,7 +2371,7 @@ Player.prototype.zeroGravity = function() {
 
 Player.prototype.applyDamage = function(damage) {
   this.sounds.hurt.replay();
-  this.hitPoints = toFixedPrecision(this.hitPoints - damage);
+  this.hitPoints = utils.toFixedPrecision(this.hitPoints - damage);
 };
 
 Player.prototype.die = function(cb) {
@@ -2390,13 +2403,13 @@ Player.prototype.getDeltaWidth = function() {
 };
 
 Player.prototype.updatePlayerSize = function(deltaWidth) {
-  this.width = toFixedPrecision(this.width + deltaWidth, 3);
-  this.height = toFixedPrecision(this.height - deltaWidth, 3);
-  this.x = toFixedPrecision(this.x - deltaWidth / 2, 3);
+  this.width = utils.toFixedPrecision(this.width + deltaWidth, 3);
+  this.height = utils.toFixedPrecision(this.height - deltaWidth, 3);
+  this.x = utils.toFixedPrecision(this.x - deltaWidth / 2, 3);
   this.y =
     this.GRAVITY_ACCELERATION < 0
-      ? toFixedPrecision(this.y, 3)
-      : toFixedPrecision(this.y + deltaWidth, 3);
+      ? utils.toFixedPrecision(this.y, 3)
+      : utils.toFixedPrecision(this.y + deltaWidth, 3);
 };
 
 Player.prototype.applyGravity = function() {
@@ -2426,10 +2439,10 @@ Player.prototype.update = function() {
 
   // apply natural position increments if no collision detected
   if (!this.isColliding[1]) {
-    this.y = toFixedPrecision(this.y + dy, 4);
+    this.y = utils.toFixedPrecision(this.y + dy, 4);
   }
   if (!this.isColliding[0]) {
-    this.x = toFixedPrecision(this.x + dx, 4);
+    this.x = utils.toFixedPrecision(this.x + dx, 4);
   }
 };
 
@@ -2602,12 +2615,14 @@ var Shield = (function() {
 
   Shield.prototype.hasCollisionWithLaser = function(laser) {
     var boundingRect = this.getBoundingRect();
-    var collision = physics.collision;
+    var collision = SDK.physics.collision;
     var shielded = this.shielded;
     var r = this.r;
 
     // return if the two shapes bounding rectangles don't collide
-    if (!collision.AABBWithAABB(boundingRect, laser.getBoundingRect())) {
+    if (
+      !collision.RectangleWithRectangle(boundingRect, laser.getBoundingRect())
+    ) {
       return false;
     }
 
@@ -2630,14 +2645,14 @@ var Shield = (function() {
     });
 
     return (
-      c1.containsPoint(laser.A) ||
-      c1.containsPoint(laser.B) ||
-      c2.containsPoint(laser.A) ||
-      c2.containsPoint(laser.B) ||
-      c3.containsPoint(laser.A) ||
-      c3.containsPoint(laser.B) ||
-      c4.containsPoint(laser.A) ||
-      c4.containsPoint(laser.B) ||
+      c1.containsPoint(laser.A.x, laser.A.y) ||
+      c1.containsPoint(laser.B.x, laser.B.y) ||
+      c2.containsPoint(laser.A.x, laser.A.y) ||
+      c2.containsPoint(laser.B.x, laser.B.y) ||
+      c3.containsPoint(laser.A.x, laser.A.y) ||
+      c3.containsPoint(laser.B.x, laser.B.y) ||
+      c4.containsPoint(laser.A.x, laser.A.y) ||
+      c4.containsPoint(laser.B.x, laser.B.y) ||
       r1.contains(laser.A.x, laser.A.y) ||
       r1.contains(laser.B.x, laser.B.y) ||
       r2.contains(laser.A.x, laser.A.y) ||
@@ -2993,6 +3008,7 @@ module.exports = SmokeParticle;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+var utils = __webpack_require__(/*! ./utils */ "./js/utils.js");
 var Game = __webpack_require__(/*! ./game/game */ "./js/game/game.js");
 
 window.addEventListener("DOMContentLoaded", function() {
@@ -3027,8 +3043,8 @@ window.addEventListener("DOMContentLoaded", function() {
       document.documentElement.requestFullscreen();
 
     // instantiate game
-    show(gameContainer);
-    hide(gameIntroEl);
+    utils.show(gameContainer);
+    utils.show(gameIntroEl);
     window.game = new Game({
       shouldDisplayDebug: true,
       shouldDisplayRulers: true
@@ -3052,6 +3068,127 @@ window.addEventListener("DOMContentLoaded", function() {
     }, 50);
   }
 });
+
+
+/***/ }),
+
+/***/ "./js/utils.js":
+/*!*********************!*\
+  !*** ./js/utils.js ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = {
+  toFixedPrecision: function(number, precision) {
+    return +number.toFixed(precision || 0);
+  },
+
+  noop: function() {},
+
+  randInt: function(start, end) {
+    return Math.floor(Math.random() * (end - start + 1) + start);
+  },
+
+  lerp: function(v0, v1, t) {
+    return (1 - t) * v0 + t * v1;
+  },
+
+  show: function(el) {
+    el.classList.remove("hidden");
+  },
+
+  hide: function(el) {
+    el.classList.add("hidden");
+  },
+
+  incrementID: (function() {
+    var id = -1;
+    return function() {
+      id = id + 1;
+      return id;
+    };
+  })(),
+
+  h: function(type, props, children) {
+    var el = document.createElement(type);
+    var nodes, node;
+    for (var key in props) {
+      el.setAttribute(key, props[key]);
+    }
+    if (Array.isArray(children)) {
+      nodes = children;
+    } else {
+      nodes = [children];
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      if (typeof nodes[i] === "string") {
+        node = document.createTextNode(nodes[i]);
+      } else {
+        node = nodes[i];
+      }
+      el.appendChild(node);
+    }
+    return el;
+  },
+
+  /**
+   * Build DOM from virtual DOM tree.
+   * @param {Object} dom
+   */
+  render: function(vdom) {
+    return (function renderNode(vdom) {
+      if (vdom.split) return document.createTextNode(vdom);
+
+      const element = document.createElement(vdom.type);
+      const props = vdom.props || {};
+
+      Object.keys(props).forEach(function(key) {
+        // treat events separately
+        if (typeof props[key] !== "function") {
+          element.setAttribute(key, props[key]);
+        }
+
+        // events
+        if (typeof props[key] === "function") {
+          var eventType = key.substring(2); // remove the 'on' part
+          element.addEventListener(eventType, props[key]);
+        }
+      });
+
+      (vdom.children || []).forEach(function(vNode) {
+        return element.appendChild(renderNode(vNode));
+      });
+      return element;
+    })(vdom);
+  },
+
+  h: function() {
+    var vNode = {};
+    var type = arguments[0];
+    var props = arguments[1];
+    var children = Array.prototype.slice.call(arguments, 2);
+
+    vNode.type = type;
+    vNode.props = props;
+
+    if (children.length) {
+      vNode.children = children.reduce((acc, item) => {
+        return Array.isArray(item) ? [...acc, ...item] : [...acc, item];
+      }, []);
+    } else {
+      vNode.children = null;
+    }
+
+    return vNode;
+  },
+
+  emptyElement(el) {
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
+};
 
 
 /***/ })

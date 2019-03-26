@@ -1,10 +1,12 @@
+var utils = require("../utils");
+
 var GameTimer = (function() {
   function GameTimer() {}
 
   Object.defineProperties(GameTimer.prototype, {
     dt: {
       get: function() {
-        return toFixedPrecision(
+        return utils.toFixedPrecision(
           (this.currentTime - this.previousTime) / 1000,
           4
         );

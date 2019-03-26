@@ -1,3 +1,4 @@
+var utils = require("./utils");
 var Game = require("./game/game");
 
 window.addEventListener("DOMContentLoaded", function() {
@@ -32,8 +33,8 @@ window.addEventListener("DOMContentLoaded", function() {
       document.documentElement.requestFullscreen();
 
     // instantiate game
-    show(gameContainer);
-    hide(gameIntroEl);
+    utils.show(gameContainer);
+    utils.show(gameIntroEl);
     window.game = new Game({
       shouldDisplayDebug: true,
       shouldDisplayRulers: true

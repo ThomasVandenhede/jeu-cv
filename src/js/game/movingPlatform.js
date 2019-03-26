@@ -1,4 +1,5 @@
 var Platform = require("./platform");
+var utils = require('../utils');
 
 var MovingPlatform = (function() {
   function MovingPlatform(props) {
@@ -64,8 +65,8 @@ var MovingPlatform = (function() {
       this.v.y = Math.abs(this.v.y);
     }
 
-    this.x = toFixedPrecision(this.x + dx, 2);
-    this.y = toFixedPrecision(this.y + dy, 2);
+    this.x = utils.toFixedPrecision(this.x + dx, 2);
+    this.y = utils.toFixedPrecision(this.y + dy, 2);
   };
 
   return MovingPlatform;
