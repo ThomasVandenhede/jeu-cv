@@ -6,7 +6,6 @@ var ABS_JUMP_SPEED = 700;
 var MAX_FALL_SPEED = 1000;
 var INITIAL_WIDTH = 30;
 var INITIAL_HEIGHT = 30;
-var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
 function Player(props) {
   SDK.Rectangle.call(this, {
@@ -18,16 +17,11 @@ function Player(props) {
 
   this.v = new SDK.Vector();
   this.acceleration = new SDK.Vector();
-  this.COEFFICIENT_OF_RESTITUTION = 0.4;
   this.solid = true; // can collide with other solid objects
   this.maxHitPoints = 100;
   this.hitPoints = this.maxHitPoints;
   this.skills = []; // the player must harvest these
   this.color = this.getColorFromHP();
-
-  // crouching / standing state and animations
-  this.isCrouching = false;
-  CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
   // collision direction for movement
   this.isColliding = [0, 0]; // [horizontal, vertical]
@@ -69,14 +63,6 @@ Player.prototype.moveRight = function() {
   this.v.x = 250;
 };
 
-Player.prototype.crouch = function() {
-  this.isCrouching = true;
-};
-
-Player.prototype.stand = function() {
-  this.isCrouching = false;
-};
-
 Player.prototype.jump = function() {
   if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
     // emit particles
@@ -115,34 +101,6 @@ Player.prototype.die = function(cb) {
   cb && cb();
 };
 
-Player.prototype.getDeltaWidth = function() {
-  var deltaWidth;
-  var computedDelta =
-    (dt / CROUCH_STAND_ANIMATION_DURATION) * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
-  if (this.isCrouching) {
-    deltaWidth =
-      this.height - computedDelta < INITIAL_WIDTH
-        ? this.height - INITIAL_WIDTH
-        : computedDelta;
-  } else {
-    deltaWidth =
-      this.height + computedDelta > INITIAL_HEIGHT
-        ? this.height - INITIAL_HEIGHT
-        : -computedDelta;
-  }
-  return deltaWidth;
-};
-
-Player.prototype.updatePlayerSize = function(deltaWidth) {
-  this.width = utils.toFixedPrecision(this.width + deltaWidth, 3);
-  this.height = utils.toFixedPrecision(this.height - deltaWidth, 3);
-  this.x = utils.toFixedPrecision(this.x - deltaWidth / 2, 3);
-  this.y =
-    this.GRAVITY_ACCELERATION < 0
-      ? utils.toFixedPrecision(this.y, 3)
-      : utils.toFixedPrecision(this.y + deltaWidth, 3);
-};
-
 Player.prototype.applyGravity = function() {
   // apply gravity if player is free falling
   this.acceleration.y = this.GRAVITY_ACCELERATION;
@@ -165,8 +123,6 @@ Player.prototype.update = function() {
 
   var dx = this.v.x * dt,
     dy = this.v.y * dt;
-
-  this.updatePlayerSize(this.getDeltaWidth());
 
   // apply natural position increments if no collision detected
   if (!this.isColliding[1]) {

@@ -154,13 +154,14 @@ var Game = (function() {
     }
 
     if (keyboard.DOWN || touchInput.JOYPAD_DOWN) {
-      player.GRAVITY_ACCELERATION > 0 ? player.crouch() : player.jump();
-    } else {
-      player.stand();
+      player.GRAVITY_ACCELERATION <= 0 && player.jump();
     }
+    //  else {
+    //   player.stand();
+    // }
 
     if (keyboard.UP || touchInput.JOYPAD_UP) {
-      player.GRAVITY_ACCELERATION > 0 ? player.jump() : player.crouch();
+      player.GRAVITY_ACCELERATION > 0 && player.jump();
     }
 
     if (keyboard.SPACE || touchInput.BUTTON_A) {
