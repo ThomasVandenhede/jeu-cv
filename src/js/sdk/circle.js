@@ -52,6 +52,11 @@ var Circle = (function() {
     }
   });
 
+  Circle.prototype.moveTo = function(x, y) {
+    this.x = x;
+    this.y = y;
+  };
+
   /**
    * Determines whether the circle contains a point.
    * @param {number} x
