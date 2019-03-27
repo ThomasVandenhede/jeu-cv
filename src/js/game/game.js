@@ -5,6 +5,7 @@ var LifeBar = require("./lifebar");
 var SkillBar = require("./skillBar");
 var Ghost = require("./ghost");
 var Clock = require("./clock");
+var ClockDisplay = require("./clockDisplay");
 var utils = require("../utils");
 window.gameData = require("./gameData.json");
 
@@ -60,7 +61,9 @@ var Game = (function() {
     // game timer (game inner logic)
     this.timer = new SDK.GameTimer();
 
-    this.clock = new Clock({
+    this.clock = new Clock();
+    this.clockDisplay = new ClockDisplay({
+      game: this,
       x: canvas.width - 170,
       y: 35,
       width: 80,
@@ -242,7 +245,7 @@ var Game = (function() {
     if (!player.isDead) {
       if (
         !player.within(this.level.worldRect) ||
-        this.clock.countdownStart - this.clock.totalTime <= 0
+        this.clock.timeRemaining <= 0
       ) {
         player.die();
       }
@@ -462,7 +465,7 @@ var Game = (function() {
   Game.prototype.renderUI = function(ctx, camera) {
     this.uiElements = [
       // this.lifeBar,
-      this.clock,
+      this.clockDisplay,
       this.grid,
       this.skillBar
     ];

@@ -1,80 +1,92 @@
-var Clock = (function() {
-  function Clock(props) {
-    // reference to game object
-    SDK.Rectangle.call(this, props);
-    this.DANGER_COUNTDOWN_TIME = 5000;
-    this.isPaused = false;
-    this.isCountDown = true;
-    this.timerEl = document.getElementById("gameclock");
+var SECONDS_IN_ONE_MINUTE = 60;
+var MINUTES_IN_ONE_HOUR = 60;
+var HOURS_IN_ONE_DAY = 24;
+var ONE_SECOND_IN_MS = 1000;
+var ONE_MINUTE_IN_MS = SECONDS_IN_ONE_MINUTE * ONE_SECOND_IN_MS;
+var ONE_HOUR_IN_MS = MINUTES_IN_ONE_HOUR * ONE_MINUTE_IN_MS;
+var ONE_DAY_IN_MS = HOURS_IN_ONE_DAY * ONE_HOUR_IN_MS;
+
+function Clock() {
+  this.isPaused = false;
+  this.hasMilliseconds = false;
+  this.isCountDown = true;
+}
+
+Object.defineProperties(Clock.prototype, {
+  timeRemaining: {
+    get: function() {
+      return this.countdownDuration - this.timeEllapsed;
+    }
+  }
+});
+
+Clock.prototype.pause = function() {
+  this.isPaused = true;
+};
+
+Clock.prototype.play = function() {
+  this.isPaused = false;
+  this.currentTime = Date.now();
+};
+
+Clock.prototype.update = function() {
+  if (!this.isPaused) {
+    this.previousTime = this.currentTime;
+    this.currentTime = Date.now();
+    this.timeEllapsed += this.currentTime - this.previousTime;
+  }
+};
+
+Clock.prototype.reset = function(initialDuration) {
+  var defaultDuration =
+    0 * ONE_DAY_IN_MS +
+    0 * ONE_HOUR_IN_MS +
+    180 * ONE_MINUTE_IN_MS +
+    2 * ONE_SECOND_IN_MS;
+
+  this.timeEllapsed = 0;
+  this.countdownDuration = initialDuration || defaultDuration; // ms;
+};
+
+Clock.prototype.getValues = function() {
+  var displayTime = this.isCountDown
+    ? new Date(Math.max(0, this.timeRemaining))
+    : new Date(this.timeEllapsed);
+  var ms = displayTime.getTime();
+  var milliseconds, seconds, minutes, hours, days;
+  var round;
+
+  if (this.isCountDown && !this.hasMilliseconds) {
+    round = Math.ceil;
+  } else {
+    round = Math.floor;
   }
 
-  Clock.prototype = Object.create(SDK.Rectangle.prototype);
-  Clock.prototype.constructor = Clock;
+  milliseconds = ms % 1000;
+  seconds = round(ms / ONE_SECOND_IN_MS) % SECONDS_IN_ONE_MINUTE;
+  minutes =
+    round((ms - seconds * ONE_SECOND_IN_MS) / ONE_MINUTE_IN_MS) %
+    MINUTES_IN_ONE_HOUR;
+  hours =
+    round(
+      (ms - minutes * ONE_MINUTE_IN_MS - seconds * ONE_SECOND_IN_MS) /
+        ONE_HOUR_IN_MS
+    ) % HOURS_IN_ONE_DAY;
+  days = round(
+    (ms -
+      hours * ONE_HOUR_IN_MS -
+      minutes * ONE_MINUTE_IN_MS -
+      seconds * ONE_SECOND_IN_MS) /
+      ONE_DAY_IN_MS
+  );
 
-  Clock.prototype.pause = function() {
-    this.isPaused = true;
+  return {
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+    milliseconds: milliseconds
   };
-
-  Clock.prototype.play = function() {
-    this.isPaused = false;
-    this.currentTime = Date.now();
-  };
-
-  Clock.prototype.update = function() {
-    if (!this.isPaused) {
-      this.previousTime = this.currentTime;
-      this.currentTime = Date.now();
-      this.totalTime += this.currentTime - this.previousTime;
-    }
-  };
-
-  Clock.prototype.reset = function(timestamp) {
-    this.totalTime = 0;
-    this.currentTime = Date.now();
-    this.previousTime = this.currentTime;
-    this.countdownStart = timestamp || 0.5 * 60 * 1000; // ms;
-  };
-
-  Clock.prototype.getTimerText = function() {
-    var displayTime = new Date();
-    this.isCountDown
-      ? displayTime.setTime(Math.max(0, this.countdownStart - this.totalTime))
-      : displayTime.setTime(this.totalTime);
-    var milliseconds = displayTime.getMilliseconds();
-    var seconds = displayTime.getSeconds();
-    var minutes = displayTime.getMinutes();
-
-    return (
-      minutes.toString().padStart(2, "0") +
-      ":" +
-      seconds.toString().padStart(2, "0") +
-      ":" +
-      milliseconds
-        .toString()
-        .padStart(3, "0")
-        .substring(0, 2)
-    );
-  };
-
-  // update html element instead of drawing to the canvas
-  Clock.prototype.draw = function() {
-    var timerText = this.getTimerText();
-
-    if (this.timerEl.textContent !== timerText) {
-      if (
-        this.isCountDown &&
-        this.countdownStart - this.totalTime < this.DANGER_COUNTDOWN_TIME
-      ) {
-        this.timerEl.classList.add("danger");
-      } else {
-        this.timerEl.classList.contains("danger") &&
-          this.timerEl.classList.remove("danger");
-      }
-      this.timerEl.innerHTML = timerText;
-    }
-  };
-
-  return Clock;
-})();
+};
 
 module.exports = Clock;

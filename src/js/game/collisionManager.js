@@ -60,7 +60,7 @@ CollisionManager.prototype.handleCollisionsWithSkills = function() {
     var skillBox = skill.getBoundingRect();
     if (SDK.physics.collision.RectangleWithRectangle(playerBox, skillBox)) {
       this.level.player.skills.push(skill);
-      this.clock.countdownStart += 5 * 1000; // add 5s to clock
+      this.clock.countdownDuration += 5 * 1000; // add 5s to clock
       this.level.skills.splice(index, 1);
     }
   }, this);

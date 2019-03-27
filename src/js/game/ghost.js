@@ -17,7 +17,7 @@ Ghost.prototype.reset = function() {
 };
 
 Ghost.prototype.update = function() {
-  // var totalTime = this.clock.totalTime;
+  // var totalTime = this.clock.timeEllapsed;
   // var ghostTimes = this.ghostPositions.map(function(position) {
   //   return position.time;
   // });
@@ -52,7 +52,7 @@ Ghost.prototype.update = function() {
 
   // store position for next ghost
   this.ghostPositionsTemp.push({
-    time: this.clock.totalTime,
+    time: this.clock.timeEllapsed,
     x: this.player.x,
     y: this.player.y
   });

@@ -93,86 +93,167 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var Clock = (function() {
-  function Clock(props) {
-    // reference to game object
-    SDK.Rectangle.call(this, props);
-    this.DANGER_COUNTDOWN_TIME = 5000;
-    this.isPaused = false;
-    this.isCountDown = true;
-    this.timerEl = document.getElementById("gameclock");
+var SECONDS_IN_ONE_MINUTE = 60;
+var MINUTES_IN_ONE_HOUR = 60;
+var HOURS_IN_ONE_DAY = 24;
+var ONE_SECOND_IN_MS = 1000;
+var ONE_MINUTE_IN_MS = SECONDS_IN_ONE_MINUTE * ONE_SECOND_IN_MS;
+var ONE_HOUR_IN_MS = MINUTES_IN_ONE_HOUR * ONE_MINUTE_IN_MS;
+var ONE_DAY_IN_MS = HOURS_IN_ONE_DAY * ONE_HOUR_IN_MS;
+
+function Clock() {
+  this.isPaused = false;
+  this.hasMilliseconds = false;
+  this.isCountDown = true;
+}
+
+Object.defineProperties(Clock.prototype, {
+  timeRemaining: {
+    get: function() {
+      return this.countdownDuration - this.timeEllapsed;
+    }
+  }
+});
+
+Clock.prototype.pause = function() {
+  this.isPaused = true;
+};
+
+Clock.prototype.play = function() {
+  this.isPaused = false;
+  this.currentTime = Date.now();
+};
+
+Clock.prototype.update = function() {
+  if (!this.isPaused) {
+    this.previousTime = this.currentTime;
+    this.currentTime = Date.now();
+    this.timeEllapsed += this.currentTime - this.previousTime;
+  }
+};
+
+Clock.prototype.reset = function(initialDuration) {
+  var defaultDuration =
+    0 * ONE_DAY_IN_MS +
+    0 * ONE_HOUR_IN_MS +
+    180 * ONE_MINUTE_IN_MS +
+    2 * ONE_SECOND_IN_MS;
+
+  this.timeEllapsed = 0;
+  this.countdownDuration = initialDuration || defaultDuration; // ms;
+};
+
+Clock.prototype.getValues = function() {
+  var displayTime = this.isCountDown
+    ? new Date(Math.max(0, this.timeRemaining))
+    : new Date(this.timeEllapsed);
+  var ms = displayTime.getTime();
+  var milliseconds, seconds, minutes, hours, days;
+  var round;
+
+  if (this.isCountDown && !this.hasMilliseconds) {
+    round = Math.ceil;
+  } else {
+    round = Math.floor;
   }
 
-  Clock.prototype = Object.create(SDK.Rectangle.prototype);
-  Clock.prototype.constructor = Clock;
+  milliseconds = ms % 1000;
+  seconds = round(ms / ONE_SECOND_IN_MS) % SECONDS_IN_ONE_MINUTE;
+  minutes =
+    round((ms - seconds * ONE_SECOND_IN_MS) / ONE_MINUTE_IN_MS) %
+    MINUTES_IN_ONE_HOUR;
+  hours =
+    round(
+      (ms - minutes * ONE_MINUTE_IN_MS - seconds * ONE_SECOND_IN_MS) /
+        ONE_HOUR_IN_MS
+    ) % HOURS_IN_ONE_DAY;
+  days = round(
+    (ms -
+      hours * ONE_HOUR_IN_MS -
+      minutes * ONE_MINUTE_IN_MS -
+      seconds * ONE_SECOND_IN_MS) /
+      ONE_DAY_IN_MS
+  );
 
-  Clock.prototype.pause = function() {
-    this.isPaused = true;
+  return {
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+    milliseconds: milliseconds
   };
+};
 
-  Clock.prototype.play = function() {
-    this.isPaused = false;
-    this.currentTime = Date.now();
-  };
+module.exports = Clock;
 
-  Clock.prototype.update = function() {
-    if (!this.isPaused) {
-      this.previousTime = this.currentTime;
-      this.currentTime = Date.now();
-      this.totalTime += this.currentTime - this.previousTime;
-    }
-  };
 
-  Clock.prototype.reset = function(timestamp) {
-    this.totalTime = 0;
-    this.currentTime = Date.now();
-    this.previousTime = this.currentTime;
-    this.countdownStart = timestamp || 0.5 * 60 * 1000; // ms;
-  };
+/***/ }),
 
-  Clock.prototype.getTimerText = function() {
-    var displayTime = new Date();
-    this.isCountDown
-      ? displayTime.setTime(Math.max(0, this.countdownStart - this.totalTime))
-      : displayTime.setTime(this.totalTime);
-    var milliseconds = displayTime.getMilliseconds();
-    var seconds = displayTime.getSeconds();
-    var minutes = displayTime.getMinutes();
+/***/ "./js/game/clockDisplay.js":
+/*!*********************************!*\
+  !*** ./js/game/clockDisplay.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
 
-    return (
-      minutes.toString().padStart(2, "0") +
-      ":" +
-      seconds.toString().padStart(2, "0") +
-      ":" +
+function ClockDisplay(props) {
+  SDK.Rectangle.call(this, props);
+  this.DANGER_COUNTDOWN_TIME = 5000;
+  this.game = props.game;
+  this.timerEl = document.getElementById("gameclock");
+}
+
+ClockDisplay.prototype = Object.create(SDK.Rectangle.prototype);
+ClockDisplay.prototype.constructor = ClockDisplay;
+
+ClockDisplay.prototype.getText = function(values) {
+  var days = values.days;
+  var hours = values.hours;
+  var minutes = values.minutes;
+  var seconds = values.seconds;
+  var milliseconds = values.milliseconds;
+  var textArr = [];
+
+  if (values.days > 0) {
+    textArr.push(days.toString());
+  }
+  if (days > 0 || hours > 0) {
+    textArr.push(hours.toString().padStart(2, "0"));
+  }
+  textArr.push(
+    minutes.toString().padStart(2, "0"),
+    seconds.toString().padStart(2, "0")
+  );
+  if (this.game.clock.hasMilliseconds) {
+    textArr.push(
       milliseconds
         .toString()
         .padStart(3, "0")
         .substring(0, 2)
     );
-  };
+  }
 
-  // update html element instead of drawing to the canvas
-  Clock.prototype.draw = function() {
-    var timerText = this.getTimerText();
+  return textArr.join(":");
+};
 
-    if (this.timerEl.textContent !== timerText) {
-      if (
-        this.isCountDown &&
-        this.countdownStart - this.totalTime < this.DANGER_COUNTDOWN_TIME
-      ) {
-        this.timerEl.classList.add("danger");
-      } else {
-        this.timerEl.classList.contains("danger") &&
-          this.timerEl.classList.remove("danger");
-      }
-      this.timerEl.innerHTML = timerText;
+// update html element instead of drawing to the canvas
+ClockDisplay.prototype.draw = function() {
+  var clock = this.game.clock;
+  var values = clock.getValues();
+  var text = this.getText(values);
+
+  if (this.timerEl.textContent !== text) {
+    if (clock.isCountDown && clock.timeRemaining < this.DANGER_COUNTDOWN_TIME) {
+      this.timerEl.classList.add("danger");
+    } else {
+      this.timerEl.classList.contains("danger") &&
+        this.timerEl.classList.remove("danger");
     }
-  };
+    this.timerEl.innerHTML = text;
+  }
+};
 
-  return Clock;
-})();
-
-module.exports = Clock;
+module.exports = ClockDisplay;
 
 
 /***/ }),
@@ -246,7 +327,7 @@ CollisionManager.prototype.handleCollisionsWithSkills = function() {
     var skillBox = skill.getBoundingRect();
     if (SDK.physics.collision.RectangleWithRectangle(playerBox, skillBox)) {
       this.level.player.skills.push(skill);
-      this.clock.countdownStart += 5 * 1000; // add 5s to clock
+      this.clock.countdownDuration += 5 * 1000; // add 5s to clock
       this.level.skills.splice(index, 1);
     }
   }, this);
@@ -463,6 +544,7 @@ var LifeBar = __webpack_require__(/*! ./lifebar */ "./js/game/lifebar.js");
 var SkillBar = __webpack_require__(/*! ./skillBar */ "./js/game/skillBar.js");
 var Ghost = __webpack_require__(/*! ./ghost */ "./js/game/ghost.js");
 var Clock = __webpack_require__(/*! ./clock */ "./js/game/clock.js");
+var ClockDisplay = __webpack_require__(/*! ./clockDisplay */ "./js/game/clockDisplay.js");
 var utils = __webpack_require__(/*! ../utils */ "./js/utils.js");
 window.gameData = __webpack_require__(/*! ./gameData.json */ "./js/game/gameData.json");
 
@@ -518,7 +600,9 @@ var Game = (function() {
     // game timer (game inner logic)
     this.timer = new SDK.GameTimer();
 
-    this.clock = new Clock({
+    this.clock = new Clock();
+    this.clockDisplay = new ClockDisplay({
+      game: this,
       x: canvas.width - 170,
       y: 35,
       width: 80,
@@ -609,13 +693,14 @@ var Game = (function() {
     }
 
     if (keyboard.DOWN || touchInput.JOYPAD_DOWN) {
-      player.GRAVITY_ACCELERATION > 0 ? player.crouch() : player.jump();
-    } else {
-      player.stand();
+      player.GRAVITY_ACCELERATION <= 0 && player.jump();
     }
+    //  else {
+    //   player.stand();
+    // }
 
     if (keyboard.UP || touchInput.JOYPAD_UP) {
-      player.GRAVITY_ACCELERATION > 0 ? player.jump() : player.crouch();
+      player.GRAVITY_ACCELERATION > 0 && player.jump();
     }
 
     if (keyboard.SPACE || touchInput.BUTTON_A) {
@@ -700,7 +785,7 @@ var Game = (function() {
     if (!player.isDead) {
       if (
         !player.within(this.level.worldRect) ||
-        this.clock.countdownStart - this.clock.totalTime <= 0
+        this.clock.timeRemaining <= 0
       ) {
         player.die();
       }
@@ -920,7 +1005,7 @@ var Game = (function() {
   Game.prototype.renderUI = function(ctx, camera) {
     this.uiElements = [
       // this.lifeBar,
-      this.clock,
+      this.clockDisplay,
       this.grid,
       this.skillBar
     ];
@@ -1525,7 +1610,7 @@ Ghost.prototype.reset = function() {
 };
 
 Ghost.prototype.update = function() {
-  // var totalTime = this.clock.totalTime;
+  // var totalTime = this.clock.timeEllapsed;
   // var ghostTimes = this.ghostPositions.map(function(position) {
   //   return position.time;
   // });
@@ -1560,7 +1645,7 @@ Ghost.prototype.update = function() {
 
   // store position for next ghost
   this.ghostPositionsTemp.push({
-    time: this.clock.totalTime,
+    time: this.clock.timeEllapsed,
     x: this.player.x,
     y: this.player.y
   });
@@ -2275,7 +2360,6 @@ var ABS_JUMP_SPEED = 700;
 var MAX_FALL_SPEED = 1000;
 var INITIAL_WIDTH = 30;
 var INITIAL_HEIGHT = 30;
-var CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
 function Player(props) {
   SDK.Rectangle.call(this, {
@@ -2287,16 +2371,11 @@ function Player(props) {
 
   this.v = new SDK.Vector();
   this.acceleration = new SDK.Vector();
-  this.COEFFICIENT_OF_RESTITUTION = 0.4;
   this.solid = true; // can collide with other solid objects
   this.maxHitPoints = 100;
   this.hitPoints = this.maxHitPoints;
   this.skills = []; // the player must harvest these
   this.color = this.getColorFromHP();
-
-  // crouching / standing state and animations
-  this.isCrouching = false;
-  CROUCH_STAND_ANIMATION_DURATION = 0.2;
 
   // collision direction for movement
   this.isColliding = [0, 0]; // [horizontal, vertical]
@@ -2338,14 +2417,6 @@ Player.prototype.moveRight = function() {
   this.v.x = 250;
 };
 
-Player.prototype.crouch = function() {
-  this.isCrouching = true;
-};
-
-Player.prototype.stand = function() {
-  this.isCrouching = false;
-};
-
 Player.prototype.jump = function() {
   if (this.isColliding[1] === Math.sign(this.GRAVITY_ACCELERATION)) {
     // emit particles
@@ -2384,34 +2455,6 @@ Player.prototype.die = function(cb) {
   cb && cb();
 };
 
-Player.prototype.getDeltaWidth = function() {
-  var deltaWidth;
-  var computedDelta =
-    (dt / CROUCH_STAND_ANIMATION_DURATION) * (INITIAL_HEIGHT - INITIAL_WIDTH); // absolute value
-  if (this.isCrouching) {
-    deltaWidth =
-      this.height - computedDelta < INITIAL_WIDTH
-        ? this.height - INITIAL_WIDTH
-        : computedDelta;
-  } else {
-    deltaWidth =
-      this.height + computedDelta > INITIAL_HEIGHT
-        ? this.height - INITIAL_HEIGHT
-        : -computedDelta;
-  }
-  return deltaWidth;
-};
-
-Player.prototype.updatePlayerSize = function(deltaWidth) {
-  this.width = utils.toFixedPrecision(this.width + deltaWidth, 3);
-  this.height = utils.toFixedPrecision(this.height - deltaWidth, 3);
-  this.x = utils.toFixedPrecision(this.x - deltaWidth / 2, 3);
-  this.y =
-    this.GRAVITY_ACCELERATION < 0
-      ? utils.toFixedPrecision(this.y, 3)
-      : utils.toFixedPrecision(this.y + deltaWidth, 3);
-};
-
 Player.prototype.applyGravity = function() {
   // apply gravity if player is free falling
   this.acceleration.y = this.GRAVITY_ACCELERATION;
@@ -2434,8 +2477,6 @@ Player.prototype.update = function() {
 
   var dx = this.v.x * dt,
     dy = this.v.y * dt;
-
-  this.updatePlayerSize(this.getDeltaWidth());
 
   // apply natural position increments if no collision detected
   if (!this.isColliding[1]) {
