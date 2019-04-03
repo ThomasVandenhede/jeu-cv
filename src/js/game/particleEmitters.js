@@ -1,5 +1,5 @@
 var SmokeParticle = require("./smokeParticle");
-var utils = require('../utils');
+var utils = require("../utils");
 
 var sparksParticles = function(gameObj) {
   var start = Date.now();
@@ -9,11 +9,14 @@ var sparksParticles = function(gameObj) {
     particles: {},
     minSpeed: 5,
     maxSpeed: 20,
-    size: 10,
+    maxSize: 20,
+    minSize: 3,
     maxLife: 2000,
     duration: 200,
     addNewParticle: function() {
       this.particleIndex++;
+      var t = (this.duration - (Date.now() - start)) / this.duration;
+      var size = utils.lerp(this.minSize, this.maxSize, t);
       var color = !gameObj.hasWon
         ? gameObj.color
         : "rgb(" +
@@ -28,8 +31,8 @@ var sparksParticles = function(gameObj) {
           // top edge
           particle = new SmokeParticle({
             x: utils.randInt(gameObj.left, gameObj.right),
-            y: gameObj.top - this.size,
-            size: this.size,
+            y: gameObj.top - size,
+            size: size,
             color: color,
             vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
             vy: utils.randInt(-this.maxSpeed, -this.minSpeed),
@@ -43,7 +46,7 @@ var sparksParticles = function(gameObj) {
           particle = new SmokeParticle({
             x: utils.randInt(gameObj.left, gameObj.right),
             y: gameObj.bottom,
-            size: this.size,
+            size: size,
             color: color,
             vx: utils.randInt(-this.maxSpeed, this.maxSpeed),
             vy: utils.randInt(this.minSpeed, this.maxSpeed),
@@ -55,9 +58,9 @@ var sparksParticles = function(gameObj) {
         case 2:
           // left edge
           particle = new SmokeParticle({
-            x: gameObj.left - this.size,
+            x: gameObj.left - size,
             y: utils.randInt(gameObj.top, gameObj.bottom),
-            size: this.size,
+            size: size,
             color: color,
             vx: utils.randInt(-this.maxSpeed, -this.minSpeed),
             vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
@@ -71,7 +74,7 @@ var sparksParticles = function(gameObj) {
           particle = new SmokeParticle({
             x: gameObj.right,
             y: utils.randInt(gameObj.top, gameObj.bottom),
-            size: this.size,
+            size: size,
             color: color,
             vx: utils.randInt(this.minSpeed, this.maxSpeed),
             vy: utils.randInt(-this.maxSpeed, this.maxSpeed),
@@ -183,8 +186,9 @@ var explosionParticles = function(gameObj) {
 var hitParticles = function(x, y, direction, color) {
   var createdAt = Date.now();
   var particleIndex = 0;
-  var maxCount = 10;
-  var size = 4;
+  var maxCount = 30;
+  var minSize = 2;
+  var maxSize = 6;
   var minLife = 300;
   var maxLife = 500;
   var minSpeed = 10;
@@ -195,28 +199,22 @@ var hitParticles = function(x, y, direction, color) {
       .getUnitVector()
       .scale(utils.randInt(minSpeed, maxSpeed))
       .rotateRadians((Math.random() * Math.PI) / 3 - Math.PI / 6);
+    particleIndex++;
     var particle = new SDK.Particle({
+      id: particleIndex,
+      particles: particles,
       x: x,
       y: y,
-      size: size,
+      size: utils.randInt(minSize, maxSize),
       color: color,
       vx: v.x,
       vy: v.y,
-      maxLife: utils.randInt(minLife, maxLife)
+      maxLife: utils.randInt(minLife, maxLife),
+      circle: true
     });
-    particleIndex++;
     particles[particleIndex] = particle;
   }
   return {
-    createdAt: createdAt,
-    particleIndex: particleIndex,
-    maxCount: maxCount,
-    size: size,
-    minLife: minLife,
-    maxLife: maxLife,
-    minSpeed: minSpeed,
-    maxSpeed: maxSpeed,
-    particles: particles,
     update: function() {
       for (var id in particles) {
         var particle = particles[id];
