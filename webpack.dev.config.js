@@ -2,7 +2,7 @@ var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 var path = require("path");
 
 module.exports = {
-  mode: "production",
+  mode: "development",
   context: `${__dirname}/src/`,
   entry: {
     polyfills: "./js/polyfills.js",
