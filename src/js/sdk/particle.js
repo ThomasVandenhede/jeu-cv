@@ -4,6 +4,7 @@ var Particle = (function() {
   function Particle(props) {
     Vector.call(this, props.x, props.y);
 
+    this.circle = props.circle;
     this.size = props.size;
     this.color = props.color;
 
@@ -20,15 +21,30 @@ var Particle = (function() {
     this.y += this.v.y * dt;
   };
 
+  Particle.prototype.destroy = function() {
+    delete this.particles[this.id];
+  };
+
   Particle.prototype.draw = function(ctx, camera) {
     ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.fillRect(
-      camera.applyToX(this.x),
-      camera.applyToY(this.y),
-      camera.applyToDistance(this.size),
-      camera.applyToDistance(this.size)
-    );
+    if (this.circle) {
+      ctx.arc(
+        camera.applyToX(this.x + this.size / 2),
+        camera.applyToY(this.y + this.size / 2),
+        camera.applyToDistance(this.size / 2),
+        0,
+        2 * Math.PI
+      );
+    } else {
+      ctx.rect(
+        camera.applyToX(this.x),
+        camera.applyToY(this.y),
+        camera.applyToDistance(this.size),
+        camera.applyToDistance(this.size)
+      );
+    }
+    ctx.fill();
   };
 
   return Particle;
