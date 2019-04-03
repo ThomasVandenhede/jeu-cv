@@ -13,10 +13,10 @@ var SDK = {
   TouchManager: require("./input/touch/touchManager"),
   Particle: require("./particle"),
   physics: require("./physics"),
-  Sound: require("./sound"),
-  SoundManager: require("./soundManager"),
+  Sound: require("./sound/sound"),
+  SoundManager: require("./sound/soundManager"),
   Tile: require("./tile"),
-  Tilemap: require("./tilemap"),
+  Tilemap: require("./tilemap")
 };
 
 module.exports = SDK;

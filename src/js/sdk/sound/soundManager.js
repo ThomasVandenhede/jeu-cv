@@ -13,6 +13,7 @@ var SoundManager = (function() {
 
     location = soundData.location;
     files = soundData.files;
+
     // load sounds
     files.forEach(function(file) {
       var filename = file.filename;
@@ -25,6 +26,7 @@ var SoundManager = (function() {
 
     location = musicData.location;
     files = musicData.files;
+
     // load musics
     files.forEach(function(file) {
       var filename = file.filename;
