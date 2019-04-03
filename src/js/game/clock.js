@@ -54,7 +54,7 @@ Clock.prototype.getValues = function() {
     : new Date(this.timeEllapsed);
   var ms = displayTime.getTime();
   var milliseconds, seconds, minutes, hours, days;
-  var round;
+  var round, values;
 
   if (this.isCountDown && !this.hasMilliseconds) {
     round = Math.ceil;
@@ -62,7 +62,7 @@ Clock.prototype.getValues = function() {
     round = Math.floor;
   }
 
-  milliseconds = ms % 1000;
+  milliseconds = ms % ONE_SECOND_IN_MS;
   seconds = round(ms / ONE_SECOND_IN_MS) % SECONDS_IN_ONE_MINUTE;
   minutes =
     round((ms - seconds * ONE_SECOND_IN_MS) / ONE_MINUTE_IN_MS) %
@@ -80,13 +80,17 @@ Clock.prototype.getValues = function() {
       ONE_DAY_IN_MS
   );
 
-  return {
+  values = {
     days: days,
     hours: hours,
     minutes: minutes,
-    seconds: seconds,
-    milliseconds: milliseconds
+    seconds: seconds
   };
+  if (this.hasMilliseconds) {
+    values.milliseconds = milliseconds;
+  }
+
+  return values;
 };
 
 module.exports = Clock;
