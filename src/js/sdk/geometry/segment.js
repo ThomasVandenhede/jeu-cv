@@ -1,11 +1,10 @@
-var Rectangle = require("./Rectangle");
+var Rectangle = require("./rectangle");
 var Vector = require("./vector");
 
 var Segment = (function() {
-  function Segment(A, B, color) {
+  function Segment(A, B) {
     this.A = A;
     this.B = B;
-    this.color = color;
   }
 
   Segment.prototype.getBoundingRect = function() {
@@ -76,27 +75,6 @@ var Segment = (function() {
       return H;
     }
     return false;
-  };
-
-  // Segment.prototype.intersectSegment = function(O, P) {
-  //   var AB = Vector.subtract(this.B, this.A);
-  //   var OP = Vector.subtract(P, O);
-  //   if (!CollisionDroiteSeg(A, B, O, P)) {
-  //     return false;
-  //   }
-  //   var k =
-  //     -(this.A.x * OP.y - O.x * OP.y - OP.x * this.A.y + OP.x * O.y) /
-  //     (AB.x * OP.y - AB.y * OP.x);
-  //   return !(k < 0 || k > 1);
-  // };
-
-  Segment.prototype.draw = function(ctx) {
-    ctx.save();
-    ctx.strokeStyle = this.color;
-    ctx.moveTo(this.A.x, this.A.y);
-    ctx.lineTo(this.B.x, this.B.y);
-    ctx.stroke();
-    ctx.restore();
   };
 
   return Segment;

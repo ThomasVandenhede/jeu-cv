@@ -1,4 +1,4 @@
-var Vector = require("./vector");
+var Vector = require("./geometry/vector");
 
 var Grid = (function() {
   function Grid(props) {

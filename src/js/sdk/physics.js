@@ -1,5 +1,5 @@
-var Segment = require("./segment");
-var Vector = require("./vector");
+var Segment = require("./geometry/segment");
+var Vector = require("./geometry/vector");
 var utils = require("../utils");
 
 var physics = {
