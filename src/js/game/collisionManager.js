@@ -115,8 +115,9 @@ CollisionManager.prototype.handleCollisionsWithPlatforms = function() {
     boxV = null;
 
   // apply gravity acceleration and reset collisions
-  player.applyGravity();
   player.isColliding = [0, 0];
+
+  // determine all collisions between player and platforms
   collisions = this.getCollisions(collidableWith);
 
   /**
@@ -142,14 +143,14 @@ CollisionManager.prototype.handleCollisionsWithPlatforms = function() {
 
     // set player collisions [0, 1] + [-1, 0] -> [-1, 1]
     if (box.solid) {
-      player.isColliding[0] = side[0] ? side[0] : player.isColliding[0];
+      player.isColliding[0] = side[0] || player.isColliding[0];
       if (box.passthrough) {
         player.isColliding[1] =
           side[1] * player.GRAVITY_ACCELERATION > 0
             ? side[1]
             : player.isColliding[1];
       } else {
-        player.isColliding[1] = side[1] ? side[1] : player.isColliding[1];
+        player.isColliding[1] = side[1] || player.isColliding[1];
       }
     }
 
@@ -189,6 +190,22 @@ CollisionManager.prototype.handleCollisionsWithPlatforms = function() {
   }
   if (boxV) {
     boxV.touched = true;
+  }
+
+  // limit player's vertical speed when touching the ground
+  if (player.isColliding[1] * player.GRAVITY_ACCELERATION > 0) {
+    player.v.y = player.collidingWith[1].v.y;
+  }
+
+  // limit player's horizontal speed when touching a wall
+  if (player.isColliding[0]) {
+    player.v.x = player.collidingWith[0].v.x;
+  } else {
+    // player's base horizontal speed when touching the ground
+    player.v.x =
+      player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
+        ? player.collidingWith[1].v.x
+        : 0;
   }
 };
 

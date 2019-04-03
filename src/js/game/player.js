@@ -15,6 +15,7 @@ function Player(props) {
     height: INITIAL_HEIGHT
   });
 
+  this.ABS_HORIZONTAL_MAX_SPEED = 250;
   this.v = new SDK.Vector();
   this.acceleration = new SDK.Vector();
   this.solid = true; // can collide with other solid objects
@@ -56,11 +57,11 @@ Player.prototype = Object.create(SDK.Rectangle.prototype);
 Player.prototype.constructor = Player;
 
 Player.prototype.moveLeft = function() {
-  this.v.x = -250;
+  this.v.x -= this.ABS_HORIZONTAL_MAX_SPEED;
 };
 
 Player.prototype.moveRight = function() {
-  this.v.x = 250;
+  this.v.x += this.ABS_HORIZONTAL_MAX_SPEED;
 };
 
 Player.prototype.jump = function() {

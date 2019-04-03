@@ -129,65 +129,57 @@ var Game = (function() {
       return;
     }
 
-    player.v.y =
-      player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
-        ? player.collidingWith[1].v.y
-        : player.v.y;
+    // increase player's horizontal speed based on user input
+    if (keyboard.keys.ArrowRight.isPressed || touchInput.JOYPAD_RIGHT) {
+      player.moveRight();
+    }
+    if (keyboard.keys.ArrowLeft.isPressed || touchInput.JOYPAD_LEFT) {
+      player.moveLeft();
+    }
 
-    // player controls
+    // jump
     if (
-      keyboard.RIGHT ||
-      keyboard.LEFT ||
-      touchInput.JOYPAD_RIGHT ||
-      touchInput.JOYPAD_LEFT
+      (keyboard.keys.ArrowDown.isPressed || touchInput.JOYPAD_DOWN) &&
+      player.GRAVITY_ACCELERATION < 0
     ) {
-      (keyboard.LEFT || touchInput.JOYPAD_LEFT) && player.moveLeft();
-      (keyboard.RIGHT || touchInput.JOYPAD_RIGHT) && player.moveRight();
-    } else {
-      player.v.x =
-        player.isColliding[1] * player.GRAVITY_ACCELERATION > 0
-          ? player.collidingWith[1].v.x
-          : 0;
-      player.v.x = player.isColliding[0]
-        ? player.collidingWith[0].v.x
-        : player.v.x;
-    }
-
-    if (keyboard.DOWN || touchInput.JOYPAD_DOWN) {
-      player.GRAVITY_ACCELERATION <= 0 && player.jump();
-    }
-    //  else {
-    //   player.stand();
-    // }
-
-    if (keyboard.UP || touchInput.JOYPAD_UP) {
-      player.GRAVITY_ACCELERATION > 0 && player.jump();
-    }
-
-    if (keyboard.SPACE || touchInput.BUTTON_A) {
       player.jump();
     }
 
-    if (keyboard.ENTER || touchInput.BUTTON_B) {
+    if (
+      (keyboard.keys.ArrowUp.isPressed || touchInput.JOYPAD_UP) &&
+      player.GRAVITY_ACCELERATION > 0
+    ) {
+      player.jump();
+    }
+
+    if (keyboard.keys.Space.isPressed || touchInput.BUTTON_A) {
+      player.jump();
+    }
+
+    // shield
+    if (keyboard.keys.Enter.isPressed || touchInput.BUTTON_B) {
       if (!player.shield.isAnimating) {
         player.shield.isOpen ? player.shield.close() : player.shield.open();
       }
     }
 
     // camera controls
-    if (keyboard.EQUAL) {
+    if (keyboard.keys.Equal.isPressed) {
       this.camera.zoomIn();
     }
 
-    if (keyboard.MINUS) {
+    if (keyboard.keys.Minus.isPressed) {
       this.camera.zoomOut();
     }
   };
 
   Game.prototype.update = function() {
     if (this.state === Game.states.RUNNING) {
-      this.handleKeyboard();
+      // Order matters!
+      // First detect collisions and resolve player's position and speed.
+      // Then, handle keyboard and increase player's speed.
       this.runPhysics();
+      this.handleKeyboard();
     }
 
     if (this.state === Game.states.PAUSED) {
@@ -390,12 +382,18 @@ var Game = (function() {
       skills: this.level.skills
     });
 
-    this.pauseLoop();
-  };
+    // create keyboard event bindings
+    this.keyboard.keys.Pause.onDown = function() {
+      if (!this.keyboard.keys.Pause.repeat) {
+        this.state === "running" ? this.pause() : this.unpause();
+      }
+    };
 
-  Game.prototype.step = function() {
-    this.timer.update();
-    dt = this.timer.dt;
+    this.keyboard.keys.KeyG.onDown = function() {
+      if (!this.keyboard.keys.KeyG.repeat) {
+        this.level.player.reverseGravity();
+      }
+    };
 
     this.update();
     this.render(this.ctx, this.camera);
