@@ -27,15 +27,20 @@ body {
   margin: auto;
 }
 
-.game-container {
+.game-container,
+.ui-container,
+.debug-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #303030;
   overflow: hidden;
   user-select: none; /* disable text highlighting */
+}
+
+.game-container {
+  background-color: #303030;
 }
 
 .gamecontrols__container {

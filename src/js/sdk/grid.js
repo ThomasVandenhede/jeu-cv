@@ -189,13 +189,13 @@ var Grid = (function() {
     this.precisionAreaSize = this.innerGridSize;
     this.precisionGridSize = this.precisionAreaSize / 10;
 
-    this.options.shouldDisplayRulers && this._drawRulers(ctx, camera);
+    this.options.displayRulers && this._drawRulers(ctx, camera);
     !this.options.isGame && this._drawInnerGrid(ctx, camera);
     // this._drawPrecisionArea(ctx, camera);
     !this.options.isGame && this._drawCursor(ctx, camera);
     !this.options.isGame && this._displayCoordinates(ctx, camera);
     !this.options.isGame &&
-      this.options.shouldDisplayRulers &&
+      this.options.displayRulers &&
       this._drawRulers(ctx, camera);
   };
 

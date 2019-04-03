@@ -15,11 +15,13 @@ var Game = (function() {
 
     // config
     if (config) {
-      this.shouldDisplayDebug = config.shouldDisplayDebug || false;
-      this.shouldDisplayRulers =
-        config.shouldDisplayRulers !== undefined
-          ? config.shouldDisplayRulers
-          : true;
+      if (config.displayDebug) {
+        this.debugIntervalID = setInterval(function() {
+          game.updateDebugInfo();
+        }, 50);
+      }
+      this.displayRulers =
+        config.displayRulers !== undefined ? config.displayRulers : true;
     }
 
     // game menu
@@ -36,7 +38,7 @@ var Game = (function() {
     this.grid = new SDK.Grid({
       options: {
         isGame: true,
-        shouldDisplayRulers: this.shouldDisplayRulers
+        displayRulers: this.displayRulers
       },
       canvas: this.canvas,
       camera: this.camera,
@@ -464,71 +466,76 @@ var Game = (function() {
 
   // debug display
   Game.prototype.updateDebugInfo = function() {
-    var uiContainerEl = document.getElementById("ui-container");
-    var debugEl = utils.h(
-      "div",
-      { class: "debug" },
-      utils.h("h2", null, "debug info"),
-      utils.h(
-        "section",
-        { class: "player" },
+    var debugContainerEl = document.getElementById("debug-container");
+    utils.emptyElement(debugContainerEl);
+    if (this.level) {
+      var debugEl = utils.h(
+        "div",
+        { class: "debug" },
+        utils.h("h2", null, "debug info"),
         utils.h(
-          "p",
-          null,
-          utils.h("strong", null, "x: "),
-          this.level.player.x,
-          utils.h("br"),
-          utils.h("strong", null, " y: "),
-          this.level.player.y
+          "section",
+          { class: "player" },
+          utils.h(
+            "p",
+            null,
+            utils.h("strong", null, "x: "),
+            this.level.player.x,
+            utils.h("br"),
+            utils.h("strong", null, " y: "),
+            this.level.player.y
+          ),
+          utils.h(
+            "p",
+            null,
+            utils.h("strong", null, "width: "),
+            this.level.player.width,
+            utils.h("br"),
+            utils.h("strong", null, " height: "),
+            this.level.player.height
+          ),
+          utils.h(
+            "p",
+            null,
+            utils.h("strong", null, "crouching: "),
+            this.level.player.isCrouching
+          ),
+          utils.h(
+            "p",
+            null,
+            utils.h("strong", null, "speedX: "),
+            this.level.player.v.x,
+            utils.h("br"),
+            utils.h("strong", null, " speedY: "),
+            this.level.player.v.y
+          ),
+          utils.h(
+            "p",
+            null,
+            utils.h("strong", null, "accelX: "),
+            this.level.player.acceleration.x,
+            utils.h("strong", null, " accelY: "),
+            this.level.player.acceleration.y
+          ),
+          utils.h(
+            "p",
+            null,
+            utils.h("strong", null, "colliding: "),
+            this.level.player.isColliding
+          )
         ),
         utils.h(
-          "p",
-          null,
-          utils.h("strong", null, "width: "),
-          this.level.player.width,
-          utils.h("br"),
-          utils.h("strong", null, " height: "),
-          this.level.player.height
-        ),
-        utils.h(
-          "p",
-          null,
-          utils.h("strong", null, "crouching: "),
-          this.level.player.isCrouching
-        ),
-        utils.h(
-          "p",
-          null,
-          utils.h("strong", null, "speedX: "),
-          this.level.player.v.x,
-          utils.h("br"),
-          utils.h("strong", null, " speedY: "),
-          this.level.player.v.y
-        ),
-        utils.h(
-          "p",
-          null,
-          utils.h("strong", null, "accelX: "),
-          this.level.player.acceleration.x,
-          utils.h("strong", null, " accelY: "),
-          this.level.player.acceleration.y
-        ),
-        utils.h(
-          "p",
-          null,
-          utils.h("strong", null, "colliding: "),
-          this.level.player.isColliding
+          "section",
+          { class: "camera" },
+          utils.h("p", null, [
+            utils.h("strong", null, "camX: "),
+            this.camera.x
+          ]),
+          utils.h("p", null, [utils.h("strong", null, "camY: "), this.camera.y])
         )
-      ),
-      utils.h(
-        "section",
-        { class: "camera" },
-        utils.h("p", null, [utils.h("strong", null, "camX: "), this.camera.x]),
-        utils.h("p", null, [utils.h("strong", null, "camY: "), this.camera.y])
-      )
-    );
-
-    uiContainerEl.appendChild(utils.render(debugEl));
+      );
+      debugContainerEl.appendChild(utils.render(debugEl));
+    }
   };
 
   return Game;

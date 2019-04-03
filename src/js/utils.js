@@ -29,38 +29,36 @@ module.exports = {
     };
   })(),
 
-  h: function(type, props, children) {
-    var el = document.createElement(type);
-    var nodes, node;
-    for (var key in props) {
-      el.setAttribute(key, props[key]);
-    }
-    if (Array.isArray(children)) {
-      nodes = children;
-    } else {
-      nodes = [children];
-    }
-    for (var i = 0; i < nodes.length; i++) {
-      if (typeof nodes[i] === "string") {
-        node = document.createTextNode(nodes[i]);
-      } else {
-        node = nodes[i];
-      }
-      el.appendChild(node);
-    }
-    return el;
-  },
+  // h: function(type, props, children) {
+  //   var el = document.createElement(type);
+  //   var nodes, node;
+  //   for (var key in props) {
+  //     el.setAttribute(key, props[key]);
+  //   }
+  //   if (Array.isArray(children)) {
+  //     nodes = children;
+  //   } else {
+  //     nodes = [children];
+  //   }
+  //   for (var i = 0; i < nodes.length; i++) {
+  //     if (typeof nodes[i] === "string") {
+  //       node = document.createTextNode(nodes[i]);
+  //     } else {
+  //       node = nodes[i];
+  //     }
+  //     el.appendChild(node);
+  //   }
+  //   return el;
+  // },
 
-  /**
-   * Build DOM from virtual DOM tree.
-   * @param {Object} dom
-   */
   render: function(vdom) {
-    return (function renderNode(vdom) {
-      if (vdom.split) return document.createTextNode(vdom);
+    return (function renderNode(vnode) {
+      // vnode is a string
+      if (typeof vnode === "string" || typeof vnode === "number")
+        return document.createTextNode(vnode);
 
-      const element = document.createElement(vdom.type);
-      const props = vdom.props || {};
+      const element = document.createElement(vnode.type);
+      const props = vnode.props || {};
 
       Object.keys(props).forEach(function(key) {
         // treat events separately
@@ -75,8 +73,9 @@ module.exports = {
         }
       });
 
-      (vdom.children || []).forEach(function(vNode) {
-        return element.appendChild(renderNode(vNode));
+      (vnode.children || []).forEach(function(childNode) {
+        if (childNode === undefined) return;
+        return element.appendChild(renderNode(childNode));
       });
       return element;
     })(vdom);
@@ -90,7 +89,6 @@ module.exports = {
 
     vNode.type = type;
     vNode.props = props;
-
     if (children.length) {
       vNode.children = children.reduce((acc, item) => {
         return Array.isArray(item) ? [...acc, ...item] : [...acc, item];

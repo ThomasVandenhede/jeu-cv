@@ -13,9 +13,9 @@ var LevelEditor = (function() {
   }
 
   LevelEditor.prototype.init = function(config) {
-    this.shouldDisplayRulers =
-      config.shouldDisplayRulers !== undefined
-        ? config.shouldDisplayRulers
+    this.displayRulers =
+      config.displayRulers !== undefined
+        ? config.displayRulers
         : true;
     this.canvas = document.getElementById("canvas");
     this.ctx = canvas.getContext("2d");
@@ -31,7 +31,7 @@ var LevelEditor = (function() {
     });
     this.grid = new SDK.Grid({
       options: {
-        shouldDisplayRulers: config.shouldDisplayRulers,
+        displayRulers: config.displayRulers,
         isGame: false
       },
       camera: this.camera,
@@ -152,7 +152,7 @@ var LevelEditor = (function() {
 
   LevelEditor.prototype.drawGrid = function(ctx) {
     this.grid.draw(ctx, this.camera, {
-      shouldDisplayRulers: this.shouldDisplayRulers
+      displayRulers: this.displayRulers
     });
   };
 

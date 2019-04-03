@@ -36,8 +36,8 @@ window.addEventListener("DOMContentLoaded", function() {
     utils.show(gameContainer);
     utils.show(gameIntroEl);
     window.game = new Game({
-      shouldDisplayDebug: true,
-      shouldDisplayRulers: true
+      displayRulers: true,
+      displayDebug: false
     });
 
     game.start();
@@ -51,7 +51,6 @@ window.addEventListener("DOMContentLoaded", function() {
   resize();
 
   // update debug info
-  var debugEl = document.querySelector(".debug");
   if (window.hasOwnProperty("game")) {
     setInterval(function() {
       game.updateDebugInfo();
