@@ -1,4 +1,5 @@
 var SDK = {
+  Game: require("./Game"),
   Rectangle: require("./geometry/rectangle"),
   Circle: require("./geometry/circle"),
   Vector: require("./geometry/vector"),

@@ -11,6 +11,8 @@ window.gameData = require("./gameData.json");
 
 var Game = (function() {
   function Game(config) {
+    SDK.Game.call(this, config);
+
     // config
     if (config) {
       this.shouldDisplayDebug = config.shouldDisplayDebug || false;
@@ -20,29 +22,15 @@ var Game = (function() {
           : true;
     }
 
-    // initalize canvas(es) and html elements
-    this.canvas = document.getElementById("canvas");
-    this.ctx = this.canvas.getContext("2d");
-
     // game menu
     this.gameMenu = new GameMenu({ game: this });
 
     // initial game state
     this.state = Game.states.PAUSED;
 
-    // initialize keyboard & sound
-    this.keyboard = new SDK.KeyboardManager(this);
-    this.touchInput = new SDK.TouchManager(this);
-    this.soundManager = new SDK.SoundManager(gameData);
-
     // initialize level manager
     this.levelManager = new LevelManager({ data: gameData, app: this });
     this.currentLevelName = "level 1";
-
-    // camera
-    this.camera = new SDK.Camera({
-      canvas: this.canvas
-    });
 
     // grid
     this.grid = new SDK.Grid({
@@ -58,9 +46,7 @@ var Game = (function() {
     // ghost
     this.ghost = new Ghost();
 
-    // game timer (game inner logic)
-    this.timer = new SDK.GameTimer();
-
+    // clock / timer
     this.clock = new Clock();
     this.clockDisplay = new ClockDisplay({
       game: this,
@@ -70,6 +56,9 @@ var Game = (function() {
       height: 30
     });
   }
+
+  Game.prototype = Object.create(SDK.Game.prototype);
+  Game.prototype.constructor = Game;
 
   Game.states = {
     PAUSED: "paused",
@@ -395,13 +384,11 @@ var Game = (function() {
       }
     };
 
-    this.update();
-    this.render(this.ctx, this.camera);
-
-    this.frame = requestAnimationFrame(this.step.bind(this));
+    this.pauseLoop();
   };
 
   Game.prototype.runPhysics = function() {
+    this.level.player.applyGravity();
     this.collisionManager.handleCollisions();
   };
 
