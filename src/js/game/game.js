@@ -13,6 +13,23 @@ var Game = (function() {
   function Game(config) {
     SDK.Game.call(this, config);
 
+    // events
+    window.addEventListener("blur", function(e) {
+      if (window.hasOwnProperty("game")) {
+        game.pause();
+      }
+    });
+
+    // show game
+    this.introContainer = document.getElementById("game-intro");
+    this.gameContainer = document.getElementById("game-container");
+    utils.hide(this.introContainer);
+    utils.show(this.gameContainer);
+
+    // go fullscreen
+    document.documentElement.requestFullscreen &&
+      document.documentElement.requestFullscreen();
+
     // config
     if (config) {
       if (config.displayDebug) {
@@ -260,6 +277,7 @@ var Game = (function() {
     this.pauseLoop();
     this.gameMenu.close();
     utils.hide(this.gameMenu.gameContainerEl);
+    utils.show(this.introContainer);
     this.state = Game.states.EXIT;
     this.keyboard.unbindEventHandlers();
     this.touchInput.unbindEventHandlers();
