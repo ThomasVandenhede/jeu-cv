@@ -6,7 +6,7 @@ var VirtualJoypad = (function() {
     // minimum distance travelled by joypad to trigger action
     this.THRESHOLD_X = 10;
     this.THRESHOLD_Y = 10;
-    this.SPRING_BACK_TO_RESTING_POSITION = false;
+    this.SPRING_BACK_TO_RESTING_POSITION = true;
 
     // var joypadOuterStyle = {
     //   touchAction: "none",
