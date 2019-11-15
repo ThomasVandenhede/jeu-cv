@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/ThomasVandenhede/jeu-cv#readme",
   "devDependencies": {
-    "uglifyjs-webpack-plugin": "^2.1.2",
+    "terser-webpack-plugin": "^2.2.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0"
   }

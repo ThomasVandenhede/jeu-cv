@@ -57,8 +57,8 @@ module.exports = {
       if (typeof vnode === "string" || typeof vnode === "number")
         return document.createTextNode(vnode);
 
-      const element = document.createElement(vnode.type);
-      const props = vnode.props || {};
+      var element = document.createElement(vnode.type);
+      var props = vnode.props || {};
 
       Object.keys(props).forEach(function(key) {
         // treat events separately
@@ -90,8 +90,8 @@ module.exports = {
     vNode.type = type;
     vNode.props = props;
     if (children.length) {
-      vNode.children = children.reduce((acc, item) => {
-        return Array.isArray(item) ? [...acc, ...item] : [...acc, item];
+      vNode.children = children.reduce(function(acc, item) {
+        return Array.isArray(item) ? acc.concat(item) : acc.concat(item);
       }, []);
     } else {
       vNode.children = null;
@@ -100,7 +100,7 @@ module.exports = {
     return vNode;
   },
 
-  emptyElement(el) {
+  emptyElement: function(el) {
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }

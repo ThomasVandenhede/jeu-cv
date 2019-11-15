@@ -1,4 +1,4 @@
-var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+var TerserPlugin = require("terser-webpack-plugin");
 var path = require("path");
 
 module.exports = {
@@ -19,21 +19,22 @@ module.exports = {
     filename: "[name].js"
   },
   optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        include: /\.min\.js$/,
-        parallel: true,
-        // generate source maps for minified code
-        sourceMap: true,
-        uglifyOptions: {
-          compress: true,
-          ie8: false,
-          ecma: 5,
-          output: { comments: false },
-          warnings: false
-        }
-      })
-    ]
+    minimize: true,
+    minimizer: [new TerserPlugin()]
+    // minimizer: [
+    //   new UglifyJsPlugin({
+    //     include: /\.min\.js$/,
+    //     parallel: true,
+    //     // generate source maps for minified code
+    //     sourceMap: true,
+    //     uglifyOptions: {
+    //       compress: true,
+    //       ie8: false,
+    //       output: { comments: false },
+    //       warnings: false
+    //     }
+    //   })
+    // ]
   },
   devtool: "source-map"
 };

@@ -1,8 +1,7 @@
 var modes = {
   SPRING_IN: 0,
   SPRING_OUT: 1,
-  STATIC: 2,
-  DEFAULT: this.SPRING_IN
+  STATIC: 2
 };
 
 var TouchManager = (function() {
@@ -15,7 +14,7 @@ var TouchManager = (function() {
     this.JOYPAD_THRESHOLD_Y = 10;
 
     // joypad
-    this.joypadMode = modes.DEFAULT;
+    this.joypadMode = modes.SPRING_IN;
     this.joypadOuter = document.getElementById("joypad-outer");
     this.joypad = document.getElementById("joypad");
 
@@ -175,6 +174,7 @@ var TouchManager = (function() {
   ) {
     event.preventDefault();
     var joypadOuterRect = this.joypadOuter.getBoundingClientRect();
+    console.log("TCL: TouchManager -> this.joypadMode", this.joypadMode);
 
     if (this.joypadMode === modes.SPRING_IN) {
       this.joypad.style.transition = "all 0.07s ease-in-out";
